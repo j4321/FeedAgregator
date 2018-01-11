@@ -20,6 +20,7 @@ First, install the missing dependencies among:
  - Tkhtml3 http://tkhtml.tcl.tk/
  - libnotify and a notification server if your desktop environment does not provide one.
    (see https://wiki.archlinux.org/index.php/Desktop_notifications for more details)
+ - Beautifulsoup 4 https://pypi.python.org/pypi/beautifulsoup4/
 
 You also need to have at least one of the following GUI toolkits for the system tray icon:
  - Tktray https://code.google.com/archive/p/tktray/downloads
@@ -31,11 +32,12 @@ If you are using a Tcl/Tk version < 8.6, you will also need PIL.
 
 For instance, in Ubuntu/Debian you will need to install the following packages:
 python3-tk, tk-tktray, libnotify and the notification server of your choice,
-tk-html3, (python3-pil and python3-pil.imagek if tk < 8.6)
+tk-html3, python3-bs4, (python3-pil and python3-pil.imagek if tk < 8.6)
 
 In Archlinux, you will need to install the following packages:
 tk, tktray (`AUR <https://aur.archlinux.org/packages/tktray>`__), 
 libnotify and the notification server of your choice,
+python-beautifulsoup4,
 tkhtml3-git (`AUR <https://aur.archlinux.org/packages/tkhtml3-git>`__)
 
 Then install the application:

@@ -50,7 +50,7 @@ If an update is found, a notification is sent. In addition, a desktop
 widget show the latest entry of all feeds and for each feed, a widget
 shows all entries.
 """,
-      requires = ["tkinter", "sys", "os", "re",  "locale", "gettext",
+      requires = ["tkinter", "sys", "os", "re",  "locale", "gettext", "beautifulsoup4",
                   'configparser', "feedparser", 'multiprocessing', 'subprocess']
 )
 
