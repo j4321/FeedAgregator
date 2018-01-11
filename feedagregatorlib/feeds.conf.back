@@ -1,0 +1,76 @@
+[Release notes from pynput]
+url = https://github.com/moses-palmer/pynput/releases.atom
+updated = 2017-12-08 19:14
+visible = True
+latest = <b>v1.3.8.1</b>
+	<p>Release 1.3.8.1</p>
+geometry = 281x243+66+91
+position = normal
+
+[Recent Commits to easywebdav:master]
+url = https://github.com/amnong/easywebdav/commits/master.atom
+visible = True
+updated = 2014-05-30 21:34
+latest = <b>Bumped version to 1.2.0</b>
+	<pre style="white-space: pre-wrap; width: 81ex;">Bumped version to 1.2.0</pre>
+geometry = 1x1+0+0
+position = normal
+
+[artefetcher Code changes]
+url = https://sourceforge.net/p/artefetcher/code/feed
+visible = True
+updated = 2015-10-31 16:59
+latest = <b>Fix Bug#5 ArteFetcher UI is broken</b>
+	<div class="markdown_content"><p>Fix Bug#5 ArteFetcher UI is broken Everything should be fixed now<br /><a href="https://sourceforge.net/p/artefetcher/code/ci/7a7a7d8082e7275d456b782c2be6025b79d69637/">View Changes</a></p></div>
+geometry = 464x300+511+481
+position = normal
+
+[Release notes from spyder]
+url = https://github.com/spyder-ide/spyder/releases.atom
+visible = True
+updated = 2018-01-09 02:45
+latest = <b>Spyder 3.2.6</b>
+	<p><strong>Important Notes</strong>:</p>
+	<ol>
+	<li>If you are new to Python or the Scientific Python ecosystem, we <em>strongly</em> recommend you to install and use <a href="https://www.anaconda.com/download/" rel="nofollow">Anaconda</a>. It comes with Spyder and all its dependencies, along with the most important Python scientific libraries (i.e. Numpy, Pandas, Matplotlib, IPython, etc) in a single, easy to use environment.</li>
+	<li>We also support <code>pip</code>, but please be aware that <code>pip</code> installations are for advanced users with good knowledge of all Spyder dependencies. Because of that, all installation problems you encounter are expected to be solved by you, so please <em>don't</em> ask us for help.</li>
+	</ol>
+	<hr />
+	<ul>
+	<li>
+	<p>You can easily install this version if you use Anaconda by running:</p>
+	<pre><code>conda update qt pyqt
+	conda update spyder
+	</code></pre>
+	<p><em>Note</em>: This usually takes a couple of days to work until conda packages are created and uploaded by Continuum. Please be patient.</p>
+	</li>
+	<li>
+	<p>Or you can use pip with this command:</p>
+	<pre><code>pip install -U spyder
+	</code></pre>
+	<p><em>Note</em>: <strong>Do not</strong> use this command if you are using Anaconda because it could break your installation.</p>
+	</li>
+	</ul>
+	<hr />
+	<p>For the list of new features, closed issues and merged pull requests in this release, please see our <a href="https://github.com/spyder-ide/spyder/blob/master/CHANGELOG.md#version-326-2018-01-09">Changelog</a>.</p>
+geometry = 411x290+980+478
+position = normal
+
+[Release notes from ttkwidgets]
+url = https://github.com/RedFantom/ttkwidgets/releases.atom
+visible = True
+updated = 2017-11-23 11:36
+latest = <b>0.8.0</b>
+	<p>Bump version number to 0.8.0</p>
+geometry = 283x220+900+197
+position = normal
+
+[Release notes from apscheduler]
+url = https://github.com/agronholm/apscheduler/releases.atom
+visible = True
+updated = 2017-12-23 11:20
+latest = <b>v3.5.0</b>
+	<p>Bumped up the fallback version</p>
+geometry = 264x362+156+366
+position = normal
+

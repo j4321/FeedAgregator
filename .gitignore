@@ -1,0 +1,8 @@
+*.pyc
+dist/
+config/
+__pycache__/
+build/
+*.egg-info
+*.ini
+*.conf

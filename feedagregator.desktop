@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0.0
+Encoding=UTF-8
+Comment="RSS and Atom feed agregator in desktop widgets + notifications"
+Name=FeedAgregator
+Exec=feedagregator
+Terminal=false
+Type=Application
+Categories=Internet
+StartupNotify=false
+Icon=feedagregator
