@@ -3,8 +3,8 @@
 """
 FeedAgregator - RSS and Atom feed agregator in desktop widgets + notifications
 Copyright 2018 Juliette Monsel <j_4321@protonmail.com>
-based on code by Fredrik Lundh copyright 1998
-<http://effbot.org/zone/tkinter-autoscrollbar.htm>
+based on code by RedFantom Copyright (C) 2017
+<https://github.com/RedFantom/ttkwidgets/blob/master/ttkwidgets/frames/toggledframe.py>
 
 FeedAgregator is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -69,6 +69,8 @@ class ToggledFrame(Frame):
         self.label = Label(self, text=text, font=font,
                            style=self.style_name.replace('TFrame', 'TLabel'))
         self.interior = Frame(self, style=self.style_name)
+        self.interior.grid(row=1, column=1, sticky="nswe", padx=(4, 0))
+        self.interior.grid_remove()
         self.label.bind('<Configure>', self._wrap)
         self._grid_widgets()
         self.bind('<<ThemeChanged>>', self._theme_changed)
@@ -87,8 +89,18 @@ class ToggledFrame(Frame):
 
     def toggle(self):
         if 'selected' not in self.__checkbutton.state():
-            self.interior.grid_forget()
-            self.event_generate("<<ToggledFrameWrap>>")
+            self.interior.grid_remove()
+            self.event_generate("<<ToggledFrameClose>>")
         else:
-            self.interior.grid(row=1, column=1, sticky="nswe", padx=(4, 0))
-            self.event_generate("<<ToggledFrameUnwrap>>")
+            self.interior.grid()
+            self.event_generate("<<ToggledFrameOpen>>")
+
+    def open(self):
+        self.__checkbutton.state(('selected',))
+        self.interior.grid()
+        self.event_generate("<<ToggledFrameOpen>>")
+
+    def close(self):
+        self.__checkbutton.state(('!selected',))
+        self.interior.grid_remove()
+        self.event_generate("<<ToggledFrameClose>>")

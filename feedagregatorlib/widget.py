@@ -71,6 +71,8 @@ class Widget(Toplevel):
         self.menu.add_cascade(label=_('Sort'), menu=menu_sort)
         self.menu.add_cascade(label=_('Position'), menu=menu_pos)
         self.menu.add_command(label=_('Hide'), command=self.withdraw)
+        self.menu.add_command(label=_('Open all'), command=self.open_all)
+        self.menu.add_command(label=_('Close all'), command=self.close_all)
 
         # --- elements
         label = Label(self, text=_('Feeds: Latests'), style='widget.title.TLabel',
@@ -115,6 +117,18 @@ class Widget(Toplevel):
         self.update_idletasks()
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
 
+    def open_all(self):
+        for tf, l in self.feeds.values():
+            tf.open()
+        self.update_idletasks()
+        self.canvas.configure(scrollregion=self.canvas.bbox('all'))
+
+    def close_all(self):
+        for tf, l in self.feeds.values():
+            tf.close()
+        self.update_idletasks()
+        self.canvas.configure(scrollregion=self.canvas.bbox('all'))
+
     def init_feed_display(self):
         for tf, l in self.feeds.values():
             tf.destroy()
@@ -137,7 +151,7 @@ class Widget(Toplevel):
             except TclError:
                 pass
             else:
-                l.configure(height=h)
+                l.configure(height=h + 2)
 
         def resize(event):
             if l.winfo_viewable():
@@ -146,7 +160,7 @@ class Widget(Toplevel):
                 except TclError:
                     pass
                 else:
-                    l.configure(height=h)
+                    l.configure(height=h + 2)
 
         formatted_date = format_datetime(datetime.strptime(date, '%Y-%m-%d %H:%M'),
                                          'short', locale=getlocale()[0])
@@ -164,7 +178,7 @@ class Widget(Toplevel):
         Button(tf.interior, text='Open', style='widget.TButton',
                command=lambda: webopen(url)).grid(pady=4, padx=6, sticky='e')
         tf.grid(sticky='we', row=len(self.feeds), pady=2, padx=(8, 4))
-        tf.bind("<<ToggledFrameUnwrap>>", unwrap)
+        tf.bind("<<ToggledFrameOpen>>", unwrap)
         l.bind("<Configure>", resize)
         self.feeds[title] = tf, l
 

@@ -146,8 +146,8 @@ class App(Tk):
     def widget_style_init(self):
         """Init widgets style."""
         bg = CONFIG.get('Widget', 'background')
-        fg = CONFIG.get('Widget', 'foreground')
         feed_bg = CONFIG.get('Widget', 'feed_background')
+        fg = CONFIG.get('Widget', 'foreground')
         vmax = self.winfo_rgb('white')[0]
         color = tuple(int(val / vmax * 255) for val in self.winfo_rgb(bg))
         active_bg = cst.active_color(color)
@@ -161,12 +161,13 @@ class App(Tk):
         self.style.configure('widget.title.TLabel', background=bg, foreground=fg,
                              font=CONFIG.get('Widget', 'font_title'))
         self.style.configure('widget.TButton', background=bg, foreground=fg,
-                             padding=1, darkcolor=active_bg, lightcolor=active_bg,
-                             bordercolor=active_bg)
+                             padding=1, relief='flat')
         self.style.map('widget.TButton', background=[('disabled', active_bg),
-                                                     ('pressed', active_bg),
+                                                     ('pressed', bg),
                                                      ('active', active_bg)],
-                       darkcolor=[('pressed', fg)],
+                       relief=[('pressed', 'sunken')],
+                       bordercolor=[('pressed', active_bg)],
+                       darkcolor=[('pressed', bg)],
                        lightcolor=[('pressed', fg)])
 
     def hide_all(self):
