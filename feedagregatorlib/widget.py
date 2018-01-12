@@ -79,7 +79,7 @@ class Widget(Toplevel):
         sep = Separator(self, style='widget.TSeparator')
         sep.pack(fill='x')
         self.canvas = Canvas(self, highlightthickness=0)
-        self.canvas.pack(fill='both', expand=True, padx=2, pady=2)
+        self.canvas.pack(fill='both', expand=True, padx=(2, 8), pady=2)
         self.display = Frame(self.canvas, style='widget.TFrame')
         self.canvas.create_window(0, 0, anchor='nw', window=self.display, tags=('display',))
 
@@ -131,6 +131,7 @@ class Widget(Toplevel):
         """Display feed."""
 
         def unwrap(event):
+            l.update_idletasks()
             try:
                 h = l.html.bbox()[-1]
             except TclError:
@@ -138,24 +139,33 @@ class Widget(Toplevel):
             else:
                 l.configure(height=h)
 
+        def resize(event):
+            if l.winfo_viewable():
+                try:
+                    h = l.html.bbox()[-1]
+                except TclError:
+                    pass
+                else:
+                    l.configure(height=h)
+
         formatted_date = format_datetime(datetime.strptime(date, '%Y-%m-%d %H:%M'),
                                          'short', locale=getlocale()[0])
 
         tf = ToggledFrame(self.display, text="{} - {}".format(title, formatted_date),
                           style='widget.TFrame')
-        l = HtmlFrame(tf.interior, height=50, style='widget.TFrame')
+        l = HtmlFrame(tf.interior, height=50, style='widget.interior.TFrame')
         l.set_content(latest)
         l.set_style(self._stylesheet)
         l.set_font_size(self._font_size)
+        tf.interior.configure(style='widget.interior.TFrame')
         tf.interior.rowconfigure(0, weight=1)
-        tf.interior.columnconfigure(1, weight=1)
-        Frame(tf.interior, height=50, width=1,
-              style='widget.line.TFrame').grid(row=0, column=0, rowspan=2, sticky='ns')
-        l.grid(row=0, column=1, padx=4, sticky='eswn')
+        tf.interior.columnconfigure(0, weight=1)
+        l.grid(padx=4, sticky='eswn')
         Button(tf.interior, text='Open', style='widget.TButton',
-               command=lambda: webopen(url)).grid(row=1, column=1, pady=4, padx=6, sticky='e')
+               command=lambda: webopen(url)).grid(pady=4, padx=6, sticky='e')
         tf.grid(sticky='we', row=len(self.feeds), pady=2, padx=(8, 4))
         tf.bind("<<ToggledFrameUnwrap>>", unwrap)
+        l.bind("<Configure>", resize)
         self.feeds[title] = tf, l
 
     def hide_feed(self, title):
@@ -190,7 +200,9 @@ class Widget(Toplevel):
         self.attributes('-alpha', CONFIG.getint('Widget', 'alpha') / 100)
         text_font = Font(self, font=CONFIG.get('Widget', 'font')).actual()
         bg = CONFIG.get('Widget', 'background')
-        fg = CONFIG.get('Widget', 'foreground')
+        feed_bg = CONFIG.get('Widget', 'feed_background')
+        feed_fg = CONFIG.get('Widget', 'feed_foreground')
+
 
         self._stylesheet = """
 body {
@@ -217,7 +229,7 @@ a:hover {
   font-style: italic;
   border-bottom: 1px solid %(link)s;
 }
-""" % (dict(bg=bg, fg=fg, link=CONFIG.get('Widget', 'link_color'), **text_font))
+""" % (dict(bg=feed_bg, fg=feed_fg, link=CONFIG.get('Widget', 'link_color'), **text_font))
 
         self.configure(bg=bg)
         self.canvas.configure(background=bg)
@@ -275,20 +287,12 @@ a:hover {
 
     def _on_configure(self, event):
         if event.widget is self:
-            self.canvas.configure(scrollregion=self.canvas.bbox('all'))
-            self.canvas.itemconfigure('display', width=self.canvas.winfo_width() - 4)
             geometry = self.geometry()
             if geometry != '1x1+0+0':
                 CONFIG.set('Widget', 'geometry', geometry)
-                self.update_idletasks()
-                for tf, l in self.feeds.values():
-                    if tf.winfo_ismapped():
-                        try:
-                            h = l.html.bbox()[-1]
-                        except TclError:
-                            self.after(10, lambda: self._on_configure(None))
-                        else:
-                            l.configure(height=h)
+        elif event.widget in [self.canvas, self.display]:
+            self.canvas.configure(scrollregion=self.canvas.bbox('all'))
+            self.canvas.itemconfigure('display', width=self.canvas.winfo_width() - 4)
 
     def _start_move(self, event):
         self.x = event.x

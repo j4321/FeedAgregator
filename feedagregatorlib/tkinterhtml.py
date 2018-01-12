@@ -13,7 +13,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 FeedAgregator is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PaURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
@@ -292,7 +292,11 @@ class HtmlFrame(ttk.Frame):
 
     def set_content(self, html_source):
         self.html.reset()
-        self.html.parse(html_source)
+        if "</body>" not in html_source:
+            content =  "<html><body>{}</body></html>".format(html_source)
+        else:
+            content = html_source
+        self.html.parse(content)
 
     def set_style(self, stylesheet):
         """ stylesheet: string containing css style configuration """

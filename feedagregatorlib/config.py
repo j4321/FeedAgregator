@@ -248,13 +248,23 @@ class Config(Toplevel):
         Label(frame_color, text=_('Foreground')).grid(row=1, column=0,
                                                       sticky='e', padx=4,
                                                       pady=4)
-        Label(frame_color, text=_('Link color')).grid(row=2, column=0,
+        Label(frame_color, text=_('Feed background')).grid(row=2, column=0,
+                                                           sticky='e', padx=4,
+                                                           pady=4)
+        Label(frame_color, text=_('Feed foreground')).grid(row=3, column=0,
+                                                           sticky='e', padx=4,
+                                                           pady=4)
+        Label(frame_color, text=_('Link color')).grid(row=4, column=0,
                                                       sticky='e', padx=4,
                                                       pady=4)
         self.entry_bg.grid(row=0, column=1, sticky='w', padx=4, pady=4)
         self.entry_fg.grid(row=1, column=1, sticky='w', padx=4, pady=4)
-        self.entry_link.grid(row=2, column=1, sticky='w', padx=4, pady=4)
+        self.entry_feed_bg.grid(row=2, column=1, sticky='w', padx=4, pady=4)
+        self.entry_feed_fg.grid(row=3, column=1, sticky='w', padx=4, pady=4)
+        self.entry_link.grid(row=4, column=1, sticky='w', padx=4, pady=4)
         self.entry_bg.insert(0, CONFIG.get("Widget", "background"))
+        self.entry_feed_fg.insert(0, CONFIG.get("Widget", "feed_foreground"))
+        self.entry_feed_bg.insert(0, CONFIG.get("Widget", "feed_background"))
         self.entry_fg.insert(0, CONFIG.get("Widget", "foreground"))
         self.entry_link.insert(0, CONFIG.get("Widget", "link_color"))
         Button(frame_color, image=self.img_color, padding=0,
@@ -266,7 +276,15 @@ class Config(Toplevel):
                                                                   sticky='w',
                                                                   padx=4, pady=4)
         Button(frame_color, image=self.img_color, padding=0,
-               command=lambda: self.askcolor(self.entry_link)).grid(row=2, column=2,
+               command=lambda: self.askcolor(self.entry_feed_bg)).grid(row=2, column=2,
+                                                                       sticky='w',
+                                                                       padx=4, pady=4)
+        Button(frame_color, image=self.img_color, padding=0,
+               command=lambda: self.askcolor(self.entry_feed_fg)).grid(row=3, column=2,
+                                                                       sticky='w',
+                                                                       padx=4, pady=4)
+        Button(frame_color, image=self.img_color, padding=0,
+               command=lambda: self.askcolor(self.entry_link)).grid(row=4, column=2,
                                                                     sticky='w',
                                                                     padx=4, pady=4)
 
@@ -346,5 +364,7 @@ class Config(Toplevel):
         CONFIG.set("Widget", "font", "{family} {size}".format(**font_text_dic))
         CONFIG.set("Widget", "foreground", self.entry_fg.get())
         CONFIG.set("Widget", "background", self.entry_bg.get())
+        CONFIG.set("Widget", "feed_foreground", self.entry_feed_fg.get())
+        CONFIG.set("Widget", "feed_background", self.entry_feed_bg.get())
         CONFIG.set("Widget", "link_color", self.entry_link.get())
         self.destroy()

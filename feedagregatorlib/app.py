@@ -109,6 +109,7 @@ class App(Tk):
         self.icon.loop(self)
 
         self.widget = Widget(self)
+        self.widget.event_generate('<Configure>')
         cst.add_trace(self.widget.variable, 'write', self.widget_trace)
         self.widget.variable.set(CONFIG.getboolean('Widget', 'visible'))
 
@@ -146,16 +147,17 @@ class App(Tk):
         """Init widgets style."""
         bg = CONFIG.get('Widget', 'background')
         fg = CONFIG.get('Widget', 'foreground')
+        feed_bg = CONFIG.get('Widget', 'feed_background')
         vmax = self.winfo_rgb('white')[0]
         color = tuple(int(val / vmax * 255) for val in self.winfo_rgb(bg))
         active_bg = cst.active_color(color)
         self.style.configure('widget.TFrame', background=bg)
-        self.style.configure('widget.line.TFrame', background=active_bg)
+        self.style.configure('widget.interior.TFrame',
+                             background=feed_bg)
         self.style.configure('widget.TSizegrip', background=bg)
         self.style.configure('widget.TSeparator', background=bg)
-        self.style.configure('widget.TLabel', background=bg, foreground=fg)
-        self.style.configure('widget.TLabel', background=bg, foreground=fg,
-                             font=CONFIG.get('Widget', 'font'))
+        self.style.configure('widget.TLabel', background=bg,
+                             foreground=fg, font=CONFIG.get('Widget', 'font'))
         self.style.configure('widget.title.TLabel', background=bg, foreground=fg,
                              font=CONFIG.get('Widget', 'font_title'))
         self.style.configure('widget.TButton', background=bg, foreground=fg,
@@ -260,8 +262,8 @@ class App(Tk):
     def report_callback_exception(self, *args):
         """Log exceptions."""
         err = "".join(traceback.format_exception(*args))
-        showerror(_("Error"), str(args[1]), err, True)
         logging.error(err)
+        showerror(_("Error"), str(args[1]), err, True)
 
     def settings(self):
         dialog = Config(self)
@@ -302,7 +304,8 @@ class App(Tk):
                 else:
                     date = entry.get('published', today)
                 date = dateutil.parser.parse(date).strftime('%Y-%m-%d %H:%M')
-                data.append((title, date, summary))
+                link = entry.get('link', '')
+                data.append((title, date, summary, link))
             queue.put((feed_title, latest, updated, data))
         else:
             queue.put((feed_title, latest, updated))
@@ -331,7 +334,8 @@ class App(Tk):
                             name = "{}~#{}".format(title, i)
                 else:
                     name = title
-                manager_queue.put(name)
+                if manager_queue is not None:
+                    manager_queue.put(name)
                 logging.info("Added feed '%s' %s", name, url)
                 run(["notify-send", "-i", cst.IM_ICON_SVG, name,
                      cst.html2text(latest)])
@@ -350,17 +354,17 @@ class App(Tk):
                                                   command=lambda: self.toggle_feed_widget(name))
                 cst.add_trace(self.feed_widgets[title].variable, 'write',
                               lambda *args: self.feed_widget_trace(title))
-                for entry_title, date, summary in data:
-                    self.feed_widgets[name].entry_add(entry_title, date, summary, -1)
+                for entry_title, date, summary, link in data:
+                    self.feed_widgets[name].entry_add(entry_title, date, summary, link, -1)
             else:
                 if manager_queue is not None:
                     manager_queue.put('')
                 if cst.internet_on():
-                    showerror(_('Error'), _('{url} is not a valid feed.').format(url=url))
                     logging.error('%s is not a valid feed.', url)
+                    showerror(_('Error'), _('{url} is not a valid feed.').format(url=url))
                 else:
-                    showerror(_('Error'), _('No Internet connection.'))
                     logging.warning('No Internet connection.')
+                    showerror(_('Error'), _('No Internet connection.'))
 
     def feed_add(self, url, manager=False):
         """
@@ -509,9 +513,10 @@ class App(Tk):
                     logging.info("Updated feed '%s'", title)
                 else:
                     logging.info("Feed '%s' is up-to-date", title)
-                for entry_title, date, summary in data:
-                    self.feed_widgets[title].entry_add(entry_title, date, summary, -1)
+                for entry_title, date, summary, link in data:
+                    self.feed_widgets[title].entry_add(entry_title, date, summary, link, -1)
                 logging.info("Populated widget for feed '%s'", title)
+                self.feed_widgets[title].event_generate('<Configure>')
 
     def feed_update(self):
         """Update feeds."""

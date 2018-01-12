@@ -46,8 +46,8 @@ if os.path.isfile(PIDFILE):
         root.withdraw()
         s = Style(root)
         s.theme_use("clam")
-        showerror(_("Error"), _("{app_name} is already running, if not delete ~/.feedagregator/feedagregator.pid.").format(app_name=APP_NAME))
         logging.error("%s is already running", APP_NAME)
+        showerror(_("Error"), _("{app_name} is already running, if not delete ~/.feedagregator/feedagregator.pid.").format(app_name=APP_NAME))
         sys.exit()
     else:
         # it is an old pid file (certainly due to session logout then login)
@@ -59,8 +59,8 @@ try:
     app = App()
     app.mainloop()
 except Exception as e:
-    showerror(_("Error"), str(type(e)), traceback.format_exc(), True)
     logging.exception(str(type(e)))
+    showerror(_("Error"), str(type(e)), traceback.format_exc(), True)
 finally:
     save_config()
     save_feeds()

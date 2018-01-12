@@ -103,6 +103,8 @@ else:
     CONFIG.set("Widget", 'font_title', 'Liberation\ Sans 12 bold')
     CONFIG.set("Widget", 'foreground', 'white')
     CONFIG.set("Widget", 'background', 'gray10')
+    CONFIG.set("Widget", 'feed_foreground', 'white')
+    CONFIG.set("Widget", 'feed_background', 'gray20')
     CONFIG.set("Widget", 'link_color', '#89B9F6')
     CONFIG.set("Widget", "geometry", "")
     CONFIG.set("Widget", 'position', 'normal')
