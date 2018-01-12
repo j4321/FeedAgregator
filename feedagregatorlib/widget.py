@@ -39,6 +39,9 @@ class Widget(Toplevel):
         self.attributes('-type', 'splash')
         self.minsize(50, 50)
 
+        # control main menu checkbutton
+        self.variable = BooleanVar(self, False)
+
         self._position = StringVar(self, CONFIG.get('Widget', 'position'))
         add_trace(self._position, 'write',
                   lambda *x: CONFIG.set('Widget', 'position', self._position.get()))
@@ -51,9 +54,6 @@ class Widget(Toplevel):
         self.x = None
         self.y = None
 
-        # control main menu checkbutton
-        self.variable = BooleanVar(self, False)
-
         # --- menu
         self.menu = Menu(self, tearoff=False)
         menu_sort = Menu(self.menu, tearoff=False)
@@ -63,11 +63,11 @@ class Widget(Toplevel):
         menu_sort.add_command(label=_('Most recent first'), command=lambda: self._sort_by_date(reverse=True))
         menu_pos = Menu(self.menu, tearoff=False)
         menu_pos.add_radiobutton(label=_('Normal'), value='normal',
-                                 variable=self._position, command=self._on_map)
+                                 variable=self._position, command=self._change_position)
         menu_pos.add_radiobutton(label=_('Above'), value='above',
-                                 variable=self._position, command=self._on_map)
+                                 variable=self._position, command=self._change_position)
         menu_pos.add_radiobutton(label=_('Below'), value='below',
-                                 variable=self._position, command=self._on_map)
+                                 variable=self._position, command=self._change_position)
         self.menu.add_cascade(label=_('Sort'), menu=menu_sort)
         self.menu.add_cascade(label=_('Position'), menu=menu_pos)
         self.menu.add_command(label=_('Hide'), command=self.withdraw)
@@ -109,8 +109,6 @@ class Widget(Toplevel):
             widget.bind('<ButtonRelease-1>', self._stop_move)
             widget.bind('<B1-Motion>', self._move)
         self.bind('<Configure>', self._on_configure)
-        self.display.bind('<Unmap>', self._on_unmap)
-        self.display.bind('<Map>', self._on_map)
         self.bind('<4>', lambda e: self._scroll(-1))
         self.bind('<5>', lambda e: self._scroll(1))
 
@@ -228,6 +226,14 @@ a:hover {
             l.set_style(self._stylesheet)
             l.set_font_size(self._font_size)
 
+    def withdraw(self):
+        Toplevel.withdraw(self)
+        self.variable.set(False)
+
+    def deiconify(self):
+        Toplevel.deiconify(self)
+        self.variable.set(True)
+
     def _sort(self, reverse):
         titles = sorted(self.feeds, reverse=reverse, key=lambda x: x.lower())
         for i, title in enumerate(titles):
@@ -244,7 +250,7 @@ a:hover {
         top = min(max(top, 0), 1)
         self.canvas.yview_moveto(top)
 
-    def _on_map(self, event=None):
+    def _change_position(self):
         ''' make widget sticky '''
         for w in self.ewmh.getClientList():
             if w.get_wm_name() == 'feedagregator.widget':
@@ -266,30 +272,23 @@ a:hover {
                     self.ewmh.setWmState(w, 0, '_NET_WM_STATE_BELOW')
                     self.ewmh.setWmState(w, 0, '_NET_WM_STATE_ABOVE')
         self.ewmh.display.flush()
-        if self.winfo_ismapped():
-            self.variable.set(True)
-            CONFIG.set('Widget', 'visible', 'True')
-
-    def _on_unmap(self, event):
-        self.variable.set(False)
-        CONFIG.set('Widget', 'visible', 'False')
-        print(event)
 
     def _on_configure(self, event):
-        self.canvas.configure(scrollregion=self.canvas.bbox('all'))
-        self.canvas.itemconfigure('display', width=self.canvas.winfo_width() - 4)
-        geometry = self.geometry()
-        if geometry != '1x1+0+0':
-            CONFIG.set('Widget', 'geometry', geometry)
-            self.update_idletasks()
-            for tf, l in self.feeds.values():
-                if tf.winfo_ismapped():
-                    try:
-                        h = l.html.bbox()[-1]
-                    except TclError:
-                        self.after(10, lambda: self._on_configure(None))
-                    else:
-                        l.configure(height=h)
+        if event.widget is self:
+            self.canvas.configure(scrollregion=self.canvas.bbox('all'))
+            self.canvas.itemconfigure('display', width=self.canvas.winfo_width() - 4)
+            geometry = self.geometry()
+            if geometry != '1x1+0+0':
+                CONFIG.set('Widget', 'geometry', geometry)
+                self.update_idletasks()
+                for tf, l in self.feeds.values():
+                    if tf.winfo_ismapped():
+                        try:
+                            h = l.html.bbox()[-1]
+                        except TclError:
+                            self.after(10, lambda: self._on_configure(None))
+                        else:
+                            l.configure(height=h)
 
     def _start_move(self, event):
         self.x = event.x

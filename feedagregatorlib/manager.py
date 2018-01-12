@@ -43,7 +43,7 @@ class Manager(Toplevel):
         self._no_edit_entry = self.register(lambda: False)
 
         self.change_made = False
-        
+
         # --- treeview
         self.tree = Treeview(self, columns=('Title', 'URL', 'Remove'),
                              style='manager.Treeview',
@@ -177,7 +177,15 @@ class Manager(Toplevel):
         self.configure(cursor='watch')
         url = dialog.url
         if url:
-            title = self.master.feed_add(url)
+            queue = self.master.feed_add(url, manager=True)
+            self.after(1000, self._check_add_finished, url, queue)
+
+    def _check_add_finished(self, url, queue):
+
+        if queue.empty():
+            self.after(1000, self._check_add_finished, url, queue)
+        else:
+            title = queue.get(False)
             if title:
                 item = self.tree.insert('', 'end', values=(title, url, ''))
                 self.tree.item(item, tags=item)
@@ -188,6 +196,7 @@ class Manager(Toplevel):
                                    lambda event, i=item: self._press(i))
                 self.tree.tag_bind(item, '<Double-1>',
                                    lambda event, i=item: self._edit(event, i))
+                self.tree.selection_add(item)
 
                 self.change_made = True
-        self.configure(cursor='arrow')
+            self.configure(cursor='arrow')

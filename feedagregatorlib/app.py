@@ -106,10 +106,8 @@ class App(Tk):
         self.icon.loop(self)
 
         self.widget = Widget(self)
-        self.menu_widgets.set_item_value(_("Latests"),
-                                         CONFIG.getboolean('Widget', 'visible'))
-        print(CONFIG.getboolean('Widget', 'visible'))
         cst.add_trace(self.widget.variable, 'write', self.widget_trace)
+        self.widget.variable.set(CONFIG.getboolean('Widget', 'visible'))
 
         self._notify_no_internet = True
 
@@ -132,6 +130,7 @@ class App(Tk):
             self.feed_widgets[title] = FeedWidget(self, title)
             cst.add_trace(self.feed_widgets[title].variable, 'write',
                           lambda *args, t=title: self.feed_widget_trace(t))
+            self.feed_widgets[title].variable.set(FEEDS.getboolean(title, 'visible'))
         self.feed_init()
 
         # --- check for updates
@@ -223,6 +222,9 @@ class App(Tk):
         after_ids.extend(self._check_result_init_id.values())
         for after_id in after_ids:
             self.after_cancel(after_id)
+        CONFIG.set('Widget', 'visible', str(self.widget.variable.get()))
+        for title, widget in self.feed_widgets.items():
+            FEEDS.set(title, 'visible', str(widget.variable.get()))
         self.destroy()
 
     def feed_widget_trace(self, title):
@@ -238,6 +240,7 @@ class App(Tk):
             self.widget.deiconify()
         else:
             self.widget.withdraw()
+        self.update_idletasks()
 
     def toggle_feed_widget(self, title):
         value = self.menu_widgets.get_item_value(title)
@@ -295,12 +298,12 @@ class App(Tk):
         else:
             queue.put((feed_title, latest, updated))
 
-    def _check_result_add(self, thread, queue, url):
+    def _check_result_add(self, thread, queue, url, manager_queue=None):
         if thread.is_alive():
             self._check_add_id = self.after(1000, self._check_result_add,
-                                            thread, queue, url)
+                                            thread, queue, url, manager_queue)
         else:
-            title, latest, date, data = queue.get()
+            title, latest, date, data = queue.get(False)
             if title:
                 try:
                     # check if feed's title already exists
@@ -319,6 +322,7 @@ class App(Tk):
                             name = "{}~#{}".format(title, i)
                 else:
                     name = title
+                manager_queue.put(name)
                 run(["notify-send", "-i", cst.IM_ICON_SVG, name,
                      cst.html2text(latest)])
                 self.widget.add_feed(name, latest, url, date)
@@ -332,25 +336,35 @@ class App(Tk):
                 cst.save_feeds()
                 self.queues[name] = queue
                 self.feed_widgets[name] = FeedWidget(self, name)
-                self.menu_widgets.add_checkbutton(label=_(name),
+                self.menu_widgets.add_checkbutton(label=name,
                                                   command=lambda: self.toggle_feed_widget(name))
                 cst.add_trace(self.feed_widgets[title].variable, 'write',
                               lambda *args: self.feed_widget_trace(title))
                 for entry_title, date, summary in data:
                     self.feed_widgets[name].entry_add(entry_title, date, summary, -1)
             else:
+                if manager_queue is not None:
+                    manager_queue.put('')
                 if cst.internet_on():
                     showerror(_('Error'), _('{url} is not a valid feed.').format(url=url))
                 else:
                     showerror(_('Error'), _('No Internet connection.'))
 
-    def feed_add(self, url):
+    def feed_add(self, url, manager=False):
+        """
+        Add feed with given url.
+
+        manager: whether this command is run from the feed manager.
+        """
         if url:
             queue = Queue(1)
+            manager_queue = Queue(1) if manager else None
             thread = Process(target=self.feed_get_info, args=(url, queue, 'all'),
                              daemon=True)
             thread.start()
-            self._check_result_add(thread, queue, url)
+            self._check_result_add(thread, queue, url, manager_queue)
+            if manager:
+                return manager_queue
 
     def feed_show(self, title):
         self.widget.show_feed(title)
@@ -497,7 +511,7 @@ class App(Tk):
                                                              self._check_result_update,
                                                              title)
         else:
-            t, latest, updated = self.queues[title].get()
+            t, latest, updated = self.queues[title].get(False)
             if not t:
                 if cst.internet_on():
                     run(["notify-send", "-i", "dialog-error", _("Error"),
