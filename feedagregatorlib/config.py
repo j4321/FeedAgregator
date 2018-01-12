@@ -241,6 +241,8 @@ class Config(Toplevel):
         frame_color = Frame(frame_widget)
         self.entry_bg = Entry(frame_color, width=9, justify='center')
         self.entry_fg = Entry(frame_color, width=9, justify='center')
+        self.entry_feed_bg = Entry(frame_color, width=9, justify='center')
+        self.entry_feed_fg = Entry(frame_color, width=9, justify='center')
         self.entry_link = Entry(frame_color, width=9, justify='center')
         Label(frame_color, text=_('Background')).grid(row=0, column=0,
                                                       sticky='e', padx=4,
