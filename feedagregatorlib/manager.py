@@ -23,8 +23,9 @@ Feed manager dialog
 from tkinter import Toplevel
 from tkinter.ttk import Entry, Button, Treeview
 from feedagregatorlib.constants import FEEDS, IM_MOINS, IM_PLUS, \
-    IM_MOINS_SEL, IM_MOINS_CLICKED, APP_NAME, PhotoImage
+    IM_MOINS_SEL, IM_MOINS_CLICKED, APP_NAME, PhotoImage, CONFIG
 from feedagregatorlib.add import Add
+from feedagregatorlib.messagebox import askokcancel
 from feedagregatorlib.autoscrollbar import AutoScrollbar
 
 
@@ -135,9 +136,15 @@ class Manager(Toplevel):
         """Handle click on items."""
         if self.tree.identify_row(event.y) == item:
             if self.tree.identify_column(event.x) == '#3':
-                self.master.feed_remove(self.tree.item(item, 'values')[0])
-                self.tree.delete(item)
-                self.change_made = True
+                title = self.tree.item(item, 'values')[0]
+                rep = True
+                if CONFIG.getboolean('General', 'confirm_remove', fallback=True):
+                    rep = askokcancel(_('Confirmation'),
+                                      _('Do you want to remove the feed {feed}?').format(feed=title))
+                if rep:
+                    self.master.feed_remove(title)
+                    self.tree.delete(item)
+                    self.change_made = True
             elif self.tree.identify_element(event.x, event.y) == 'Checkbutton.indicator':
                 sel = self.tree.selection()
                 if item in sel:

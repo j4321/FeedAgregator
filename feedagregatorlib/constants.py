@@ -97,6 +97,7 @@ else:
     CONFIG.set("General", "update_delay", "3600000")
     CONFIG.set("General", "language", getdefaultlocale()[0])
     CONFIG.set("General", "check_update", "True")
+    CONFIG.set("General", "confirm_remove", "True")
     CONFIG.add_section("Widget")
     CONFIG.set("Widget", "alpha", "80")
     CONFIG.set("Widget", 'font', 'Liberation\ Sans 10')
