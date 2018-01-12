@@ -1,13 +1,15 @@
-FeedAgregator - RSS and Atom feed agregator in desktop widgets + notifications
-==============================================================================
+FeedAgregator
+=============
+RSS and Atom feed agregator in desktop widgets + notifications
+--------------------------------------------------------------
 Copyright 2018 Juliette Monsel <j_4321@protonmail.com>
 
-FeedAgregator periodically looks for RSS/Atom feed updates. 
-If an update is found, a notification is sent. In addition, a desktop 
+FeedAgregator periodically looks for RSS/Atom feed updates.
+If an update is found, a notification is sent. In addition, a desktop
 widget show the latest entry of all feeds and for each feed, a widget
 shows all entries.
 
-FeedAgregator is designed for Linux. It is written in Python 3 and relies 
+FeedAgregator is designed for Linux. It is written in Python 3 and relies
 mostly upon Tk GUI toolkit. The application is in the system tray, so it
 might not work with all desktop environments (see Troubleshooting).
 
@@ -26,7 +28,7 @@ You also need to have at least one of the following GUI toolkits for the system 
  - Tktray https://code.google.com/archive/p/tktray/downloads
  - PyGTK http://www.pygtk.org/downloads.html
  - PyQt5, PyQt4 or PySide
- 
+
 If you are using a Tcl/Tk version < 8.6, you will also need PIL.
 
 
@@ -35,7 +37,7 @@ python3-tk, tk-tktray, libnotify and the notification server of your choice,
 tk-html3, python3-bs4, (python3-pil and python3-pil.imagek if tk < 8.6)
 
 In Archlinux, you will need to install the following packages:
-tk, tktray (`AUR <https://aur.archlinux.org/packages/tktray>`__), 
+tk, tktray (`AUR <https://aur.archlinux.org/packages/tktray>`__),
 libnotify and the notification server of your choice,
 python-beautifulsoup4,
 tkhtml3-git (`AUR <https://aur.archlinux.org/packages/tkhtml3-git>`__)
@@ -45,9 +47,8 @@ Then install the application:
     $ sudo python3 setup.py install
 
 You can now launch it from `Menu > Internet > FeedAgregator`. You can launch
-it from the command line with `feedagregator`. In this last case, you will see
-the messages printed every time a process is lauched or finished and when
-an error is encountered. Therefore you can check that everything works fine.
+it from the command line with `feedagregator`.
+
 
 Troubleshooting
 ---------------
