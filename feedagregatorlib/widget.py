@@ -194,7 +194,8 @@ class Widget(Toplevel):
 
     def rename_feed(self, old_name, new_name):
         self.feeds[new_name] = self.feeds.pop(old_name)
-        self.feeds[new_name][0].label.configure(text=new_name)
+        old_title = self.feeds[new_name][0].label.cget('text')
+        self.feeds[new_name][0].label.configure(text=old_title.replace(old_name, new_name))
 
     def update_display(self, title, latest, date):
         formatted_date = format_datetime(datetime.strptime(date, '%Y-%m-%d %H:%M'),
