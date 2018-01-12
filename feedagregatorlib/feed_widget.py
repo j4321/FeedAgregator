@@ -41,7 +41,7 @@ class FeedWidget(Toplevel):
         self.minsize(50, 50)
 
         self._position = StringVar(self, FEEDS.get(feed_name, 'position'))
-        add_trace(self._position, 'write', 
+        add_trace(self._position, 'write',
                   lambda *x: FEEDS.set(feed_name, 'position', self._position.get()))
 
         self.ewmh = EWMH()
@@ -93,9 +93,10 @@ class FeedWidget(Toplevel):
         corner.place(relx=1, rely=1, anchor='se')
 
         geometry = FEEDS.get(self.feed_name, 'geometry')
-        self.update_idletasks()
         if geometry:
             self.geometry(geometry)
+        self.update_idletasks()
+        if FEEDS.getboolean(self.feed_name, 'visible'):
             self.deiconify()
 
         # --- bindings
@@ -226,11 +227,12 @@ a:hover {
                     self.ewmh.setWmState(w, 0, '_NET_WM_STATE_ABOVE')
         self.ewmh.display.flush()
         self.update_idletasks()
-        if self.geometry() != '1x1+0+0':
+        if self.winfo_ismapped():
             self.variable.set(True)
+            FEEDS.set(self.feed_name, 'visible', 'True')
 
     def _on_unmap(self, event):
-        FEEDS.set(self.feed_name, 'geometry', '')
+        FEEDS.set(self.feed_name, 'visible', 'False')
         self.variable.set(False)
 
     def _on_configure(self, event):

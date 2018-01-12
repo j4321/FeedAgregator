@@ -165,8 +165,6 @@ class TkinterHtml(tk.Widget):
         return self.tk.call(self._w, "style", *args)
 
     def _fetch_image(self, *args):
-        # TODO: load images in the background
-        # TODO: support base url
 
         assert len(args) == 1
         url = args[0]
@@ -247,7 +245,6 @@ class TkinterHtml(tk.Widget):
             self._selection_end_node = None
             traceback.print_exc()
 
-        # TODO: the selection may actually shrink
         try:
             self.tag("add", "selection",
                      self._selection_start_node, self._selection_start_offset,

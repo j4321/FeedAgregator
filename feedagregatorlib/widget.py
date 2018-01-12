@@ -96,9 +96,10 @@ class Widget(Toplevel):
         corner.place(relx=1, rely=1, anchor='se')
 
         geometry = CONFIG.get('Widget', 'geometry')
-        self.update_idletasks()
         if geometry:
             self.geometry(geometry)
+        self.update_idletasks()
+        if CONFIG.getboolean('Widget', 'visible'):
             self.deiconify()
 
         # --- bindings
@@ -125,7 +126,7 @@ class Widget(Toplevel):
             latest = FEEDS.get(title, 'latest')
             date = FEEDS.get(title, 'updated')
             self.add_feed(title, latest, url, date)
-            if not FEEDS.getboolean(title, 'visible'):
+            if not FEEDS.getboolean(title, 'in_latests'):
                 self.hide_feed(title)
 
     def add_feed(self, title, latest, url, date):
@@ -265,25 +266,30 @@ a:hover {
                     self.ewmh.setWmState(w, 0, '_NET_WM_STATE_BELOW')
                     self.ewmh.setWmState(w, 0, '_NET_WM_STATE_ABOVE')
         self.ewmh.display.flush()
-        self.variable.set(True)
+        if self.winfo_ismapped():
+            self.variable.set(True)
+            CONFIG.set('Widget', 'visible', 'True')
 
     def _on_unmap(self, event):
-        CONFIG.set('Widget', 'geometry', '')
         self.variable.set(False)
+        CONFIG.set('Widget', 'visible', 'False')
+        print(event)
 
     def _on_configure(self, event):
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
         self.canvas.itemconfigure('display', width=self.canvas.winfo_width() - 4)
-        CONFIG.set('Widget', 'geometry', self.geometry())
-        self.update_idletasks()
-        for tf, l in self.feeds.values():
-            if tf.winfo_ismapped():
-                try:
-                    h = l.html.bbox()[-1]
-                except TclError:
-                    self.after(10, lambda: self._on_configure(None))
-                else:
-                    l.configure(height=h)
+        geometry = self.geometry()
+        if geometry != '1x1+0+0':
+            CONFIG.set('Widget', 'geometry', geometry)
+            self.update_idletasks()
+            for tf, l in self.feeds.values():
+                if tf.winfo_ismapped():
+                    try:
+                        h = l.html.bbox()[-1]
+                    except TclError:
+                        self.after(10, lambda: self._on_configure(None))
+                    else:
+                        l.configure(height=h)
 
     def _start_move(self, event):
         self.x = event.x

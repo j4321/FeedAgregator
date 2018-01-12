@@ -50,6 +50,7 @@ from tkinter import TclVersion, colorchooser
 
 APP_NAME = "FeedAgregator"
 
+
 # --- paths
 PATH = os.path.dirname(__file__)
 
@@ -83,14 +84,15 @@ else:
     CONFIG.set("General", "language", getdefaultlocale()[0])
     CONFIG.set("General", "check_update", "True")
     CONFIG.add_section("Widget")
-    CONFIG.set("Widget", "geometry", "")
     CONFIG.set("Widget", "alpha", "80")
     CONFIG.set("Widget", 'font', 'Liberation\ Sans 10')
     CONFIG.set("Widget", 'font_title', 'Liberation\ Sans 12 bold')
     CONFIG.set("Widget", 'foreground', 'white')
     CONFIG.set("Widget", 'background', 'gray10')
     CONFIG.set("Widget", 'link_color', '#89B9F6')
+    CONFIG.set("Widget", "geometry", "")
     CONFIG.set("Widget", 'position', 'normal')
+    CONFIG.set("Widget", 'visible', 'True')
 
 
 def save_config():
@@ -365,6 +367,7 @@ def active_color(color):
     b += (255 - b) / 3
     return ("#%2.2x%2.2x%2.2x" % (round(r), round(g), round(b))).upper()
 
+
 ZENITY = False
 
 try:
@@ -416,7 +419,6 @@ def askcolor(color=None, **options):
     else:
         color = colorchooser.askcolor(color, **options)
         return color[1]
-
 
 
 # --- compatibility

@@ -23,8 +23,8 @@ Main class
 import feedparser
 import dateutil.parser
 from datetime import datetime
-import tkinter as tk
-from tkinter import ttk
+from tkinter import Tk
+from tkinter.ttk import Style
 from feedagregatorlib.messagebox import showerror
 from feedagregatorlib.trayicon import TrayIcon, SubMenu
 import feedagregatorlib.constants as cst
@@ -45,9 +45,9 @@ CONFIG = cst.CONFIG
 FEEDS = cst.FEEDS
 
 
-class App(tk.Tk):
+class App(Tk):
     def __init__(self):
-        tk.Tk.__init__(self, className=cst.APP_NAME)
+        Tk.__init__(self, className=cst.APP_NAME)
         self.protocol("WM_DELETE_WINDOW", self.quit)
         self.withdraw()
 
@@ -55,7 +55,7 @@ class App(tk.Tk):
         self.iconphoto(True, self.im_icon)
 
         # --- style
-        self.style = ttk.Style(self)
+        self.style = Style(self)
         self.style.theme_use("clam")
         self.style.configure("TScale", sliderlength=20)
         self.style.map("TCombobox",
@@ -107,7 +107,8 @@ class App(tk.Tk):
 
         self.widget = Widget(self)
         self.menu_widgets.set_item_value(_("Latests"),
-                                         bool(CONFIG.get('Widget', 'geometry')))
+                                         CONFIG.getboolean('Widget', 'visible'))
+        print(CONFIG.getboolean('Widget', 'visible'))
         cst.add_trace(self.widget.variable, 'write', self.widget_trace)
 
         self._notify_no_internet = True
@@ -248,7 +249,7 @@ class App(tk.Tk):
     def report_callback_exception(self, *args):
         """Log exceptions."""
         err = "".join(traceback.format_exception(*args))
-        showerror(_("Error"), str(args[1]), err)
+        showerror(_("Error"), str(args[1]), err, True)
 
     def settings(self):
         dialog = Config(self)
@@ -273,7 +274,7 @@ class App(tk.Tk):
         today = datetime.now().strftime('%Y-%m-%d %H:%M')
         if entries:
             latest = """<p id=title>{}</p>\n{}""".format(entries[0].get('title', ''),
-                                                                    entries[0].get('summary', ''))
+                                                         entries[0].get('summary', ''))
             updated = dateutil.parser.parse(entries[0].get('updated', today)).strftime('%Y-%m-%d %H:%M')
         else:
             latest = ""
@@ -318,25 +319,25 @@ class App(tk.Tk):
                             name = "{}~#{}".format(title, i)
                 else:
                     name = title
-                run(["notify-send", "-i", cst.IM_ICON_SVG, title,
+                run(["notify-send", "-i", cst.IM_ICON_SVG, name,
                      cst.html2text(latest)])
                 self.widget.add_feed(name, latest, url, date)
                 FEEDS.set(name, 'url', url)
-                FEEDS.set(name, 'visible', 'True')
                 FEEDS.set(name, 'updated', date)
                 FEEDS.set(name, 'latest', latest)
+                FEEDS.set(name, 'visible', 'True')
                 FEEDS.set(name, 'geometry', '')
                 FEEDS.set(name, 'position', 'normal')
+                FEEDS.set(name, 'in_latests', 'True')
                 cst.save_feeds()
-                self.queues[title] = queue
-                self.feed_widgets[title] = FeedWidget(self, name)
-                self.feed_widgets[title] = FeedWidget(self, title)
-                self.menu_widgets.add_checkbutton(label=_(title),
-                                                  command=lambda: self.toggle_feed_widget(title))
+                self.queues[name] = queue
+                self.feed_widgets[name] = FeedWidget(self, name)
+                self.menu_widgets.add_checkbutton(label=_(name),
+                                                  command=lambda: self.toggle_feed_widget(name))
                 cst.add_trace(self.feed_widgets[title].variable, 'write',
                               lambda *args: self.feed_widget_trace(title))
                 for entry_title, date, summary in data:
-                    self.feed_widgets[title].entry_add(entry_title, date, summary, -1)
+                    self.feed_widgets[name].entry_add(entry_title, date, summary, -1)
             else:
                 if cst.internet_on():
                     showerror(_('Error'), _('{url} is not a valid feed.').format(url=url))
@@ -353,16 +354,17 @@ class App(tk.Tk):
 
     def feed_show(self, title):
         self.widget.show_feed(title)
-        FEEDS.set(title, 'visible', 'True')
+        FEEDS.set(title, 'in_latests', 'True')
 
     def feed_hide(self, title):
         self.widget.hide_feed(title)
-        FEEDS.set(title, 'visible', 'False')
+        FEEDS.set(title, 'in_latests', 'False')
 
     def feed_rename(self, old_name, new_name):
         url = FEEDS.get(old_name, 'url')
         visible = FEEDS.get(old_name, 'visible')
         latest = FEEDS.get(old_name, 'latest')
+        in_latests = FEEDS.get(old_name, 'in_latests')
         position = FEEDS.get(old_name, 'position')
         geometry = FEEDS.get(old_name, 'geometry')
         FEEDS.remove_section(old_name)
@@ -384,10 +386,11 @@ class App(tk.Tk):
         else:
             name = new_name
         FEEDS.set(name, 'url', url)
-        FEEDS.set(name, 'visible', visible)
         FEEDS.set(name, 'latest', latest)
-        FEEDS.set(name, 'position', position)
+        FEEDS.set(name, 'visible', visible)
         FEEDS.set(name, 'geometry', geometry)
+        FEEDS.set(name, 'position', position)
+        FEEDS.set(name, 'in_latests', in_latests)
         self._check_result_init_id[name] = self._check_result_init_id.pop(old_name)
         self._check_result_update_id[name] = self._check_result_update_id.pop(old_name)
         self.threads[name] = self.threads.pop(old_name)
@@ -396,7 +399,7 @@ class App(tk.Tk):
         self.feed_widgets[name].rename_feed(name)
         self.widget.rename_feed(old_name, name)
         self.menu_widgets.delete(old_name)
-        self.menu_widgets.add_checkbutton(label=_(name),
+        self.menu_widgets.add_checkbutton(label=name,
                                           command=lambda: self.toggle_feed_widget(name))
         trace_id = cst.trinfo_trace(self.feed_widgets[name].variable)[0][1]
         cst.remove_trace(self.feed_widgets[name].variable, 'write', trace_id)

@@ -72,7 +72,7 @@ class Manager(Toplevel):
             item = self.tree.insert('', 'end',
                                     values=(title, FEEDS.get(title, 'url'), ''))
             self.tree.item(item, tags=item)
-            if FEEDS.getboolean(title, 'visible'):
+            if FEEDS.getboolean(title, 'in_latests'):
                 self.tree.selection_add(item)
             self.tree.tag_configure(item, image=self.im_moins)
             self.tree.tag_bind(item, '<ButtonRelease-1>',

@@ -178,7 +178,7 @@ class ShowError(Toplevel):
             report_frame = Frame(self)
             Label(report_frame, text=_("Please report this bug on ")).pack(side="left")
             url = Label(report_frame, style="url.TLabel", cursor="hand1",
-                        font="TkDefaultFont 10 underline",
+                        font="TkDefaultFont 9 underline",
                         text="https://github.com/j4321/FeedAgregator/issues")
             url.pack(side="left")
             url.bind("<Button-1>", lambda e: url_open("https://github.com/j4321/FeedAgregator/issues"))
