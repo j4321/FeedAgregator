@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Feed manager dialog
 """
 from tkinter import Toplevel
-from tkinter.ttk import Entry, Button, Style, Treeview
+from tkinter.ttk import Entry, Button, Treeview
 from feedagregatorlib.constants import FEEDS, IM_MOINS, IM_PLUS, \
     IM_MOINS_SEL, IM_MOINS_CLICKED, APP_NAME, PhotoImage
 from feedagregatorlib.add import Add
@@ -48,6 +48,8 @@ class Manager(Toplevel):
         self.tree = Treeview(self, columns=('Title', 'URL', 'Remove'),
                              style='manager.Treeview',
                              selectmode='none')
+        self.tree.heading('#0',
+                          command=lambda: self._sort_by_in_latests(False))
         self.tree.heading('Title', text='Title',
                           command=lambda: self._sort_column('Title', False))
         self.tree.heading('URL', text='URL',
@@ -88,6 +90,11 @@ class Manager(Toplevel):
         Button(self, image=self.im_plus, command=self.feed_add,
                style='manager.TButton').grid(row=2, column=0, columnspan=2,
                                              sticky='e', padx=4, pady=4)
+        self._check_add_id = ''
+
+    def destroy(self):
+        self.after_cancel(self._check_add_id)
+        Toplevel.destroy(self)
 
     def _edit(self, event, item):
         """Edit feed title."""
@@ -171,19 +178,28 @@ class Manager(Toplevel):
         self.tree.heading(column,
                           command=lambda: self._sort_column(column, not reverse))
 
+    def _sort_by_in_latests(self, reverse):
+        sel = self.tree.selection()
+        l = [(c in sel,) + self.tree.item(c, 'values') + (c,) for c in self.tree.get_children('')]
+        l.sort(reverse=reverse, key=lambda x: x[0])
+        for index, val in enumerate(l):
+            self.tree.move(val[-1], "", index)
+        self.tree.heading('#0',
+                          command=lambda: self._sort_by_in_latests(not reverse))
+
     def feed_add(self):
         dialog = Add(self)
         self.wait_window(dialog)
-        self.configure(cursor='watch')
         url = dialog.url
         if url:
+            self.configure(cursor='watch')
             queue = self.master.feed_add(url, manager=True)
-            self.after(1000, self._check_add_finished, url, queue)
+            self._check_add_id = self.after(1000, self._check_add_finished, url, queue)
 
     def _check_add_finished(self, url, queue):
 
         if queue.empty():
-            self.after(1000, self._check_add_finished, url, queue)
+            self._check_add_id = self.after(1000, self._check_add_finished, url, queue)
         else:
             title = queue.get(False)
             if title:
@@ -191,11 +207,11 @@ class Manager(Toplevel):
                 self.tree.item(item, tags=item)
                 self.tree.tag_configure(item, image=self.im_moins)
                 self.tree.tag_bind(item, '<ButtonRelease-1>',
-                                   lambda event, i=item: self._click_release(event, i))
+                                   lambda event: self._click_release(event, item))
                 self.tree.tag_bind(item, '<ButtonPress-1>',
-                                   lambda event, i=item: self._press(i))
+                                   lambda event: self._press(event, item))
                 self.tree.tag_bind(item, '<Double-1>',
-                                   lambda event, i=item: self._edit(event, i))
+                                   lambda event: self._edit(event, item))
                 self.tree.selection_add(item)
 
                 self.change_made = True

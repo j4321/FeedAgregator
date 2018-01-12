@@ -31,6 +31,7 @@ from tkinter import Tk
 from tkinter.ttk import Style
 from feedagregatorlib.messagebox import showerror
 import traceback
+import logging
 
 
 # check whether feedagregator is running
@@ -46,6 +47,7 @@ if os.path.isfile(PIDFILE):
         s = Style(root)
         s.theme_use("clam")
         showerror(_("Error"), _("{app_name} is already running, if not delete ~/.feedagregator/feedagregator.pid.").format(app_name=APP_NAME))
+        logging.error("%s is already running", APP_NAME)
         sys.exit()
     else:
         # it is an old pid file (certainly due to session logout then login)
@@ -58,7 +60,10 @@ try:
     app.mainloop()
 except Exception as e:
     showerror(_("Error"), str(type(e)), traceback.format_exc(), True)
+    logging.exception(str(type(e)))
 finally:
     save_config()
     save_feeds()
     os.unlink(PIDFILE)
+    logging.info('Closing %s', APP_NAME)
+    logging.shutdown()

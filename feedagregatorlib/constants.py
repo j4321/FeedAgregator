@@ -46,6 +46,8 @@ import gettext
 import babel
 from glob import glob
 from tkinter import TclVersion, colorchooser
+import logging
+from logging.handlers import TimedRotatingFileHandler
 
 
 APP_NAME = "FeedAgregator"
@@ -56,12 +58,14 @@ PATH = os.path.dirname(__file__)
 
 if os.access(PATH, os.W_OK) and os.path.exists(os.path.join(PATH, "images")):
     # the app is not installed
-    # local directory containing config files and sticky notes data
-    LOCAL_PATH = PATH
+    # local directory containing config files
+    LOCAL_PATH = os.path.join(PATH, 'config')
+    if not os.path.exists(LOCAL_PATH):
+        os.mkdir(LOCAL_PATH)
     PATH_LOCALE = os.path.join(PATH, "locale")
     PATH_IMAGES = os.path.join(PATH, "images")
 else:
-    # local directory containing config files and sticky notes data
+    # local directory containing config files
     LOCAL_PATH = os.path.join(os.path.expanduser("~"), ".feedagregator")
     if not os.path.isdir(LOCAL_PATH):
         os.mkdir(LOCAL_PATH)
@@ -71,6 +75,16 @@ else:
 PATH_FEEDS = os.path.join(LOCAL_PATH, "feeds.conf")
 PATH_CONFIG = os.path.join(LOCAL_PATH, "feedagregator.ini")
 PIDFILE = os.path.join(LOCAL_PATH, "feedagregator.pid")
+PATH_LOG = os.path.join(LOCAL_PATH, "feedagregator.log")
+
+
+# --- log
+handler = TimedRotatingFileHandler(PATH_LOG, when='midnight',
+                                   interval=1, backupCount=7)
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)-15s %(levelname)s: %(message)s',
+                    handlers=[handler])
+logging.getLogger().addHandler(logging.StreamHandler())
 
 
 # --- config file

@@ -18,17 +18,17 @@ data_files = [("/usr/share/applications", ["feedagregator.desktop"]),
 with open("feedagregatorlib/version.py") as file:
     exec(file.read())
 
-setup(name = "feedagregator",
-      version = __version__,
-      description = "RSS and Atom feed agregator in desktop widgets + notifications",
-      author = "Juliette Monsel",
-      author_email = "j_4321@protonmail.com",
-      license = "GPLv3",
+setup(name="feedagregator",
+      version=__version__,
+      description="RSS and Atom feed agregator in desktop widgets + notifications",
+      author="Juliette Monsel",
+      author_email="j_4321@protonmail.com",
+      license="GPLv3",
       url="https://github.com/j4321/FeedAgregator/",
-      packages = ['feedagregatorlib', 'feedagregatorlib.trayicon'],
-      package_data = {'feedagregatorlib' : ["packages.tcl"]},
-      scripts = ["feedagregator"],
-      data_files = data_files,
+      packages=['feedagregatorlib', 'feedagregatorlib.trayicon'],
+      package_data={'feedagregatorlib' : ["packages.tcl"]},
+      scripts=["feedagregator"],
+      data_files=data_files,
       classifiers=[
             'Development Status :: 5 - Production/Stable',
             'Environment :: X11 Applications',
@@ -43,15 +43,13 @@ setup(name = "feedagregator",
             'Natural Language :: French',
             'Operating System :: POSIX :: Linux',
       ],
-      long_description =
+      long_description=
 """
-FeedAgregator periodically looks for RSS/Atom feed updates. 
-If an update is found, a notification is sent. In addition, a desktop 
+FeedAgregator periodically looks for RSS/Atom feed updates.
+If an update is found, a notification is sent. In addition, a desktop
 widget show the latest entry of all feeds and for each feed, a widget
 shows all entries.
 """,
-      requires = ["tkinter", "sys", "os", "re",  "locale", "gettext", "beautifulsoup4",
-                  'configparser', "feedparser", 'multiprocessing', 'subprocess']
-)
-
-
+      requires=["tkinter", "sys", "os", "re", "locale", "gettext",
+                "beautifulsoup4", "logging", 'configparser', "feedparser",
+                'multiprocessing', 'subprocess'])

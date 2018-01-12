@@ -39,6 +39,7 @@ from subprocess import run
 import configparser
 import traceback
 from multiprocessing import Process, Queue
+import logging
 
 
 CONFIG = cst.CONFIG
@@ -50,6 +51,8 @@ class App(Tk):
         Tk.__init__(self, className=cst.APP_NAME)
         self.protocol("WM_DELETE_WINDOW", self.quit)
         self.withdraw()
+
+        logging.info('Starting %s', cst.APP_NAME)
 
         self.im_icon = cst.PhotoImage(master=self, file=cst.IM_ICON_48)
         self.iconphoto(True, self.im_icon)
@@ -207,7 +210,7 @@ class App(Tk):
         check again for an internet connection after 30s.
         """
         if cst.internet_on():
-            self.reset_conn()
+            logging.info('Connected to Internet')
             self._notify_no_internet = True
             for widget in self.feed_widgets.values():
                 widget.clear()
@@ -222,6 +225,11 @@ class App(Tk):
         after_ids.extend(self._check_result_init_id.values())
         for after_id in after_ids:
             self.after_cancel(after_id)
+        for thread in self.threads.values():
+            try:
+                thread.terminate()
+            except AttributeError:
+                pass
         CONFIG.set('Widget', 'visible', str(self.widget.variable.get()))
         for title, widget in self.feed_widgets.items():
             FEEDS.set(title, 'visible', str(widget.variable.get()))
@@ -253,6 +261,7 @@ class App(Tk):
         """Log exceptions."""
         err = "".join(traceback.format_exception(*args))
         showerror(_("Error"), str(args[1]), err, True)
+        logging.error(err)
 
     def settings(self):
         dialog = Config(self)
@@ -323,6 +332,7 @@ class App(Tk):
                 else:
                     name = title
                 manager_queue.put(name)
+                logging.info("Added feed '%s' %s", name, url)
                 run(["notify-send", "-i", cst.IM_ICON_SVG, name,
                      cst.html2text(latest)])
                 self.widget.add_feed(name, latest, url, date)
@@ -347,8 +357,10 @@ class App(Tk):
                     manager_queue.put('')
                 if cst.internet_on():
                     showerror(_('Error'), _('{url} is not a valid feed.').format(url=url))
+                    logging.error('%s is not a valid feed.', url)
                 else:
                     showerror(_('Error'), _('No Internet connection.'))
+                    logging.warning('No Internet connection.')
 
     def feed_add(self, url, manager=False):
         """
@@ -376,6 +388,7 @@ class App(Tk):
 
     def feed_rename(self, old_name, new_name):
         url = FEEDS.get(old_name, 'url')
+        updated = FEEDS.get(old_name, 'updated')
         visible = FEEDS.get(old_name, 'visible')
         latest = FEEDS.get(old_name, 'latest')
         in_latests = FEEDS.get(old_name, 'in_latests')
@@ -399,15 +412,17 @@ class App(Tk):
                     name = "{}~#{}".format(new_name, i)
         else:
             name = new_name
+        logging.info("Renamed feed '%s' to '%s'", old_name, name)
         FEEDS.set(name, 'url', url)
+        FEEDS.set(name, 'updated', updated)
         FEEDS.set(name, 'latest', latest)
         FEEDS.set(name, 'visible', visible)
         FEEDS.set(name, 'geometry', geometry)
         FEEDS.set(name, 'position', position)
         FEEDS.set(name, 'in_latests', in_latests)
-        self._check_result_init_id[name] = self._check_result_init_id.pop(old_name)
-        self._check_result_update_id[name] = self._check_result_update_id.pop(old_name)
-        self.threads[name] = self.threads.pop(old_name)
+        self._check_result_init_id[name] = self._check_result_init_id.pop(old_name, '')
+        self._check_result_update_id[name] = self._check_result_update_id.pop(old_name, '')
+        self.threads[name] = self.threads.pop(old_name, None)
         self.queues[name] = self.queues.pop(old_name)
         self.feed_widgets[name] = self.feed_widgets.pop(old_name)
         self.feed_widgets[name].rename_feed(name)
@@ -415,8 +430,9 @@ class App(Tk):
         self.menu_widgets.delete(old_name)
         self.menu_widgets.add_checkbutton(label=name,
                                           command=lambda: self.toggle_feed_widget(name))
-        trace_id = cst.trinfo_trace(self.feed_widgets[name].variable)[0][1]
-        cst.remove_trace(self.feed_widgets[name].variable, 'write', trace_id)
+        trace_info = cst.info_trace(self.feed_widgets[name].variable)
+        if trace_info:
+            cst.remove_trace(self.feed_widgets[name].variable, 'write', trace_info[0][1])
         cst.add_trace(self.feed_widgets[name].variable, 'write',
                       lambda *args: self.feed_widget_trace(name))
         cst.save_feeds()
@@ -433,6 +449,7 @@ class App(Tk):
             self.menu_widgets.delete(title)
         except KeyError:
             pass
+        logging.info("Removed feed '%s' %s", title, FEEDS.get(title, 'url'))
         FEEDS.remove_section(title)
         self.widget.remove_feed(title)
 
@@ -447,6 +464,7 @@ class App(Tk):
     def feed_init(self):
         """Update feeds."""
         for title in FEEDS.sections():
+            logging.info("Updating feed '%s'", title)
             self.threads[title] = Process(target=self.feed_get_info,
                                           args=(FEEDS.get(title, 'url'),
                                                 self.queues[title], 'all'),
@@ -466,10 +484,12 @@ class App(Tk):
                 if cst.internet_on():
                     run(["notify-send", "-i", "dialog-error", _("Error"),
                          _('{url} is not a valid feed.').format(url=FEEDS.get(title, 'url'))])
+                    logging.error('%s is not a valid feed.', FEEDS.get(title, 'url'))
                 else:
                     if self._notify_no_internet:
                         run(["notify-send", "-i", "dialog-error", _("Error"),
                              _('No Internet connection.')])
+                        logging.warning('No Internet connection')
                         self._notify_no_internet = False
                         self._internet_id = self.after(30000, self.test_connection)
                     after_ids = [self._update_id, self._check_add_id,
@@ -486,17 +506,24 @@ class App(Tk):
                     FEEDS.set(title, 'latest', latest)
                     FEEDS.set(title, 'updated', updated)
                     self.widget.update_display(title, latest, updated)
+                    logging.info("Updated feed '%s'", title)
+                else:
+                    logging.info("Feed '%s' is up-to-date", title)
                 for entry_title, date, summary in data:
                     self.feed_widgets[title].entry_add(entry_title, date, summary, -1)
+                logging.info("Populated widget for feed '%s'", title)
 
-    def feed_update(self, terminate=True):
+    def feed_update(self):
         """Update feeds."""
         self.after_cancel(self._update_id)
-        if terminate:
-            for thread in self.threads.values():
+        for thread in self.threads.values():
+            try:
                 thread.terminate()
+            except AttributeError:
+                pass
         self.threads.clear()
         for title in FEEDS.sections():
+            logging.info("Updating feed '%s'", title)
             self.threads[title] = Process(target=self.feed_get_info,
                                           args=(FEEDS.get(title, 'url'),
                                                 self.queues[title]),
@@ -516,10 +543,12 @@ class App(Tk):
                 if cst.internet_on():
                     run(["notify-send", "-i", "dialog-error", _("Error"),
                          _('{url} is not a valid feed.').format(url=FEEDS.get(title, 'url'))])
+                    logging.error('%s is not a valid feed.', FEEDS.get(title, 'url'))
                 else:
                     if self._notify_no_internet:
                         run(["notify-send", "-i", "dialog-error", _("Error"),
                              _('No Internet connection.')])
+                        logging.warning('No Internet connection')
                         self._notify_no_internet = False
                         self._internet_id = self.after(30000, self.test_connection)
                     after_ids = [self._update_id, self._check_add_id,
@@ -531,6 +560,7 @@ class App(Tk):
             else:
                 date = datetime.strptime(updated, '%Y-%m-%d %H:%M')
                 if date > datetime.strptime(FEEDS.get(title, 'updated'), '%Y-%m-%d %H:%M'):
+                    logging.info("Updated feed '%s'", title)
                     run(["notify-send", "-i", cst.IM_ICON_SVG, title,
                          cst.html2text(latest)])
                     FEEDS.set(title, 'latest', latest)
@@ -540,6 +570,8 @@ class App(Tk):
                     end = latest.find('</entry_title>')
                     self.feed_widgets[title].entry_add(latest[start: end], date,
                                                        latest[end + 15:], 0)
+                else:
+                    logging.info("Feed '%s' is up-to-date", title)
 
     def _check_end_update(self):
         b = [t.is_alive() for t in self.threads.values()]

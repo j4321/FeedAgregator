@@ -26,7 +26,7 @@ from locale import getlocale
 from tkinter.font import Font
 from tkinter import Toplevel, BooleanVar, Menu, StringVar, Canvas, TclError
 from tkinter.ttk import Style, Label, Separator, Sizegrip, Frame, Button
-from feedagregatorlib.constants import CONFIG, FEEDS, active_color, APP_NAME, add_trace
+from feedagregatorlib.constants import CONFIG, FEEDS, APP_NAME, add_trace
 from feedagregatorlib.tkinterhtml import HtmlFrame
 from feedagregatorlib.toggledframe import ToggledFrame
 from ewmh import EWMH

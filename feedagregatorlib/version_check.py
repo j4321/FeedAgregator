@@ -35,12 +35,14 @@ from feedagregatorlib.constants import CONFIG, save_config, IM_QUESTION_DATA, \
     IM_ICON_SVG, APP_NAME, PhotoImage
 from feedagregatorlib.version import __version__
 import feedparser
+import logging
 
 
 class UpdateChecker(Toplevel):
 
     def __init__(self, master, notify=False):
         Toplevel.__init__(self, master, class_=APP_NAME)
+        logging.info('Checking for updates')
         self.title(_("Update"))
         self.withdraw()
         self.rowconfigure(0, weight=1)
@@ -81,6 +83,7 @@ class UpdateChecker(Toplevel):
         if self.update is None:
             self.after(1000, self.check_update)
         elif self.update:
+            logging.info("%s %s is available", APP_NAME, self._version)
             self.deiconify()
             self.grab_set()
             self.lift()
@@ -89,6 +92,7 @@ class UpdateChecker(Toplevel):
             if self.notify:
                 run(["notify-send", "-i", IM_ICON_SVG, _("Update"),
                      _("{app_name} is up-to-date.").format(app_name=APP_NAME)])
+            logging.info("%s is up-to-date", APP_NAME)
             self.destroy()
 
     def quit(self):

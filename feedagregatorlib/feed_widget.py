@@ -26,7 +26,7 @@ from locale import getlocale
 from tkinter.font import Font
 from tkinter import Toplevel, BooleanVar, Menu, StringVar, Canvas, TclError
 from tkinter.ttk import Style, Label, Separator, Sizegrip, Frame
-from feedagregatorlib.constants import CONFIG, FEEDS, active_color, APP_NAME, add_trace
+from feedagregatorlib.constants import CONFIG, FEEDS, APP_NAME, add_trace
 from feedagregatorlib.tkinterhtml import HtmlFrame
 from feedagregatorlib.toggledframe import ToggledFrame
 from ewmh import EWMH
@@ -187,7 +187,6 @@ a:hover {
         for tf, l in self.entries:
             l.set_style(self._stylesheet)
             l.set_font_size(self._font_size)
-
 
     def withdraw(self):
         Toplevel.withdraw(self)
