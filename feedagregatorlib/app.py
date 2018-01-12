@@ -353,8 +353,9 @@ class App(Tk):
                 self.feed_widgets[name] = FeedWidget(self, name)
                 self.menu_widgets.add_checkbutton(label=name,
                                                   command=lambda: self.toggle_feed_widget(name))
-                cst.add_trace(self.feed_widgets[title].variable, 'write',
-                              lambda *args: self.feed_widget_trace(title))
+                cst.add_trace(self.feed_widgets[name].variable, 'write',
+                              lambda *args: self.feed_widget_trace(name))
+                self.feed_widgets[name].variable.set(True)
                 for entry_title, date, summary, link in data:
                     self.feed_widgets[name].entry_add(entry_title, date, summary, link, -1)
             else:
@@ -444,16 +445,22 @@ class App(Tk):
         return name
 
     def feed_remove(self, title):
+        self.feed_widgets[title].destroy()
+        del self.queues[title]
         try:
-            self.feed_widgets[title].destroy()
-            del self.queues[title]
             del self.threads[title]
-            del self.feed_widgets[title]
-            del self._check_result_init_id[title]
-            del self._check_result_update_id[title]
-            self.menu_widgets.delete(title)
         except KeyError:
             pass
+        del self.feed_widgets[title]
+        try:
+            del self._check_result_init_id[title]
+        except KeyError:
+            pass
+        try:
+            del self._check_result_update_id[title]
+        except KeyError:
+            pass
+        self.menu_widgets.delete(title)
         logging.info("Removed feed '%s' %s", title, FEEDS.get(title, 'url'))
         FEEDS.remove_section(title)
         self.widget.remove_feed(title)
