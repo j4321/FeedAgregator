@@ -120,7 +120,7 @@ class Manager(Toplevel):
                     name = entry.get()
                     if name:
                         name = self.master.feed_rename(self.tree.set(item, 'Title'), name)
-                        self.tree.set(item, self.tree.set(item, 'Title', name))
+                        self.tree.set(item, 'Title', name)
                     entry.destroy()
 
                 entry.bind('<Return>', ok)
