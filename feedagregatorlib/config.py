@@ -123,8 +123,8 @@ class Config(Toplevel):
             self.confirm_feed_rem.state(('!selected', '!alternate'))
         # --- Confirm remove cat
         self.confirm_cat_rem = Checkbutton(frame_general,
-                                           text=_("Show confirmation dialog before removing feed"))
-        self.confirm_cat_rem.grid(row=5, column=0, padx=8, pady=4, columnspan=2, sticky='w')
+                                           text=_("Show confirmation dialog before removing category"))
+        self.confirm_cat_rem.grid(row=6, column=0, padx=8, pady=4, columnspan=2, sticky='w')
         if CONFIG.getboolean('General', 'confirm_cat_remove', fallback=True):
             self.confirm_cat_rem.state(('selected', '!alternate'))
         else:
@@ -132,7 +132,7 @@ class Config(Toplevel):
         # --- Confirm update
         self.confirm_update = Checkbutton(frame_general,
                                           text=_("Check for updates on start-up"))
-        self.confirm_update.grid(row=6, column=0, padx=8, pady=4, columnspan=2, sticky='w')
+        self.confirm_update.grid(row=7, column=0, padx=8, pady=4, columnspan=2, sticky='w')
         if CONFIG.getboolean('General', 'check_update', fallback=True):
             self.confirm_update.state(('selected', '!alternate'))
         else:
@@ -142,20 +142,6 @@ class Config(Toplevel):
         frame_widget = Frame(self)
         self.notebook.add(frame_widget, text=_('Widget'))
 
-        # --- opacity
-        opacity_frame = Frame(frame_widget)
-        opacity_frame.columnconfigure(1, weight=1)
-        self.opacity_scale = Scale(opacity_frame, orient="horizontal", length=200,
-                                   from_=0, to=100,
-                                   value=CONFIG.get("Widget", "alpha"),
-                                   command=self.display_label)
-        self.opacity_label = Label(opacity_frame,
-                                   text="{val}%".format(val=self.opacity_scale.get()))
-        Label(opacity_frame,
-              text=_("Opacity")).grid(row=0, column=0, sticky="w", padx=4, pady=4)
-        self.opacity_scale.grid(row=0, column=1, padx=(4, 50), pady=4)
-        self.opacity_label.place(in_=self.opacity_scale, relx=1, rely=0.5,
-                                 anchor="w", bordermode="outside")
         # --- font
         frame_font = Frame(frame_widget)
         # ------- title
@@ -257,70 +243,98 @@ class Config(Toplevel):
         self.fonttext_size.current(self.sizes.index(str(self.text_font.cget('size'))))
         self.fonttext_size.grid(row=0, column=1, padx=4, pady=4)
         # ------- grid
-        Label(frame_font, text='Title').grid(row=0, sticky='w')
-        fonttitle_frame.grid(row=1)
-        fonttext_frame.grid(row=2)
+        frame_font.columnconfigure(1, weight=1)
+        Label(frame_font,
+              text=_('Title')).grid(row=0, column=0, sticky='nw', padx=4, pady=4)
+        fonttitle_frame.grid(row=0, column=1)
+        Label(frame_font,
+              text=_('Text')).grid(row=1, column=0, sticky='nw', padx=4, pady=4)
+        fonttext_frame.grid(row=1, column=1)
+
+        # --- opacity
+        opacity_frame = Frame(frame_widget)
+        opacity_frame.columnconfigure(1, weight=1)
+        self.opacity_scale = Scale(opacity_frame, orient="horizontal", length=300,
+                                   from_=0, to=100,
+                                   value=CONFIG.get("Widget", "alpha"),
+                                   command=self.display_label)
+        self.opacity_label = Label(opacity_frame,
+                                   text="{val}%".format(val=self.opacity_scale.get()))
+        Label(opacity_frame, font='TkDefaultFont 9 bold',
+              text=_("Opacity")).grid(row=0, column=0, sticky="w", padx=4, pady=4)
+        self.opacity_scale.grid(row=0, column=1, padx=(4, 50), pady=4)
+        self.opacity_label.place(in_=self.opacity_scale, relx=1, rely=0.5,
+                                 anchor="w", bordermode="outside")
 
         # --- colors
         frame_color = Frame(frame_widget)
+        frame_color.columnconfigure(1, weight=1)
+        frame_color.columnconfigure(3, weight=1)
         self.entry_bg = Entry(frame_color, width=9, justify='center')
         self.entry_fg = Entry(frame_color, width=9, justify='center')
         self.entry_feed_bg = Entry(frame_color, width=9, justify='center')
         self.entry_feed_fg = Entry(frame_color, width=9, justify='center')
         self.entry_link = Entry(frame_color, width=9, justify='center')
-        Label(frame_color, text=_('Background')).grid(row=0, column=0,
+        Label(frame_color,
+              text=_('General')).grid(row=0, column=0, sticky='w', padx=4, pady=4)
+        Label(frame_color, text=_('Background color')).grid(row=0, column=1,
+                                                            sticky='e', padx=4,
+                                                            pady=4)
+        Label(frame_color, text=_('Foreground color')).grid(row=1, column=1,
+                                                            sticky='e', padx=4,
+                                                            pady=4)
+        Label(frame_color,
+              text=_('Feed entry')).grid(row=2, column=0, sticky='w', padx=4, pady=4)
+        Label(frame_color, text=_('Background color')).grid(row=2, column=1,
+                                                            sticky='e', padx=4,
+                                                            pady=4)
+        Label(frame_color, text=_('Foreground color')).grid(row=3, column=1,
+                                                            sticky='e', padx=4,
+                                                            pady=4)
+        Label(frame_color, text=_('Link color')).grid(row=4, column=1,
                                                       sticky='e', padx=4,
                                                       pady=4)
-        Label(frame_color, text=_('Foreground')).grid(row=1, column=0,
-                                                      sticky='e', padx=4,
-                                                      pady=4)
-        Label(frame_color, text=_('Feed background')).grid(row=2, column=0,
-                                                           sticky='e', padx=4,
-                                                           pady=4)
-        Label(frame_color, text=_('Feed foreground')).grid(row=3, column=0,
-                                                           sticky='e', padx=4,
-                                                           pady=4)
-        Label(frame_color, text=_('Link color')).grid(row=4, column=0,
-                                                      sticky='e', padx=4,
-                                                      pady=4)
-        self.entry_bg.grid(row=0, column=1, sticky='w', padx=4, pady=4)
-        self.entry_fg.grid(row=1, column=1, sticky='w', padx=4, pady=4)
-        self.entry_feed_bg.grid(row=2, column=1, sticky='w', padx=4, pady=4)
-        self.entry_feed_fg.grid(row=3, column=1, sticky='w', padx=4, pady=4)
-        self.entry_link.grid(row=4, column=1, sticky='w', padx=4, pady=4)
+        self.entry_bg.grid(row=0, column=2, sticky='w', padx=4, pady=4)
+        self.entry_fg.grid(row=1, column=2, sticky='w', padx=4, pady=4)
+        self.entry_feed_bg.grid(row=2, column=2, sticky='w', padx=4, pady=4)
+        self.entry_feed_fg.grid(row=3, column=2, sticky='w', padx=4, pady=4)
+        self.entry_link.grid(row=4, column=2, sticky='w', padx=4, pady=4)
         self.entry_bg.insert(0, CONFIG.get("Widget", "background"))
         self.entry_feed_fg.insert(0, CONFIG.get("Widget", "feed_foreground"))
         self.entry_feed_bg.insert(0, CONFIG.get("Widget", "feed_background"))
         self.entry_fg.insert(0, CONFIG.get("Widget", "foreground"))
         self.entry_link.insert(0, CONFIG.get("Widget", "link_color"))
         Button(frame_color, image=self.img_color, padding=0,
-               command=lambda: self.askcolor(self.entry_bg)).grid(row=0, column=2,
+               command=lambda: self.askcolor(self.entry_bg)).grid(row=0, column=3,
                                                                   sticky='w',
                                                                   padx=4, pady=4)
         Button(frame_color, image=self.img_color, padding=0,
-               command=lambda: self.askcolor(self.entry_fg)).grid(row=1, column=2,
+               command=lambda: self.askcolor(self.entry_fg)).grid(row=1, column=3,
                                                                   sticky='w',
                                                                   padx=4, pady=4)
         Button(frame_color, image=self.img_color, padding=0,
-               command=lambda: self.askcolor(self.entry_feed_bg)).grid(row=2, column=2,
+               command=lambda: self.askcolor(self.entry_feed_bg)).grid(row=2, column=3,
                                                                        sticky='w',
                                                                        padx=4, pady=4)
         Button(frame_color, image=self.img_color, padding=0,
-               command=lambda: self.askcolor(self.entry_feed_fg)).grid(row=3, column=2,
+               command=lambda: self.askcolor(self.entry_feed_fg)).grid(row=3, column=3,
                                                                        sticky='w',
                                                                        padx=4, pady=4)
         Button(frame_color, image=self.img_color, padding=0,
-               command=lambda: self.askcolor(self.entry_link)).grid(row=4, column=2,
+               command=lambda: self.askcolor(self.entry_link)).grid(row=4, column=3,
                                                                     sticky='w',
                                                                     padx=4, pady=4)
 
         # --- pack
-        opacity_frame.pack()
-        # frame_position.pack()
-        Separator(frame_widget, orient='horizontal').pack(fill='x')
-        frame_font.pack()
-        Separator(frame_widget, orient='horizontal').pack(fill='x')
-        frame_color.pack()
+        Label(frame_widget, text=_('Font'),
+              font='TkDefaultFont 9 bold', anchor='w').pack(padx=4, fill='x')
+        frame_font.pack(fill='x')
+        Separator(frame_widget, orient='horizontal').pack(fill='x', pady=6)
+        opacity_frame.pack(fill='x')
+        Separator(frame_widget, orient='horizontal').pack(fill='x', pady=6)
+        Label(frame_widget, text=_('Colors'),
+              font='TkDefaultFont 9 bold', anchor='w').pack(padx=4, fill='x')
+        frame_color.pack(fill='x')
 
     def askcolor(self, entry):
         try:

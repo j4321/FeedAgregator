@@ -81,12 +81,6 @@ class App(Tk):
         self.style.layout('manager.Treeview.Row',
                           [('Treeitem.row', {'sticky': 'nswe'}),
                            ('Treeitem.image', {'side': 'right', 'sticky': 'e'})])
-#        self.style.layout('manager.Treeview.Item',
-#                          [('Treeitem.padding',
-#                            {'children': [('Checkbutton.indicator',
-#                                           {'side': 'left', 'sticky': ''}),
-#                                          ('Treeitem.text', {'side': 'left', 'sticky': ''})],
-#                             'sticky': 'nswe'})])
         self.widget_style_init()
 
         # --- tray icon menu
