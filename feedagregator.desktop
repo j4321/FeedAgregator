@@ -6,6 +6,6 @@ Name=FeedAgregator
 Exec=feedagregator
 Terminal=false
 Type=Application
-Categories=Internet
+Categories=Network
 StartupNotify=false
 Icon=feedagregator
