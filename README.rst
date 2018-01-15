@@ -5,9 +5,9 @@ RSS and Atom feed agregator in desktop widgets + notifications
 Copyright 2018 Juliette Monsel <j_4321@protonmail.com>
 
 FeedAgregator periodically looks for RSS/Atom feed updates.
-If an update is found, a notification is sent. In addition, a desktop
-widget show the latest entry of all feeds and for each feed, a widget
-shows all entries.
+If an update is found, a notification is sent. In addition, desktop widgets
+display either all the entries of one feed or the latest entry of each 
+feed of a given category.
 
 FeedAgregator is designed for Linux. It is written in Python 3 and relies
 mostly upon Tk GUI toolkit. The application is in the system tray, so it
@@ -46,7 +46,7 @@ Then install the application:
 ::
     $ sudo python3 setup.py install
 
-You can now launch it from `Menu > Internet > FeedAgregator`. You can launch
+You can now launch it from `Menu > Network > FeedAgregator`. You can launch
 it from the command line with `feedagregator`.
 
 

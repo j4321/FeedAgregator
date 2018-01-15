@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-Desktop widget
+Desktop category widget
 """
 from babel.dates import format_datetime
 from datetime import datetime
@@ -26,25 +26,28 @@ from locale import getlocale
 from tkinter.font import Font
 from tkinter import Toplevel, BooleanVar, Menu, StringVar, Canvas, TclError
 from tkinter.ttk import Style, Label, Separator, Sizegrip, Frame, Button
-from feedagregatorlib.constants import CONFIG, FEEDS, APP_NAME, add_trace
+from feedagregatorlib.constants import CONFIG, FEEDS, APP_NAME, add_trace, LATESTS
+from feedagregatorlib.messagebox import askokcancel
 from feedagregatorlib.tkinterhtml import HtmlFrame
 from feedagregatorlib.toggledframe import ToggledFrame
 from ewmh import EWMH
 from webbrowser import open as webopen
 
 
-class Widget(Toplevel):
-    def __init__(self, master):
+class CatWidget(Toplevel):
+    def __init__(self, master, category):
         Toplevel.__init__(self, master, class_=APP_NAME)
         self.attributes('-type', 'splash')
         self.minsize(50, 50)
 
+        self.category = category
+
         # control main menu checkbutton
         self.variable = BooleanVar(self, False)
 
-        self._position = StringVar(self, CONFIG.get('Widget', 'position'))
+        self._position = StringVar(self, LATESTS.get(self.category, 'position'))
         add_trace(self._position, 'write',
-                  lambda *x: CONFIG.set('Widget', 'position', self._position.get()))
+                  lambda *x: LATESTS.set(self.category, 'position', self._position.get()))
 
         self.ewmh = EWMH()
         self.title('feedagregator.widget')
@@ -73,9 +76,12 @@ class Widget(Toplevel):
         self.menu.add_command(label=_('Hide'), command=self.withdraw)
         self.menu.add_command(label=_('Open all'), command=self.open_all)
         self.menu.add_command(label=_('Close all'), command=self.close_all)
+        if category != 'All':
+            self.menu.add_command(label=_('Remove category'), command=self.remove_cat)
 
         # --- elements
-        label = Label(self, text=_('Feeds: Latests'), style='widget.title.TLabel',
+        title = _('Feeds: Latests') if category == 'All' else _('Feeds: {category}').format(category=category)
+        label = Label(self, text=title, style='widget.title.TLabel',
                       anchor='center')
         label.pack(pady=4, fill='x')
         sep = Separator(self, style='widget.TSeparator')
@@ -97,11 +103,11 @@ class Widget(Toplevel):
         corner = Sizegrip(self, style="widget.TSizegrip")
         corner.place(relx=1, rely=1, anchor='se')
 
-        geometry = CONFIG.get('Widget', 'geometry')
+        geometry = LATESTS.get(self.category, 'geometry')
         if geometry:
             self.geometry(geometry)
         self.update_idletasks()
-        if CONFIG.getboolean('Widget', 'visible'):
+        if LATESTS.getboolean(self.category, 'visible'):
             self.deiconify()
 
         # --- bindings
@@ -116,6 +122,16 @@ class Widget(Toplevel):
 
         self.update_idletasks()
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
+
+    def remove_cat(self):
+        rep = True
+        if CONFIG.getboolean('General', 'confirm_cat_remove'):
+            rep = askokcancel(_('Confirmation'),
+                              _('Do you want to remove the category {category}?').format(category=self.category))
+        if rep:
+            for title in self.feeds:
+                FEEDS.set(title, 'category', '')
+            self.master.category_remove(self.category)
 
     def open_all(self):
         for tf, l in self.feeds.values():
@@ -134,12 +150,11 @@ class Widget(Toplevel):
             tf.destroy()
         self.feeds.clear()
         for title in sorted(FEEDS.sections(), key=lambda x: x.lower()):
-            url = FEEDS.get(title, 'url')
-            latest = FEEDS.get(title, 'latest')
-            date = FEEDS.get(title, 'updated')
-            self.add_feed(title, latest, url, date)
-            if not FEEDS.getboolean(title, 'in_latests'):
-                self.hide_feed(title)
+            if self.category in ['All', FEEDS.get(title, 'category')]:
+                url = FEEDS.get(title, 'url')
+                latest = FEEDS.get(title, 'latest')
+                date = FEEDS.get(title, 'updated')
+                self.add_feed(title, latest, url, date)
 
     def add_feed(self, title, latest, url, date):
         """Display feed."""
@@ -182,12 +197,6 @@ class Widget(Toplevel):
         l.bind("<Configure>", resize)
         self.feeds[title] = tf, l
 
-    def hide_feed(self, title):
-        self.feeds[title][0].grid_remove()
-
-    def show_feed(self, title):
-        self.feeds[title][0].grid()
-
     def remove_feed(self, title):
         self.feeds[title][0].destroy()
         del self.feeds[title]
@@ -217,7 +226,6 @@ class Widget(Toplevel):
         bg = CONFIG.get('Widget', 'background')
         feed_bg = CONFIG.get('Widget', 'feed_background')
         feed_fg = CONFIG.get('Widget', 'feed_foreground')
-
 
         self._stylesheet = """
 body {
@@ -304,7 +312,7 @@ a:hover {
         if event.widget is self:
             geometry = self.geometry()
             if geometry != '1x1+0+0':
-                CONFIG.set('Widget', 'geometry', geometry)
+                LATESTS.set(self.category, 'geometry', geometry)
         elif event.widget in [self.canvas, self.display]:
             self.canvas.configure(scrollregion=self.canvas.bbox('all'))
             self.canvas.itemconfigure('display', width=self.canvas.winfo_width() - 4)

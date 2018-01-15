@@ -24,7 +24,7 @@ Launch script.
 
 
 from feedagregatorlib.app import App
-from feedagregatorlib.constants import PIDFILE, save_config, save_feeds, APP_NAME
+from feedagregatorlib.constants import PIDFILE, save_config, save_feeds, APP_NAME, save_latests
 import os
 import sys
 from tkinter import Tk
@@ -64,6 +64,7 @@ except Exception as e:
 finally:
     save_config()
     save_feeds()
+    save_latests()
     os.unlink(PIDFILE)
     logging.info('Closing %s', APP_NAME)
     logging.shutdown()

@@ -113,14 +113,22 @@ class Config(Toplevel):
                                  validatecommand=(self._validate, '%P'))
         self.entry_delay.grid(row=4, column=1, padx=8, pady=4, sticky='w')
         self.entry_delay.insert(0, CONFIG.getint('General', 'update_delay') // 60000)
-        # --- Confirm remove
-        self.confirm_rem = Checkbutton(frame_general,
-                                       text=_("Show confirmation dialog before removing feed"))
-        self.confirm_rem.grid(row=5, column=0, padx=8, pady=4, columnspan=2, sticky='w')
-        if CONFIG.getboolean('General', 'confirm_remove', fallback=True):
-            self.confirm_rem.state(('selected', '!alternate'))
+        # --- Confirm remove feed
+        self.confirm_feed_rem = Checkbutton(frame_general,
+                                            text=_("Show confirmation dialog before removing feed"))
+        self.confirm_feed_rem.grid(row=5, column=0, padx=8, pady=4, columnspan=2, sticky='w')
+        if CONFIG.getboolean('General', 'confirm_feed_remove', fallback=True):
+            self.confirm_feed_rem.state(('selected', '!alternate'))
         else:
-            self.confirm_rem.state(('!selected', '!alternate'))
+            self.confirm_feed_rem.state(('!selected', '!alternate'))
+        # --- Confirm remove cat
+        self.confirm_cat_rem = Checkbutton(frame_general,
+                                           text=_("Show confirmation dialog before removing feed"))
+        self.confirm_cat_rem.grid(row=5, column=0, padx=8, pady=4, columnspan=2, sticky='w')
+        if CONFIG.getboolean('General', 'confirm_cat_remove', fallback=True):
+            self.confirm_cat_rem.state(('selected', '!alternate'))
+        else:
+            self.confirm_cat_rem.state(('!selected', '!alternate'))
         # --- Confirm update
         self.confirm_update = Checkbutton(frame_general,
                                           text=_("Check for updates on start-up"))
@@ -370,7 +378,8 @@ class Config(Toplevel):
         CONFIG.set("General", "language", REV_LANGUAGES[self.lang.get()])
         CONFIG.set("General", "trayicon", self.gui.get().lower())
         CONFIG.set("General", "update_delay", "%i" % (int(self.entry_delay.get()) * 60000))
-        CONFIG.set('General', 'confirm_remove', str(self.confirm_rem.instate(('selected',))))
+        CONFIG.set('General', 'confirm_feed_remove', str(self.confirm_feed_rem.instate(('selected',))))
+        CONFIG.set('General', 'confirm_cat_remove', str(self.confirm_cat_rem.instate(('selected',))))
         CONFIG.set('General', 'check_update', str(self.confirm_update.instate(('selected',))))
         # --- widget
         CONFIG.set("Widget", "alpha", "%i" % float(self.opacity_scale.get()))

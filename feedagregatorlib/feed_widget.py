@@ -27,6 +27,7 @@ from tkinter.font import Font
 from tkinter import Toplevel, BooleanVar, Menu, StringVar, Canvas, TclError
 from tkinter.ttk import Style, Label, Separator, Sizegrip, Frame, Button
 from feedagregatorlib.constants import CONFIG, FEEDS, APP_NAME, add_trace
+from feedagregatorlib.messagebox import askokcancel
 from feedagregatorlib.tkinterhtml import HtmlFrame
 from feedagregatorlib.toggledframe import ToggledFrame
 from ewmh import EWMH
@@ -73,6 +74,7 @@ class FeedWidget(Toplevel):
         self.menu.add_command(label=_('Hide'), command=self.withdraw)
         self.menu.add_command(label=_('Open all'), command=self.open_all)
         self.menu.add_command(label=_('Close all'), command=self.close_all)
+        self.menu.add_command(label=_('Remove feed'), command=self.remove_feed)
 
         # --- elements
         self.label = Label(self, text=feed_name, style='widget.title.TLabel',
@@ -114,6 +116,14 @@ class FeedWidget(Toplevel):
 
         self.update_idletasks()
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
+
+    def remove_feed(self):
+        rep = True
+        if CONFIG.getboolean('General', 'confirm_remove', fallback=True):
+            rep = askokcancel(_('Confirmation'),
+                              _('Do you want to remove the feed {feed}?').format(feed=self.feed_name))
+        if rep:
+            self.master.feed_remove(self.feed_name)
 
     def open_all(self):
         for tf, l in self.entries:

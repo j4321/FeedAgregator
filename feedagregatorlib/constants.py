@@ -73,6 +73,7 @@ else:
     PATH_IMAGES = "/usr/share/feedagregator/images"
 
 PATH_FEEDS = os.path.join(LOCAL_PATH, "feeds.conf")
+PATH_LATESTS = os.path.join(LOCAL_PATH, "latests.conf")
 PATH_CONFIG = os.path.join(LOCAL_PATH, "feedagregator.ini")
 PIDFILE = os.path.join(LOCAL_PATH, "feedagregator.pid")
 PATH_LOG = os.path.join(LOCAL_PATH, "feedagregator.log")
@@ -97,7 +98,9 @@ else:
     CONFIG.set("General", "update_delay", "3600000")
     CONFIG.set("General", "language", getdefaultlocale()[0])
     CONFIG.set("General", "check_update", "True")
-    CONFIG.set("General", "confirm_remove", "True")
+    CONFIG.set("General", "confirm_cat_remove", "True")
+    CONFIG.set("General", "confirm_feed_remove", "True")
+    CONFIG.set("General", "categories", "")
     CONFIG.add_section("Widget")
     CONFIG.set("Widget", "alpha", "80")
     CONFIG.set("Widget", 'font', 'Liberation\ Sans 10')
@@ -107,9 +110,6 @@ else:
     CONFIG.set("Widget", 'feed_foreground', 'white')
     CONFIG.set("Widget", 'feed_background', 'gray20')
     CONFIG.set("Widget", 'link_color', '#89B9F6')
-    CONFIG.set("Widget", "geometry", "")
-    CONFIG.set("Widget", 'position', 'normal')
-    CONFIG.set("Widget", 'visible', 'True')
 
 
 def save_config():
@@ -150,6 +150,22 @@ def save_feeds():
     """Save feeds to file."""
     with open(PATH_FEEDS, 'w') as fichier:
         FEEDS.write(fichier)
+
+
+LATESTS = ConfigParser()
+if os.path.exists(PATH_LATESTS):
+    LATESTS.read(PATH_LATESTS)
+else:
+    LATESTS.add_section('All')
+    LATESTS.set("All", "geometry", "")
+    LATESTS.set("All", 'position', 'normal')
+    LATESTS.set("All", 'visible', 'True')
+
+
+def save_latests():
+    """Save feeds to file."""
+    with open(PATH_LATESTS, 'w') as fichier:
+        LATESTS.write(fichier)
 
 
 # --- images

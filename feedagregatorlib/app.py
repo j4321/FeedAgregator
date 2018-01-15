@@ -31,7 +31,7 @@ import feedagregatorlib.constants as cst
 from feedagregatorlib.add import Add
 from feedagregatorlib.manager import Manager
 from feedagregatorlib.config import Config
-from feedagregatorlib.widget import Widget
+from feedagregatorlib.cat_widget import CatWidget
 from feedagregatorlib.feed_widget import FeedWidget
 from feedagregatorlib.version_check import UpdateChecker
 from feedagregatorlib.about import About
@@ -44,6 +44,7 @@ import logging
 
 CONFIG = cst.CONFIG
 FEEDS = cst.FEEDS
+LATESTS = cst.LATESTS
 
 
 class App(Tk):
@@ -80,21 +81,29 @@ class App(Tk):
         self.style.layout('manager.Treeview.Row',
                           [('Treeitem.row', {'sticky': 'nswe'}),
                            ('Treeitem.image', {'side': 'right', 'sticky': 'e'})])
-        self.style.layout('manager.Treeview.Item',
-                          [('Treeitem.padding',
-                            {'children': [('Checkbutton.indicator',
-                                           {'side': 'left', 'sticky': ''}),
-                                          ('Treeitem.text', {'side': 'left', 'sticky': ''})],
-                             'sticky': 'nswe'})])
+#        self.style.layout('manager.Treeview.Item',
+#                          [('Treeitem.padding',
+#                            {'children': [('Checkbutton.indicator',
+#                                           {'side': 'left', 'sticky': ''}),
+#                                          ('Treeitem.text', {'side': 'left', 'sticky': ''})],
+#                             'sticky': 'nswe'})])
         self.widget_style_init()
 
         # --- tray icon menu
         self.icon = TrayIcon(cst.ICON)
         self.menu_widgets = SubMenu(parent=self.icon.menu)
+        self.menu_categories = SubMenu(parent=self.menu_widgets)
+        self.menu_categories.add_command(label=_('Hide all'), command=self.hide_all_cats)
+        self.menu_categories.add_command(label=_('Show all'), command=self.hide_all_cats)
+        self.menu_feeds = SubMenu(parent=self.menu_widgets)
+        self.menu_feeds.add_command(label=_('Hide all'), command=self.hide_all_feeds)
+        self.menu_feeds.add_command(label=_('Show all'), command=self.show_all_feeds)
+
+        self.menu_widgets.add_cascade(label=_('Categories'), menu=self.menu_categories)
+        self.menu_widgets.add_cascade(label=_('Feeds'), menu=self.menu_feeds)
         self.menu_widgets.add_command(label=_('Hide all'), command=self.hide_all)
         self.menu_widgets.add_command(label=_('Show all'), command=self.show_all)
-        self.menu_widgets.add_checkbutton(label=_("Latests"),
-                                          command=self.toggle_widget)
+
         self.icon.menu.add_cascade(label=_('Widgets'), menu=self.menu_widgets)
         self.icon.menu.add_command(label=_('Add feed'), command=self.add)
         self.icon.menu.add_command(label=_('Manage feeds'),
@@ -108,11 +117,6 @@ class App(Tk):
         self.icon.menu.add_command(label=_('Quit'), command=self.quit)
         self.icon.loop(self)
 
-        self.widget = Widget(self)
-        self.widget.event_generate('<Configure>')
-        cst.add_trace(self.widget.variable, 'write', self.widget_trace)
-        self.widget.variable.set(CONFIG.getboolean('Widget', 'visible'))
-
         self._notify_no_internet = True
 
         self._internet_id = ""
@@ -123,17 +127,37 @@ class App(Tk):
         self._check_result_init_id = {}
         self.queues = {}
         self.threads = {}
+        self.cat_widgets = {}
+        self.cat_widgets['All'] = CatWidget(self, 'All')
+        self.cat_widgets['All'].event_generate('<Configure>')
+        self.menu_widgets.add_checkbutton(label=_('Latests'),
+                                          command=self.toggle_latests_widget)
+        cst.add_trace(self.cat_widgets['All'].variable, 'write',
+                      self.latests_widget_trace)
+        self.cat_widgets['All'].variable.set(LATESTS.getboolean('All', 'visible'))
+        cats = LATESTS.sections()
+
+        cats.remove('All')
+        for category in cats:
+            self.cat_widgets[category] = CatWidget(self, category)
+            self.cat_widgets[category].event_generate('<Configure>')
+            self.menu_categories.add_checkbutton(label=category,
+                                                 command=lambda c=category: self.toggle_category_widget(c))
+            cst.add_trace(self.cat_widgets[category].variable, 'write',
+                          lambda *args, c=category: self.cat_widget_trace(c))
+            self.cat_widgets[category].variable.set(LATESTS.getboolean(category, 'visible'))
+
         self.feed_widgets = {}
         for title in FEEDS.sections():
             self._check_result_update_id[title] = ''
             self._check_result_init_id[title] = ''
             self.queues[title] = Queue(1)
             self.threads[title] = None
-            self.menu_widgets.add_checkbutton(label=title,
-                                              command=lambda t=title: self.toggle_feed_widget(t))
+            self.menu_feeds.add_checkbutton(label=title,
+                                            command=lambda t=title: self.toggle_feed_widget(t))
             self.feed_widgets[title] = FeedWidget(self, title)
             cst.add_trace(self.feed_widgets[title].variable, 'write',
-                          lambda *args, t=title: self.feed_widget_trace(t))
+                          lambda *args, t=title: self.feed_cat_widget_trace(t))
             self.feed_widgets[title].variable.set(FEEDS.getboolean(title, 'visible'))
         self.feed_init()
 
@@ -172,15 +196,39 @@ class App(Tk):
 
     def hide_all(self):
         """Withdraw all widgets."""
-        self.widget.withdraw()
+        for widget in self.cat_widgets.values():
+            widget.withdraw()
         for widget in self.feed_widgets.values():
             widget.withdraw()
 
     def show_all(self):
         """Deiconify all widgets."""
-        self.widget.deiconify()
+        for widget in self.cat_widgets.values():
+            widget.deiconify()
         for widget in self.feed_widgets.values():
             widget.deiconify()
+
+    def hide_all_feeds(self):
+        """Withdraw all feed widgets."""
+        for widget in self.feed_widgets.values():
+            widget.withdraw()
+
+    def show_all_feeds(self):
+        """Deiconify all feed widgets."""
+        for widget in self.feed_widgets.values():
+            widget.deiconify()
+
+    def hide_all_cats(self):
+        """Withdraw all category widgets."""
+        for cat, widget in self.cat_widgets.items():
+            if cat != 'All':
+                widget.withdraw()
+
+    def show_all_cats(self):
+        """Deiconify all category widgets."""
+        for cat, widget in self.cat_widgets.items():
+            if cat != 'All':
+                widget.deiconify()
 
     def start_stop(self):
         """Suspend / restart update checks."""
@@ -233,28 +281,42 @@ class App(Tk):
                 thread.terminate()
             except AttributeError:
                 pass
-        CONFIG.set('Widget', 'visible', str(self.widget.variable.get()))
         for title, widget in self.feed_widgets.items():
             FEEDS.set(title, 'visible', str(widget.variable.get()))
+        for cat, widget in self.cat_widgets.items():
+            LATESTS.set(cat, 'visible', str(widget.variable.get()))
         self.destroy()
 
-    def feed_widget_trace(self, title):
-        self.menu_widgets.set_item_value(title,
-                                         self.feed_widgets[title].variable.get())
+    def feed_cat_widget_trace(self, title):
+        self.menu_feeds.set_item_value(title,
+                                       self.feed_widgets[title].variable.get())
 
-    def widget_trace(self, *args):
-        self.menu_widgets.set_item_value(_("Latests"), self.widget.variable.get())
+    def cat_widget_trace(self, category):
+        self.menu_categories.set_item_value(category,
+                                            self.cat_widgets[category].variable.get())
 
-    def toggle_widget(self):
-        value = self.menu_widgets.get_item_value(_("Latests"))
+    def latests_widget_trace(self, *args):
+        self.menu_widgets.set_item_value(_('Latests'),
+                                         self.cat_widgets['All'].variable.get())
+
+    def toggle_category_widget(self, category):
+        value = self.menu_categories.get_item_value(category)
         if value:
-            self.widget.deiconify()
+            self.cat_widgets[category].deiconify()
         else:
-            self.widget.withdraw()
+            self.cat_widgets[category].withdraw()
+        self.update_idletasks()
+
+    def toggle_latests_widget(self):
+        value = self.menu_widgets.get_item_value(_('Latests'))
+        if value:
+            self.cat_widgets['All'].deiconify()
+        else:
+            self.cat_widgets['All'].withdraw()
         self.update_idletasks()
 
     def toggle_feed_widget(self, title):
-        value = self.menu_widgets.get_item_value(title)
+        value = self.menu_feeds.get_item_value(title)
         if value:
             self.feed_widgets[title].deiconify()
         else:
@@ -271,7 +333,8 @@ class App(Tk):
         self.wait_window(dialog)
         cst.save_config()
         self.widget_style_init()
-        self.widget.update_style()
+        for widget in self.cat_widgets.values():
+            widget.update_style()
         for widget in self.feed_widgets.values():
             widget.update_style()
 
@@ -281,6 +344,14 @@ class App(Tk):
         url = dialog.url
         self.feed_add(url)
 
+    def category_remove(self, category):
+        self.cat_widgets[category].destroy()
+        del self.cat_widgets[category]
+        self.menu_categories.delete(category)
+        LATESTS.remove_section(category)
+        cst.save_feeds()
+        cst.save_latests()
+
     @staticmethod
     def feed_get_info(url, queue, mode='latest'):
         feed = feedparser.parse(url)
@@ -288,10 +359,15 @@ class App(Tk):
         entries = feed['entries']
         today = datetime.now().strftime('%Y-%m-%d %H:%M')
         if entries:
-            latest = """<p id=title>{}</p>\n{}""".format(entries[0].get('title', ''),
-                                                         entries[0].get('summary', ''))
+            entry_title = entries[0].get('title', '')
+            summary = entries[0].get('summary', '')
+            link = entries[0].get('link', '')
+            latest = """<p id=title>{}</p>\n{}""".format(entry_title, summary)
             updated = dateutil.parser.parse(entries[0].get('updated', today)).strftime('%Y-%m-%d %H:%M')
         else:
+            entry_title = ""
+            summary = ""
+            link = ""
             latest = ""
             updated = today
 
@@ -309,7 +385,7 @@ class App(Tk):
                 data.append((title, date, summary, link))
             queue.put((feed_title, latest, updated, data))
         else:
-            queue.put((feed_title, latest, updated))
+            queue.put((feed_title, latest, updated, entry_title, summary, link))
 
     def _check_result_add(self, thread, queue, url, manager_queue=None):
         if thread.is_alive():
@@ -340,21 +416,21 @@ class App(Tk):
                 logging.info("Added feed '%s' %s", name, url)
                 run(["notify-send", "-i", cst.IM_ICON_SVG, name,
                      cst.html2text(latest)])
-                self.widget.add_feed(name, latest, url, date)
+                self.cat_widgets['All'].add_feed(name, latest, url, date)
                 FEEDS.set(name, 'url', url)
                 FEEDS.set(name, 'updated', date)
                 FEEDS.set(name, 'latest', latest)
                 FEEDS.set(name, 'visible', 'True')
                 FEEDS.set(name, 'geometry', '')
                 FEEDS.set(name, 'position', 'normal')
-                FEEDS.set(name, 'in_latests', 'True')
+                FEEDS.set(name, 'category', '')
                 cst.save_feeds()
                 self.queues[name] = queue
                 self.feed_widgets[name] = FeedWidget(self, name)
-                self.menu_widgets.add_checkbutton(label=name,
-                                                  command=lambda: self.toggle_feed_widget(name))
+                self.menu_feeds.add_checkbutton(label=name,
+                                                command=lambda: self.toggle_feed_widget(name))
                 cst.add_trace(self.feed_widgets[name].variable, 'write',
-                              lambda *args: self.feed_widget_trace(name))
+                              lambda *args: self.feed_cat_widget_trace(name))
                 self.feed_widgets[name].variable.set(True)
                 for entry_title, date, summary, link in data:
                     self.feed_widgets[name].entry_add(entry_title, date, summary, link, -1)
@@ -384,20 +460,36 @@ class App(Tk):
             if manager:
                 return manager_queue
 
-    def feed_show(self, title):
-        self.widget.show_feed(title)
-        FEEDS.set(title, 'in_latests', 'True')
-
-    def feed_hide(self, title):
-        self.widget.hide_feed(title)
-        FEEDS.set(title, 'in_latests', 'False')
+    def feed_change_cat(self, title, old_cat, new_cat):
+        if old_cat != new_cat:
+            FEEDS.set(title, 'category', new_cat)
+            if old_cat != '':
+                self.cat_widgets[old_cat].remove_feed(title)
+            if new_cat != '':
+                if new_cat not in LATESTS.sections():
+                    LATESTS.add_section(new_cat)
+                    LATESTS.set(new_cat, 'visible', 'True')
+                    LATESTS.set(new_cat, 'geometry', '')
+                    LATESTS.set(new_cat, 'position', 'normal')
+                    self.cat_widgets[new_cat] = CatWidget(self, new_cat)
+                    self.cat_widgets[new_cat].event_generate('<Configure>')
+                    self.menu_categories.add_checkbutton(label=new_cat,
+                                                         command=lambda: self.toggle_category_widget(new_cat))
+                    cst.add_trace(self.cat_widgets[new_cat].variable, 'write',
+                                  lambda *args: self.cat_widget_trace(new_cat))
+                    self.cat_widgets[new_cat].variable.set(True)
+                else:
+                    self.cat_widgets[new_cat].add_feed(title,
+                                                       FEEDS.get(title, 'latest'),
+                                                       FEEDS.get(title, 'url'),
+                                                       FEEDS.get(title, 'updated'))
 
     def feed_rename(self, old_name, new_name):
         url = FEEDS.get(old_name, 'url')
         updated = FEEDS.get(old_name, 'updated')
         visible = FEEDS.get(old_name, 'visible')
         latest = FEEDS.get(old_name, 'latest')
-        in_latests = FEEDS.get(old_name, 'in_latests')
+        category = FEEDS.get(old_name, 'category', fallback='')
         position = FEEDS.get(old_name, 'position')
         geometry = FEEDS.get(old_name, 'geometry')
         FEEDS.remove_section(old_name)
@@ -425,22 +517,24 @@ class App(Tk):
         FEEDS.set(name, 'visible', visible)
         FEEDS.set(name, 'geometry', geometry)
         FEEDS.set(name, 'position', position)
-        FEEDS.set(name, 'in_latests', in_latests)
+        FEEDS.set(name, 'category', category)
         self._check_result_init_id[name] = self._check_result_init_id.pop(old_name, '')
         self._check_result_update_id[name] = self._check_result_update_id.pop(old_name, '')
         self.threads[name] = self.threads.pop(old_name, None)
         self.queues[name] = self.queues.pop(old_name)
         self.feed_widgets[name] = self.feed_widgets.pop(old_name)
         self.feed_widgets[name].rename_feed(name)
-        self.widget.rename_feed(old_name, name)
-        self.menu_widgets.delete(old_name)
-        self.menu_widgets.add_checkbutton(label=name,
-                                          command=lambda: self.toggle_feed_widget(name))
+        self.cat_widgets['All'].rename_feed(old_name, name)
+        if category != '':
+            self.cat_widgets[category].rename_feed(old_name, name)
+        self.menu_feeds.delete(old_name)
+        self.menu_feeds.add_checkbutton(label=name,
+                                        command=lambda: self.toggle_feed_widget(name))
         trace_info = cst.info_trace(self.feed_widgets[name].variable)
         if trace_info:
             cst.remove_trace(self.feed_widgets[name].variable, 'write', trace_info[0][1])
         cst.add_trace(self.feed_widgets[name].variable, 'write',
-                      lambda *args: self.feed_widget_trace(name))
+                      lambda *args: self.feed_cat_widget_trace(name))
         cst.save_feeds()
         return name
 
@@ -460,15 +554,35 @@ class App(Tk):
             del self._check_result_update_id[title]
         except KeyError:
             pass
-        self.menu_widgets.delete(title)
+        self.menu_feeds.delete(title)
         logging.info("Removed feed '%s' %s", title, FEEDS.get(title, 'url'))
+        category = FEEDS.get(title, 'category', fallback='')
+        self.cat_widgets['All'].remove_feed(title)
+        if category != '':
+            self.cat_widgets[category].remove_feed(title)
         FEEDS.remove_section(title)
-        self.widget.remove_feed(title)
 
     def feed_manage(self):
         dialog = Manager(self)
         self.wait_window(dialog)
         self.update_idletasks()
+#        cats = LATESTS.sections()
+#        cats.remove('All')
+#        cats.append('')
+#        new_cats = [cat for cat in dialog.categories if cat not in cats]
+#        for cat in new_cats:
+#            LATESTS.add_section(cat)
+#            LATESTS.set(cat, 'visible', 'True')
+#            LATESTS.set(cat, 'geometry', '')
+#            LATESTS.set(cat, 'position', 'normal')
+#            self.cat_widgets[cat] = CatWidget(self, cat)
+#            self.cat_widgets[cat].event_generate('<Configure>')
+#            self.menu_categories.add_checkbutton(label=cat,
+#                                                 command=lambda: self.toggle_category_widget(cat))
+#            cst.add_trace(self.cat_widgets[cat].variable, 'write',
+#                          lambda *args: self.cat_widget_trace(cat))
+#            self.cat_widgets[cat].variable.set(True)
+        cst.save_latests()
         if dialog.change_made:
             cst.save_feeds()
             self.feed_update()
@@ -517,7 +631,10 @@ class App(Tk):
                          cst.html2text(latest)])
                     FEEDS.set(title, 'latest', latest)
                     FEEDS.set(title, 'updated', updated)
-                    self.widget.update_display(title, latest, updated)
+                    category = FEEDS.get(title, 'category')
+                    self.cat_widgets[category].update_display(title, latest, updated)
+                    if category != '':
+                        self.cat_widgets[category].update_display(title, latest, updated)
                     logging.info("Updated feed '%s'", title)
                 else:
                     logging.info("Feed '%s' is up-to-date", title)
@@ -551,7 +668,7 @@ class App(Tk):
                                                              self._check_result_update,
                                                              title)
         else:
-            t, latest, updated = self.queues[title].get(False)
+            t, latest, updated, entry_title, summary, link = self.queues[title].get(False)
             if not t:
                 if cst.internet_on():
                     run(["notify-send", "-i", "dialog-error", _("Error"),
@@ -578,11 +695,12 @@ class App(Tk):
                          cst.html2text(latest)])
                     FEEDS.set(title, 'latest', latest)
                     FEEDS.set(title, 'updated', updated)
-                    self.widget.update_display(title, latest, updated)
-                    start = latest.find('<entry_title>') + 13
-                    end = latest.find('</entry_title>')
-                    self.feed_widgets[title].entry_add(latest[start: end], date,
-                                                       latest[end + 15:], 0)
+                    category = FEEDS.get(title, 'category')
+                    self.cat_widgets['All'].update_display(title, latest, updated)
+                    if category != '':
+                        self.cat_widgets[category].update_display(title, latest, updated)
+                    self.feed_widgets[title].entry_add(entry_title, updated,
+                                                       summary, link, 0)
                 else:
                     logging.info("Feed '%s' is up-to-date", title)
 

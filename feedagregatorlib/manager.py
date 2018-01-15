@@ -23,10 +23,11 @@ Feed manager dialog
 from tkinter import Toplevel
 from tkinter.ttk import Entry, Button, Treeview
 from feedagregatorlib.constants import FEEDS, IM_MOINS, IM_PLUS, \
-    IM_MOINS_SEL, IM_MOINS_CLICKED, APP_NAME, PhotoImage, CONFIG
+    IM_MOINS_SEL, IM_MOINS_CLICKED, APP_NAME, PhotoImage, LATESTS, CONFIG
 from feedagregatorlib.add import Add
 from feedagregatorlib.messagebox import askokcancel
 from feedagregatorlib.autoscrollbar import AutoScrollbar
+from feedagregatorlib.autocomplete import AutoCompleteCombobox
 
 
 class Manager(Toplevel):
@@ -45,19 +46,23 @@ class Manager(Toplevel):
 
         self.change_made = False
 
+        self.categories = set(LATESTS.sections())
+        self.categories.remove('All')
+        self.categories.add('')
+
         # --- treeview
-        self.tree = Treeview(self, columns=('Title', 'URL', 'Remove'),
-                             style='manager.Treeview',
+        self.tree = Treeview(self, columns=('Title', 'URL', 'Category', 'Remove'),
+                             style='manager.Treeview', show='headings',
                              selectmode='none')
-        self.tree.heading('#0',
-                          command=lambda: self._sort_by_in_latests(False))
-        self.tree.heading('Title', text='Title',
+        self.tree.heading('Title', text=_('Title'),
                           command=lambda: self._sort_column('Title', False))
-        self.tree.heading('URL', text='URL',
+        self.tree.heading('URL', text=_('URL'),
                           command=lambda: self._sort_column('URL', False))
-        self.tree.column('#0', stretch=False, width=15, minwidth=15)
+        self.tree.heading('Category', text=_('Category'),
+                          command=lambda: self._sort_column('Category', False))
         self.tree.column('Title', width=250)
         self.tree.column('URL', width=350)
+        self.tree.column('Category', width=150)
         self.tree.column('Remove', width=20, minwidth=20, stretch=False)
 
         y_scroll = AutoScrollbar(self, orient='vertical',
@@ -73,10 +78,10 @@ class Manager(Toplevel):
         # --- populate treeview
         for title in sorted(FEEDS.sections(), key=lambda x: x.lower()):
             item = self.tree.insert('', 'end',
-                                    values=(title, FEEDS.get(title, 'url'), ''))
+                                    values=(title, FEEDS.get(title, 'url'),
+                                            FEEDS.get(title, 'category', fallback=''),
+                                            ''))
             self.tree.item(item, tags=item)
-            if FEEDS.getboolean(title, 'in_latests'):
-                self.tree.selection_add(item)
             self.tree.tag_configure(item, image=self.im_moins)
             self.tree.tag_bind(item, '<ButtonRelease-1>',
                                lambda event, i=item: self._click_release(event, i))
@@ -114,9 +119,8 @@ class Manager(Toplevel):
                 def ok(event):
                     name = entry.get()
                     if name:
-                        values = self.tree.item(item, 'values')
-                        name = self.master.feed_rename(values[0], name)
-                        self.tree.item(item, values=(name, values[1], ''))
+                        name = self.master.feed_rename(self.tree.set(item, 'Title'), name)
+                        self.tree.set(item, self.tree.set(item, 'Title', name))
                     entry.destroy()
 
                 entry.bind('<Return>', ok)
@@ -127,15 +131,45 @@ class Manager(Toplevel):
 
             entry.selection_range(0, 'end')
             entry.focus_set()
+        elif column == '#3':
+
+            def focus_out(event):
+                x, y = self.tree.winfo_pointerxy()
+                x0 = combo.winfo_rootx()
+                x1 = x0 + combo.winfo_width()
+                y0 = combo.winfo_rooty()
+                y1 = y0 + combo.winfo_height()
+                if not (x0 <= x <= x1 and y0 <= y <= y1):
+                    combo.destroy()
+
+            def ok(event):
+                category = combo.get().strip()
+                self.categories.add(category)
+                self.master.feed_change_cat(self.tree.set(item, 'Title'),
+                                            self.tree.set(item, 'Category'),
+                                            category)
+                self.tree.set(item, 'Category', category)
+                combo.destroy()
+
+            bbox = self.tree.bbox(item, column)
+            cat = list(self.categories)
+            combo = AutoCompleteCombobox(self.tree, values=cat, allow_other_values=True)
+            combo.place(x=bbox[0], y=bbox[1], width=bbox[2], height=bbox[3],
+                        anchor='nw')
+            combo.bind('<Escape>', lambda e: combo.destroy())
+            combo.bind('<FocusOut>', focus_out)
+            combo.bind('<Return>', ok)
+            combo.bind('<<ComboboxSelected>>', ok)
+            combo.current(cat.index(self.tree.set(item, '#3')))
 
     def _press(self, event, item):
-        if self.tree.identify_column(event.x) == '#3':
+        if self.tree.identify_column(event.x) == '#4':
             self.tree.tag_configure(item, image=self.im_moins_clicked)
 
     def _click_release(self, event, item):
         """Handle click on items."""
         if self.tree.identify_row(event.y) == item:
-            if self.tree.identify_column(event.x) == '#3':
+            if self.tree.identify_column(event.x) == '#4':
                 title = self.tree.item(item, 'values')[0]
                 rep = True
                 if CONFIG.getboolean('General', 'confirm_remove', fallback=True):
@@ -145,15 +179,6 @@ class Manager(Toplevel):
                     self.master.feed_remove(title)
                     self.tree.delete(item)
                     self.change_made = True
-            elif self.tree.identify_element(event.x, event.y) == 'Checkbutton.indicator':
-                sel = self.tree.selection()
-                if item in sel:
-                    self.tree.selection_remove(item)
-                    self.master.feed_hide(self.tree.item(item, 'values')[0])
-                else:
-                    self.tree.selection_add(item)
-                    self.master.feed_show(self.tree.item(item, 'values')[0])
-                self.change_made = True
         else:
             self.tree.tag_configure(item, image=self.im_moins)
 
@@ -166,7 +191,7 @@ class Manager(Toplevel):
         """Highlight minus icon under the mouse."""
         if self._last_active_item is not None:
             self.tree.tag_configure(self._last_active_item, image=self.im_moins)
-        if self.tree.identify_column(event.x) == '#3':
+        if self.tree.identify_column(event.x) == '#4':
             item = self.tree.identify_row(event.y)
             if item:
                 self.tree.tag_configure(item, image=self.im_moins_sel)
@@ -184,15 +209,6 @@ class Manager(Toplevel):
             self.tree.move(c, "", index)
         self.tree.heading(column,
                           command=lambda: self._sort_column(column, not reverse))
-
-    def _sort_by_in_latests(self, reverse):
-        sel = self.tree.selection()
-        l = [(c in sel,) + self.tree.item(c, 'values') + (c,) for c in self.tree.get_children('')]
-        l.sort(reverse=reverse, key=lambda x: x[0])
-        for index, val in enumerate(l):
-            self.tree.move(val[-1], "", index)
-        self.tree.heading('#0',
-                          command=lambda: self._sort_by_in_latests(not reverse))
 
     def feed_add(self):
         dialog = Add(self)
