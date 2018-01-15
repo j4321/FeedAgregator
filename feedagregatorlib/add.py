@@ -52,5 +52,5 @@ class Add(Toplevel):
         self.url_entry.focus_set()
 
     def validate(self, event=None):
-        self.url = self.url_entry.get()
+        self.url = self.url_entry.get().strip()
         self.destroy()
