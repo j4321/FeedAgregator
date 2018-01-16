@@ -35,7 +35,10 @@ from feedagregatorlib.cat_widget import CatWidget
 from feedagregatorlib.feed_widget import FeedWidget
 from feedagregatorlib.version_check import UpdateChecker
 from feedagregatorlib.about import About
-from subprocess import run
+try:
+    from subprocess import run
+except ImportError:
+    from subprocess import call as run
 import configparser
 import traceback
 from multiprocessing import Process, Queue

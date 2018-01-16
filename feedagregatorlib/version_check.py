@@ -71,7 +71,9 @@ class UpdateChecker(Toplevel):
                                                            sticky="w")
         self.ch = Checkbutton(self, text=_("Check for updates on startup."))
         if CONFIG.getboolean("General", "check_update"):
-            self.ch.state(("selected", ))
+            self.ch.state(("selected", "!alternate"))
+        else:
+            self.ch.state(("!selected", "!alternate"))
         self.ch.grid(row=2, columnspan=2, sticky='w')
         self.update = None
 
@@ -114,7 +116,7 @@ class UpdateChecker(Toplevel):
         try:
             # feed['entries'][0]['id'] is of the form 'tag:github.com,...:Repository/.../vx.y.z'
             self._version = os.path.split(feed['entries'][0]['id'])[1][1:]
-            self.update = self._version
+            self.update = self._version > __version__
         except IndexError:
             # feed['entries'] == [] because there is no Internet connection
             self.update = False
