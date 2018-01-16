@@ -25,7 +25,7 @@ from datetime import datetime
 from locale import getlocale
 from tkinter.font import Font
 from tkinter import Toplevel, BooleanVar, Menu, StringVar, Canvas, TclError
-from tkinter.ttk import Style, Label, Separator, Sizegrip, Frame, Button
+from tkinter.ttk import Style, Label, Separator, Sizegrip, Frame, Button, Entry
 from feedagregatorlib.constants import CONFIG, FEEDS, APP_NAME, add_trace
 from feedagregatorlib.messagebox import askokcancel
 from feedagregatorlib.tkinterhtml import HtmlFrame
@@ -79,7 +79,8 @@ class FeedWidget(Toplevel):
         # --- elements
         self.label = Label(self, text=feed_name, style='widget.title.TLabel',
                            anchor='center')
-        self.label.pack(pady=4, fill='x')
+        self.label.pack(padx=4, pady=4, fill='x')
+        self.label.bind('<Double-1>', self.rename)
         sep = Separator(self, style='widget.TSeparator')
         sep.pack(fill='x')
         self.canvas = Canvas(self, highlightthickness=0)
@@ -185,6 +186,23 @@ class FeedWidget(Toplevel):
             self.entries.append((tf, l))
         else:
             self.entries.insert(index, (tf, l))
+
+    def rename(self, event):
+
+        def ok(event):
+            name = entry.get()
+            entry.destroy()
+            if name:
+                self.master.feed_rename(self.feed_name, name)
+
+        entry = Entry(self, justify='center')
+        entry.insert(0, self.feed_name)
+        entry.selection_range(0, 'end')
+        entry.place(in_=self.label, relwidth=1, relheight=1, x=0, y=0, anchor='nw')
+        entry.bind('<Return>', ok)
+        entry.bind('<Escape>', lambda e: entry.destroy())
+        entry.bind('<FocusOut>', lambda e: entry.destroy())
+        entry.focus_force()
 
     def rename_feed(self, new_name):
         self.feed_name = new_name
