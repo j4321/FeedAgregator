@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-15 18:09+0100\n"
+"POT-Creation-Date: 2018-01-16 16:58+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: feedagregatorlib/config.py:36 feedagregatorlib/app.py:107
+#: feedagregatorlib/config.py:36 feedagregatorlib/app.py:111
 msgid "Settings"
 msgstr ""
 
@@ -127,7 +127,7 @@ msgid ""
 "The GUI Toolkit setting will take effect after restarting the application"
 msgstr ""
 
-#: feedagregatorlib/version_check.py:46 feedagregatorlib/version_check.py:93
+#: feedagregatorlib/version_check.py:46 feedagregatorlib/version_check.py:95
 msgid "Update"
 msgstr ""
 
@@ -152,7 +152,7 @@ msgstr ""
 msgid "Check for updates on startup."
 msgstr ""
 
-#: feedagregatorlib/version_check.py:94
+#: feedagregatorlib/version_check.py:96
 #, python-brace-format
 msgid "{app_name} is up-to-date."
 msgstr ""
@@ -219,7 +219,7 @@ msgid "Feeds: {category}"
 msgstr ""
 
 #: feedagregatorlib/cat_widget.py:129 feedagregatorlib/manager.py:176
-#: feedagregatorlib/feed_widget.py:123
+#: feedagregatorlib/feed_widget.py:124
 msgid "Confirmation"
 msgstr ""
 
@@ -275,77 +275,81 @@ msgstr ""
 msgid "Please report this bug on "
 msgstr ""
 
-#: feedagregatorlib/app.py:90 feedagregatorlib/app.py:93
-#: feedagregatorlib/app.py:98
+#: feedagregatorlib/app.py:93 feedagregatorlib/app.py:96
+#: feedagregatorlib/app.py:101
 msgid "Hide all"
 msgstr ""
 
-#: feedagregatorlib/app.py:91 feedagregatorlib/app.py:94
-#: feedagregatorlib/app.py:99
+#: feedagregatorlib/app.py:94 feedagregatorlib/app.py:97
+#: feedagregatorlib/app.py:102
 msgid "Show all"
 msgstr ""
 
-#: feedagregatorlib/app.py:96
+#: feedagregatorlib/app.py:99
 msgid "Categories"
 msgstr ""
 
-#: feedagregatorlib/app.py:97
+#: feedagregatorlib/app.py:100
 msgid "Feeds"
 msgstr ""
 
-#: feedagregatorlib/app.py:101
+#: feedagregatorlib/app.py:104
 msgid "Widgets"
 msgstr ""
 
-#: feedagregatorlib/app.py:102
+#: feedagregatorlib/app.py:105
 msgid "Add feed"
 msgstr ""
 
-#: feedagregatorlib/app.py:103
+#: feedagregatorlib/app.py:106
+msgid "Update feeds"
+msgstr ""
+
+#: feedagregatorlib/app.py:107
 msgid "Manage feeds"
 msgstr ""
 
-#: feedagregatorlib/app.py:105 feedagregatorlib/app.py:229
-#: feedagregatorlib/app.py:240
+#: feedagregatorlib/app.py:109 feedagregatorlib/app.py:233
+#: feedagregatorlib/app.py:245
 msgid "Suspend"
 msgstr ""
 
-#: feedagregatorlib/app.py:108
+#: feedagregatorlib/app.py:112
 msgid "Check for updates"
 msgstr ""
 
-#: feedagregatorlib/app.py:110
+#: feedagregatorlib/app.py:114
 msgid "About"
 msgstr ""
 
-#: feedagregatorlib/app.py:111
+#: feedagregatorlib/app.py:115
 msgid "Quit"
 msgstr ""
 
-#: feedagregatorlib/app.py:127 feedagregatorlib/app.py:293
-#: feedagregatorlib/app.py:305
+#: feedagregatorlib/app.py:131 feedagregatorlib/app.py:295
+#: feedagregatorlib/app.py:307
 msgid "Latests"
 msgstr ""
 
-#: feedagregatorlib/app.py:236
+#: feedagregatorlib/app.py:240
 msgid "Restart"
 msgstr ""
 
-#: feedagregatorlib/app.py:323 feedagregatorlib/app.py:436
-#: feedagregatorlib/app.py:439 feedagregatorlib/app.py:605
-#: feedagregatorlib/app.py:610 feedagregatorlib/app.py:668
-#: feedagregatorlib/app.py:673 feedagregator.py:50 feedagregator.py:63
+#: feedagregatorlib/app.py:325 feedagregatorlib/app.py:441
+#: feedagregatorlib/app.py:444 feedagregatorlib/app.py:594
+#: feedagregatorlib/app.py:599 feedagregatorlib/app.py:657
+#: feedagregatorlib/app.py:662 feedagregator.py:50 feedagregator.py:63
 msgid "Error"
 msgstr ""
 
-#: feedagregatorlib/app.py:436 feedagregatorlib/app.py:606
-#: feedagregatorlib/app.py:669
+#: feedagregatorlib/app.py:441 feedagregatorlib/app.py:595
+#: feedagregatorlib/app.py:658
 #, python-brace-format
 msgid "{url} is not a valid feed."
 msgstr ""
 
-#: feedagregatorlib/app.py:439 feedagregatorlib/app.py:611
-#: feedagregatorlib/app.py:674
+#: feedagregatorlib/app.py:444 feedagregatorlib/app.py:600
+#: feedagregatorlib/app.py:663
 msgid "No Internet connection."
 msgstr ""
 
@@ -357,7 +361,7 @@ msgstr ""
 msgid "Category"
 msgstr ""
 
-#: feedagregatorlib/manager.py:177 feedagregatorlib/feed_widget.py:124
+#: feedagregatorlib/manager.py:177 feedagregatorlib/feed_widget.py:125
 #, python-brace-format
 msgid "Do you want to remove the feed {feed}?"
 msgstr ""
