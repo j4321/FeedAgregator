@@ -103,6 +103,7 @@ class App(Tk):
 
         self.icon.menu.add_cascade(label=_('Widgets'), menu=self.menu_widgets)
         self.icon.menu.add_command(label=_('Add feed'), command=self.add)
+        self.icon.menu.add_command(label=_('Update feeds'), command=self.feed_update)
         self.icon.menu.add_command(label=_('Manage feeds'),
                                    command=self.feed_manage)
         self.icon.menu.add_command(label=_("Suspend"), command=self.start_stop)
@@ -229,19 +230,21 @@ class App(Tk):
 
     def start_stop(self):
         """Suspend / restart update checks."""
-        if self.icon.menu.get_item_label(3) == _("Suspend"):
+        if self.icon.menu.get_item_label(4) == _("Suspend"):
             after_ids = [self._update_id, self._check_add_id, self._internet_id,
                          self._check_end_update_id, self._update_id]
             after_ids.extend(self._check_result_update_id.values())
             after_ids.extend(self._check_result_init_id.values())
             for after_id in after_ids:
                 self.after_cancel(after_id)
-            self.icon.menu.set_item_label(3, _("Restart"))
+            self.icon.menu.set_item_label(4, _("Restart"))
             self.icon.menu.disable_item(1)
+            self.icon.menu.disable_item(2)
             self.icon.change_icon(cst.ICON_DISABLED, 'feedagregator suspended')
         else:
-            self.icon.menu.set_item_label(3, _("Suspend"))
+            self.icon.menu.set_item_label(4, _("Suspend"))
             self.icon.menu.enable_item(1)
+            self.icon.menu.enable_item(2)
             self.icon.change_icon(cst.ICON, 'feedagregator')
             for widget in self.feed_widgets.values():
                 widget.clear()
