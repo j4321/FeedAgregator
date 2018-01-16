@@ -267,11 +267,7 @@ class App(Tk):
             self._internet_id = self.after(30000, self.test_connection)
 
     def quit(self):
-        after_ids = [self._update_id, self._check_add_id, self._internet_id,
-                     self._check_end_update_id, self._update_id, self.loop_id]
-        after_ids.extend(self._check_result_update_id.values())
-        after_ids.extend(self._check_result_init_id.values())
-        for after_id in after_ids:
+        for after_id in self.tk.call('after', 'info'):
             self.after_cancel(after_id)
         for thread in self.threads.values():
             try:
@@ -326,6 +322,7 @@ class App(Tk):
         showerror(_("Error"), str(args[1]), err, True)
 
     def settings(self):
+        update_delay = CONFIG.get('General', 'update_delay')
         dialog = Config(self)
         self.wait_window(dialog)
         cst.save_config()
@@ -334,6 +331,8 @@ class App(Tk):
             widget.update_style()
         for widget in self.feed_widgets.values():
             widget.update_style()
+        if update_delay != CONFIG.get('General', 'update_delay'):
+            self.feed_update()
 
     def add(self):
         dialog = Add(self)
@@ -563,22 +562,6 @@ class App(Tk):
         dialog = Manager(self)
         self.wait_window(dialog)
         self.update_idletasks()
-#        cats = LATESTS.sections()
-#        cats.remove('All')
-#        cats.append('')
-#        new_cats = [cat for cat in dialog.categories if cat not in cats]
-#        for cat in new_cats:
-#            LATESTS.add_section(cat)
-#            LATESTS.set(cat, 'visible', 'True')
-#            LATESTS.set(cat, 'geometry', '')
-#            LATESTS.set(cat, 'position', 'normal')
-#            self.cat_widgets[cat] = CatWidget(self, cat)
-#            self.cat_widgets[cat].event_generate('<Configure>')
-#            self.menu_categories.add_checkbutton(label=cat,
-#                                                 command=lambda: self.toggle_category_widget(cat))
-#            cst.add_trace(self.cat_widgets[cat].variable, 'write',
-#                          lambda *args: self.cat_widget_trace(cat))
-#            self.cat_widgets[cat].variable.set(True)
         cst.save_latests()
         if dialog.change_made:
             cst.save_feeds()
