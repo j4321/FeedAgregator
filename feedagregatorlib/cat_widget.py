@@ -50,7 +50,7 @@ class CatWidget(Toplevel):
                   lambda *x: LATESTS.set(self.category, 'position', self._position.get()))
 
         self.ewmh = EWMH()
-        self.title('feedagregator.widget')
+        self.title('feedagregator.widget.{}'.format(self.category.replace(' ', '_')))
         self.withdraw()
 
         self.feeds = {}
@@ -129,6 +129,7 @@ class CatWidget(Toplevel):
             widget.bind('<ButtonRelease-1>', self._stop_move)
             widget.bind('<B1-Motion>', self._move)
         self.bind('<Configure>', self._on_configure)
+        self.bind('<Map>', self._change_position)
         self.bind('<4>', lambda e: self._scroll(-1))
         self.bind('<5>', lambda e: self._scroll(1))
 
@@ -309,25 +310,19 @@ a:hover {
         top = min(max(top, 0), 1)
         self.canvas.yview_moveto(top)
 
-    def _change_position(self):
-        ''' make widget sticky '''
-        for w in self.ewmh.getClientList():
-            if w.get_wm_name() == 'feedagregator.widget':
-                self.ewmh.setWmState(w, 1, '_NET_WM_STATE_STICKY')
+    def _change_position(self, event=None):
+        '''Make widget sticky and set its position with respects to the other windows.'''
         pos = self._position.get()
-        if pos == 'above':
-            for w in self.ewmh.getClientList():
-                if w.get_wm_name() == 'feedagregator.widget':
+        for w in self.ewmh.getClientList():
+            if w.get_wm_name() == self.title():
+                self.ewmh.setWmState(w, 1, '_NET_WM_STATE_STICKY')
+                if pos == 'above':
                     self.ewmh.setWmState(w, 1, '_NET_WM_STATE_ABOVE')
                     self.ewmh.setWmState(w, 0, '_NET_WM_STATE_BELOW')
-        elif pos == 'below':
-            for w in self.ewmh.getClientList():
-                if w.get_wm_name() == 'feedagregator.widget':
+                elif pos == 'below':
                     self.ewmh.setWmState(w, 0, '_NET_WM_STATE_ABOVE')
                     self.ewmh.setWmState(w, 1, '_NET_WM_STATE_BELOW')
-        else:
-            for w in self.ewmh.getClientList():
-                if w.get_wm_name() == 'feedagregator.widget':
+                else:
                     self.ewmh.setWmState(w, 0, '_NET_WM_STATE_BELOW')
                     self.ewmh.setWmState(w, 0, '_NET_WM_STATE_ABOVE')
         self.ewmh.display.flush()
