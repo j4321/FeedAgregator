@@ -621,7 +621,7 @@ class App(Tk):
                     FEEDS.set(title, 'latest', latest)
                     FEEDS.set(title, 'updated', updated)
                     category = FEEDS.get(title, 'category')
-                    self.cat_widgets[category].update_display(title, latest, updated)
+                    self.cat_widgets['All'].update_display(title, latest, updated)
                     if category != '':
                         self.cat_widgets[category].update_display(title, latest, updated)
                     logging.info("Updated feed '%s'", title)
