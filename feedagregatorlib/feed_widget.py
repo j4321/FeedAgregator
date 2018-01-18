@@ -57,11 +57,24 @@ class FeedWidget(Toplevel):
         self.x = None
         self.y = None
 
+        self._sort_is_reversed = BooleanVar(self,
+                                            FEEDS.getboolean(self.feed_name,
+                                                             'sort_is_reversed',
+                                                             fallback=False))
+        add_trace(self._sort_is_reversed, 'write',
+                  lambda *args: FEEDS.set(self.feed_name, 'sort_is_reversed', str(self._sort_is_reversed.get())))
+
         # --- menu
         self.menu = Menu(self, tearoff=False)
         menu_sort = Menu(self.menu, tearoff=False)
-        menu_sort.add_command(label=_('Oldest first'), command=lambda: self._sort_by_date(reverse=True))
-        menu_sort.add_command(label=_('Most recent first'), command=lambda: self._sort_by_date(reverse=False))
+        menu_sort.add_radiobutton(label=_('Oldest first'),
+                                  variable=self._sort_is_reversed,
+                                  value=True,
+                                  command=self.sort_by_date)
+        menu_sort.add_radiobutton(label=_('Most recent first'),
+                                  variable=self._sort_is_reversed,
+                                  value=False,
+                                  command=self.sort_by_date)
         menu_pos = Menu(self.menu, tearoff=False)
         menu_pos.add_radiobutton(label=_('Normal'), value='normal',
                                  variable=self._position, command=self._change_position)
@@ -254,8 +267,8 @@ a:hover {
         Toplevel.deiconify(self)
         self.variable.set(True)
 
-    def _sort_by_date(self, reverse):
-        if reverse:
+    def sort_by_date(self):
+        if self._sort_is_reversed.get():
             l = reversed(self.entries)
         else:
             l = self.entries
