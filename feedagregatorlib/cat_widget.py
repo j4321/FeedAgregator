@@ -57,13 +57,25 @@ class CatWidget(Toplevel):
         self.x = None
         self.y = None
 
+        self._sort_order = StringVar(self, LATESTS.get(category, 'sort_order', fallback='A-Z'))
+        add_trace(self._sort_order, 'write',
+                  lambda *args: LATESTS.set(self.category, 'sort_order', self._sort_order.get()))
+
         # --- menu
         self.menu = Menu(self, tearoff=False)
         menu_sort = Menu(self.menu, tearoff=False)
-        menu_sort.add_command(label='A-Z', command=lambda: self._sort(reverse=False))
-        menu_sort.add_command(label='Z-A', command=lambda: self._sort(reverse=True))
-        menu_sort.add_command(label=_('Oldest first'), command=lambda: self._sort_by_date(reverse=False))
-        menu_sort.add_command(label=_('Most recent first'), command=lambda: self._sort_by_date(reverse=True))
+        menu_sort.add_radiobutton(label='A-Z',
+                                  variable=self._sort_order, value='A-Z',
+                                  command=lambda: self._sort_by_name(reverse=False))
+        menu_sort.add_radiobutton(label='Z-A',
+                                  variable=self._sort_order, value='Z-A',
+                                  command=lambda: self._sort_by_name(reverse=True))
+        menu_sort.add_radiobutton(label=_('Oldest first'),
+                                  variable=self._sort_order, value='oldest',
+                                  command=lambda: self._sort_by_date(reverse=False))
+        menu_sort.add_radiobutton(label=_('Most recent first'),
+                                  variable=self._sort_order, value='latest',
+                                  command=lambda: self._sort_by_date(reverse=True))
         menu_pos = Menu(self.menu, tearoff=False)
         menu_pos.add_radiobutton(label=_('Normal'), value='normal',
                                  variable=self._position, command=self._change_position)
@@ -155,6 +167,7 @@ class CatWidget(Toplevel):
                 latest = FEEDS.get(title, 'latest')
                 date = FEEDS.get(title, 'updated')
                 self.add_feed(title, latest, url, date)
+        self.sort()
 
     def add_feed(self, title, latest, url, date):
         """Display feed."""
@@ -269,10 +282,21 @@ a:hover {
         Toplevel.deiconify(self)
         self.variable.set(True)
 
-    def _sort(self, reverse):
+    def _sort_by_name(self, reverse):
         titles = sorted(self.feeds, reverse=reverse, key=lambda x: x.lower())
         for i, title in enumerate(titles):
             self.feeds[title][0].grid_configure(row=i)
+
+    def sort(self):
+        order = self._sort_order.get()
+        if order == 'A-Z':
+            self._sort_by_name(False)
+        elif order == 'Z-A':
+            self._sort_by_name(True)
+        elif order == 'oldest':
+            self._sort_by_date(False)
+        else:
+            self._sort_by_date(True)
 
     def _sort_by_date(self, reverse):
         titles = sorted(self.feeds, reverse=reverse, key=lambda x: FEEDS.get(x, 'updated'))

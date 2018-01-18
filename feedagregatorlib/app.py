@@ -423,6 +423,7 @@ class App(Tk):
                 FEEDS.set(name, 'geometry', '')
                 FEEDS.set(name, 'position', 'normal')
                 FEEDS.set(name, 'category', '')
+                FEEDS.set(name, 'sort_is_reversed', 'False')
                 cst.save_feeds()
                 self.queues[name] = queue
                 self.feed_widgets[name] = FeedWidget(self, name)
@@ -470,6 +471,7 @@ class App(Tk):
                     LATESTS.set(new_cat, 'visible', 'True')
                     LATESTS.set(new_cat, 'geometry', '')
                     LATESTS.set(new_cat, 'position', 'normal')
+                    LATESTS.set(new_cat, 'sort_order', 'A-Z')
                     self.cat_widgets[new_cat] = CatWidget(self, new_cat)
                     self.cat_widgets[new_cat].event_generate('<Configure>')
                     self.menu_categories.add_checkbutton(label=new_cat,
@@ -625,6 +627,7 @@ class App(Tk):
                     self.feed_widgets[title].entry_add(entry_title, date, summary, link, -1)
                 logging.info("Populated widget for feed '%s'", title)
                 self.feed_widgets[title].event_generate('<Configure>')
+                self.feed_widgets[title].sort_by_date()
 
     def feed_update(self):
         """Update feeds."""
@@ -684,6 +687,7 @@ class App(Tk):
                         self.cat_widgets[category].update_display(title, latest, updated)
                     self.feed_widgets[title].entry_add(entry_title, updated,
                                                        summary, link, 0)
+                    self.feed_widgets[title].sort_by_date()
                 else:
                     logging.info("Feed '%s' is up-to-date", title)
 
@@ -693,5 +697,7 @@ class App(Tk):
             self._check_end_update_id = self.after(1000, self._check_end_update)
         else:
             cst.save_feeds()
+            for widget in self.cat_widgets.values():
+                widget.sort()
             self._update_id = self.after(CONFIG.getint("General", "update_delay"),
                                          self.feed_update)
