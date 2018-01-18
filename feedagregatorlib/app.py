@@ -23,7 +23,7 @@ Main class
 import feedparser
 import dateutil.parser
 from datetime import datetime
-from tkinter import Tk
+from tkinter import Tk, TclError
 from tkinter.ttk import Style
 from feedagregatorlib.messagebox import showerror
 from feedagregatorlib.trayicon import TrayIcon, SubMenu
@@ -281,7 +281,11 @@ class App(Tk):
             FEEDS.set(title, 'visible', str(widget.variable.get()))
         for cat, widget in self.cat_widgets.items():
             LATESTS.set(cat, 'visible', str(widget.variable.get()))
-        self.destroy()
+        try:
+            self.destroy()
+        except TclError:
+            logging.exception("Error on quit")
+            self.after(500, self.quit)
 
     def feed_cat_widget_trace(self, title):
         self.menu_feeds.set_item_value(title,

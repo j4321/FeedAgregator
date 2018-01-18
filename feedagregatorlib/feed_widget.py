@@ -111,6 +111,7 @@ class FeedWidget(Toplevel):
             widget.bind('<ButtonPress-1>', self._start_move)
             widget.bind('<ButtonRelease-1>', self._stop_move)
             widget.bind('<B1-Motion>', self._move)
+        self.bind('<Map>', self._change_position)
         self.bind('<Configure>', self._on_configure)
         self.bind('<4>', lambda e: self._scroll(-1))
         self.bind('<5>', lambda e: self._scroll(1))
@@ -206,6 +207,7 @@ class FeedWidget(Toplevel):
 
     def rename_feed(self, new_name):
         self.feed_name = new_name
+        self.title('feedagregator.widget.{}'.format(new_name.replace(' ', '_')))
         self.label.configure(text=new_name)
 
     def update_style(self):
@@ -266,11 +268,11 @@ a:hover {
         top = min(max(top, 0), 1)
         self.canvas.yview_moveto(top)
 
-    def _change_position(self):
-        '''Make widget sticky.'''
+    def _change_position(self, event=None):
+        '''Make widget sticky and set its position with respects to the other windows.'''
         pos = self._position.get()
         for w in self.ewmh.getClientList():
-            if w.get_wm_name() == 'feedagregator.widget.{}'.format(self.feed_name.replace(' ', '_')):
+            if w.get_wm_name() == self.title():
                 self.ewmh.setWmState(w, 1, '_NET_WM_STATE_STICKY')
                 if pos == 'above':
                     self.ewmh.setWmState(w, 1, '_NET_WM_STATE_ABOVE')
