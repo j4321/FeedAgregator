@@ -2,7 +2,7 @@
 # -*- coding:Utf-8 -*-
 """
 FeedAgregator - RSS and Atom feed agregator in desktop widgets + notifications
-Copyright 2016-2017 Juliette Monsel <j_4321@protonmail.com>
+Copyright 2018 Juliette Monsel <j_4321@protonmail.com>
 
 FeedAgregator is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ try:
     from subprocess import run
 except ImportError:
     from subprocess import call as run
-from threading import Thread
+from multiprocessing import Process
 from webbrowser import open as webOpen
 from tkinter import Toplevel
 from tkinter.ttk import Label, Button, Frame, Checkbutton
@@ -77,7 +77,7 @@ class UpdateChecker(Toplevel):
         self.ch.grid(row=2, columnspan=2, sticky='w')
         self.update = None
 
-        self.thread = Thread(target=self.update_available, daemon=True)
+        self.thread = Process(target=self.update_available, daemon=True)
         self.thread.start()
         self.after(1000, self.check_update)
 
