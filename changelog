@@ -7,6 +7,10 @@ Copyright 2018 Juliette Monsel <j_4321@protonmail.com>
 Changelog
 ---------
 
+- Version 1.0.2
+    * Display time in locale timezone instead of UTC
+
+
 - Version 1.0.1
     * Fix update checker
     * Rename feed from widget

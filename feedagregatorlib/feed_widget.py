@@ -178,7 +178,7 @@ class FeedWidget(Toplevel):
                 else:
                     l.configure(height=h + 2)
 
-        formatted_date = format_datetime(datetime.strptime(date, '%Y-%m-%d %H:%M'),
+        formatted_date = format_datetime(datetime.strptime(date, '%Y-%m-%d %H:%M').astimezone(tz=None),
                                          'short', locale=getlocale()[0])
 
         tf = ToggledFrame(self.display, text="{} - {}".format(title, formatted_date),

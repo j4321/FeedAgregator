@@ -190,8 +190,8 @@ class CatWidget(Toplevel):
                     pass
                 else:
                     l.configure(height=h + 2)
-
-        formatted_date = format_datetime(datetime.strptime(date, '%Y-%m-%d %H:%M'),
+        # convert date to locale time
+        formatted_date = format_datetime(datetime.strptime(date, '%Y-%m-%d %H:%M').astimezone(tz=None),
                                          'short', locale=getlocale()[0])
 
         tf = ToggledFrame(self.display, text="{} - {}".format(title, formatted_date),
@@ -221,7 +221,7 @@ class CatWidget(Toplevel):
         self.feeds[new_name][0].label.configure(text=old_title.replace(old_name, new_name))
 
     def update_display(self, title, latest, date):
-        formatted_date = format_datetime(datetime.strptime(date, '%Y-%m-%d %H:%M'),
+        formatted_date = format_datetime(datetime.strptime(date, '%Y-%m-%d %H:%M').astimezone(tz=None),
                                          'short', locale=getlocale()[0])
         tf, l = self.feeds[title]
         tf.label.configure(text="{} - {}".format(title, formatted_date))
