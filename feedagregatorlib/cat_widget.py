@@ -163,7 +163,7 @@ class CatWidget(Toplevel):
             tf.destroy()
         self.feeds.clear()
         for title in sorted(FEEDS.sections(), key=lambda x: x.lower()):
-            if self.category in ['All', FEEDS.get(title, 'category')]:
+            if self.category in ['All', FEEDS.get(title, 'category', fallback='')]:
                 url = FEEDS.get(title, 'url')
                 latest = FEEDS.get(title, 'latest')
                 date = FEEDS.get(title, 'updated')

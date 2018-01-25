@@ -610,7 +610,7 @@ class App(Tk):
                          cst.html2text(latest)])
                     FEEDS.set(title, 'latest', latest)
                     FEEDS.set(title, 'updated', updated)
-                    category = FEEDS.get(title, 'category')
+                    category = FEEDS.get(title, 'category', fallback='')
                     self.cat_widgets['All'].update_display(title, latest, updated)
                     if category != '':
                         self.cat_widgets[category].update_display(title, latest, updated)
@@ -675,7 +675,7 @@ class App(Tk):
                          cst.html2text(latest)])
                     FEEDS.set(title, 'latest', latest)
                     FEEDS.set(title, 'updated', updated)
-                    category = FEEDS.get(title, 'category')
+                    category = FEEDS.get(title, 'category', fallback='')
                     self.cat_widgets['All'].update_display(title, latest, updated)
                     if category != '':
                         self.cat_widgets[category].update_display(title, latest, updated)
