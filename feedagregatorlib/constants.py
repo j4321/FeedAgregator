@@ -138,7 +138,8 @@ gettext.bindtextdomain(APP_NAME, PATH_LOCALE)
 gettext.textdomain(APP_NAME)
 
 gettext.translation(APP_NAME, PATH_LOCALE,
-                    languages=[CONFIG.get("General", "language")]).install()
+                    languages=[CONFIG.get("General", "language")], 
+                    fallback=True).install()
 
 # --- feed file
 FEEDS = ConfigParser()

@@ -3,7 +3,7 @@
 """
 FeedAgregator - RSS and Atom feed agregator in desktop widgets + notifications
 Copyright 2018 Juliette Monsel <j_4321@protonmail.com>
-The tcl part of the code was take from http://wiki.tcl.tk/15780
+The tcl part of the code was take from http://wiki.tcl.tk/15780 by Paweł Salawa copyright 2011
 
 FeedAgregator is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
