@@ -45,7 +45,7 @@ class FeedWidget(Toplevel):
         # control main menu checkbutton
         self.variable = BooleanVar(self, False)
 
-        self._position = StringVar(self, FEEDS.get(feed_name, 'position'))
+        self._position = StringVar(self, FEEDS.get(feed_name, 'position', fallback='normal'))
         add_trace(self._position, 'write',
                   lambda *x: FEEDS.set(feed_name, 'position', self._position.get()))
 
@@ -115,7 +115,7 @@ class FeedWidget(Toplevel):
         if geometry:
             self.geometry(geometry)
         self.update_idletasks()
-        if FEEDS.getboolean(self.feed_name, 'visible'):
+        if FEEDS.getboolean(self.feed_name, 'visible', fallback=True):
             self.deiconify()
 
         # --- bindings
@@ -227,8 +227,8 @@ class FeedWidget(Toplevel):
         self.attributes('-alpha', CONFIG.getint('Widget', 'alpha') / 100)
         text_font = Font(self, font=CONFIG.get('Widget', 'font')).actual()
         bg = CONFIG.get('Widget', 'background')
-        feed_bg = CONFIG.get('Widget', 'feed_background')
-        feed_fg = CONFIG.get('Widget', 'feed_foreground')
+        feed_bg = CONFIG.get('Widget', 'feed_background', fallback='gray20')
+        feed_fg = CONFIG.get('Widget', 'feed_foreground', fallback='white')
 
         self._stylesheet = """
 body {
@@ -250,7 +250,7 @@ a:hover {
   font-style: italic;
   border-bottom: 1px solid %(link)s;
 }
-""" % (dict(bg=feed_bg, fg=feed_fg, link=CONFIG.get('Widget', 'link_color'), **text_font))
+""" % (dict(bg=feed_bg, fg=feed_fg, link=CONFIG.get('Widget', 'link_color', fallback='#89B9F6'), **text_font))
 
         self.configure(bg=bg)
         self.canvas.configure(background=bg)

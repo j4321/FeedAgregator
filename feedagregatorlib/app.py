@@ -156,7 +156,7 @@ class App(Tk):
             self.feed_widgets[title] = FeedWidget(self, title)
             cst.add_trace(self.feed_widgets[title].variable, 'write',
                           lambda *args, t=title: self.feed_cat_widget_trace(t))
-            self.feed_widgets[title].variable.set(FEEDS.getboolean(title, 'visible'))
+            self.feed_widgets[title].variable.set(FEEDS.getboolean(title, 'visible', fallback=True))
         self.feed_init()
 
         # --- check for updates
@@ -490,13 +490,7 @@ class App(Tk):
                                                        FEEDS.get(title, 'updated'))
 
     def feed_rename(self, old_name, new_name):
-        url = FEEDS.get(old_name, 'url')
-        updated = FEEDS.get(old_name, 'updated')
-        visible = FEEDS.get(old_name, 'visible')
-        latest = FEEDS.get(old_name, 'latest')
-        category = FEEDS.get(old_name, 'category', fallback='')
-        position = FEEDS.get(old_name, 'position')
-        geometry = FEEDS.get(old_name, 'geometry')
+        options = {opt: FEEDS.get(old_name, opt) for opt in FEEDS.options(old_name)}
         FEEDS.remove_section(old_name)
         try:
             # check if feed's title already exists
@@ -516,13 +510,8 @@ class App(Tk):
         else:
             name = new_name
         logging.info("Renamed feed '%s' to '%s'", old_name, name)
-        FEEDS.set(name, 'url', url)
-        FEEDS.set(name, 'updated', updated)
-        FEEDS.set(name, 'latest', latest)
-        FEEDS.set(name, 'visible', visible)
-        FEEDS.set(name, 'geometry', geometry)
-        FEEDS.set(name, 'position', position)
-        FEEDS.set(name, 'category', category)
+        for opt, val in options.items():
+            FEEDS.set(name, opt, val)
         self._check_result_init_id[name] = self._check_result_init_id.pop(old_name, '')
         self._check_result_update_id[name] = self._check_result_update_id.pop(old_name, '')
         self.threads[name] = self.threads.pop(old_name, None)
@@ -530,6 +519,7 @@ class App(Tk):
         self.feed_widgets[name] = self.feed_widgets.pop(old_name)
         self.feed_widgets[name].rename_feed(name)
         self.cat_widgets['All'].rename_feed(old_name, name)
+        category = FEEDS.get(name, 'category', fallback='')
         if category != '':
             self.cat_widgets[category].rename_feed(old_name, name)
         self.menu_feeds.delete(old_name)

@@ -300,8 +300,8 @@ class Config(Toplevel):
         self.entry_feed_fg.grid(row=3, column=2, sticky='w', padx=4, pady=4)
         self.entry_link.grid(row=4, column=2, sticky='w', padx=4, pady=4)
         self.entry_bg.insert(0, CONFIG.get("Widget", "background"))
-        self.entry_feed_fg.insert(0, CONFIG.get("Widget", "feed_foreground"))
-        self.entry_feed_bg.insert(0, CONFIG.get("Widget", "feed_background"))
+        self.entry_feed_fg.insert(0, CONFIG.get("Widget", "feed_foreground", fallback='white'))
+        self.entry_feed_bg.insert(0, CONFIG.get("Widget", "feed_background", fallback='gray20'))
         self.entry_fg.insert(0, CONFIG.get("Widget", "foreground"))
         self.entry_link.insert(0, CONFIG.get("Widget", "link_color"))
         Button(frame_color, image=self.img_color, padding=0,
