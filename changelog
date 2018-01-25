@@ -9,7 +9,11 @@ Changelog
 
 - Version 1.0.2
     * Display time in locale timezone instead of UTC
-
+    * Update feeds immediately after changing update delay 
+    * Add update feed entry in menu 
+    * Fix widgets position and stickyness 
+    * Improve entry sorting
+    
 
 - Version 1.0.1
     * Fix update checker

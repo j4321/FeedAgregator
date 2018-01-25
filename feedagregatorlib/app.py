@@ -168,7 +168,7 @@ class App(Tk):
     def widget_style_init(self):
         """Init widgets style."""
         bg = CONFIG.get('Widget', 'background')
-        feed_bg = CONFIG.get('Widget', 'feed_background')
+        feed_bg = CONFIG.get('Widget', 'feed_background', fallback='gray20')
         fg = CONFIG.get('Widget', 'foreground')
         vmax = self.winfo_rgb('white')[0]
         color = tuple(int(val / vmax * 255) for val in self.winfo_rgb(bg))
