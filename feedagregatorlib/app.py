@@ -155,7 +155,7 @@ class App(Tk):
                                             command=lambda t=title: self.toggle_feed_widget(t))
             self.feed_widgets[title] = FeedWidget(self, title)
             cst.add_trace(self.feed_widgets[title].variable, 'write',
-                          lambda *args, t=title: self.feed_cat_widget_trace(t))
+                          lambda *args, t=title: self.feed_widget_trace(t))
             self.feed_widgets[title].variable.set(FEEDS.getboolean(title, 'visible', fallback=True))
         self.feed_init()
 
@@ -287,7 +287,7 @@ class App(Tk):
             logging.exception("Error on quit")
             self.after(500, self.quit)
 
-    def feed_cat_widget_trace(self, title):
+    def feed_widget_trace(self, title):
         self.menu_feeds.set_item_value(title,
                                        self.feed_widgets[title].variable.get())
 
@@ -434,7 +434,7 @@ class App(Tk):
                 self.menu_feeds.add_checkbutton(label=name,
                                                 command=lambda: self.toggle_feed_widget(name))
                 cst.add_trace(self.feed_widgets[name].variable, 'write',
-                              lambda *args: self.feed_cat_widget_trace(name))
+                              lambda *args: self.feed_widget_trace(name))
                 self.feed_widgets[name].variable.set(True)
                 for entry_title, date, summary, link in data:
                     self.feed_widgets[name].entry_add(entry_title, date, summary, link, -1)
@@ -529,7 +529,10 @@ class App(Tk):
         if trace_info:
             cst.remove_trace(self.feed_widgets[name].variable, 'write', trace_info[0][1])
         cst.add_trace(self.feed_widgets[name].variable, 'write',
-                      lambda *args: self.feed_cat_widget_trace(name))
+                      lambda *args: self.feed_widget_trace(name))
+        self.menu_feeds.set_item_value(name,
+                                       self.feed_widgets[name].variable.get())
+
         cst.save_feeds()
         return name
 
