@@ -26,7 +26,8 @@ ToggledFrame class.
 
 from tkinter.ttk import Frame, Checkbutton, Style, Label
 from feedagregatorlib.constants import IM_CLOSED, IM_OPENED, \
-    IM_CLOSED_SEL, IM_OPENED_SEL, PhotoImage
+    IM_CLOSED_SEL, IM_OPENED_SEL
+from PIL.ImageTk import PhotoImage
 
 
 class ToggledFrame(Frame):
@@ -43,14 +44,14 @@ class ToggledFrame(Frame):
         self.rowconfigure(1, weight=1)
         self.style = Style(self)
         if "toggle" not in self.style.element_names():
-            self._open_image = PhotoImage('img_opened', file=IM_OPENED, master=self)
-            self._closed_image = PhotoImage('img_closed', file=IM_CLOSED, master=self)
-            self._open_image_sel = PhotoImage('img_opened_sel', file=IM_OPENED_SEL, master=self)
-            self._closed_image_sel = PhotoImage('img_closed_sel', file=IM_CLOSED_SEL, master=self)
-            self.style.element_create("toggle", "image", "img_closed",
-                                      ("selected", "!disabled", "img_opened"),
-                                      ("active", "!selected", "!disabled", "img_closed_sel"),
-                                      ("active", "selected", "!disabled", "img_opened_sel"),
+            self._open_image = PhotoImage(file=IM_OPENED, master=self)
+            self._closed_image = PhotoImage(file=IM_CLOSED, master=self)
+            self._open_image_sel = PhotoImage(file=IM_OPENED_SEL, master=self)
+            self._closed_image_sel = PhotoImage(file=IM_CLOSED_SEL, master=self)
+            self.style.element_create("toggle", "image", self._closed_image,
+                                      ("selected", "!disabled", self._open_image),
+                                      ("active", "!selected", "!disabled", self._closed_image_sel),
+                                      ("active", "selected", "!disabled", self._open_image_sel),
                                       border=2, sticky='')
             self.style.configure(self.toggle_style_name,
                                  background=self.style.lookup(self.style_name, 'background'))

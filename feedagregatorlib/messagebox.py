@@ -26,7 +26,8 @@ from webbrowser import open as url_open
 from tkinter import Toplevel, Text
 from tkinter.ttk import Label, Button, Frame, Style
 from feedagregatorlib.autoscrollbar import AutoScrollbar as Scrollbar
-from feedagregatorlib.constants import ICONS, APP_NAME, PhotoImage
+from feedagregatorlib.constants import ICONS, APP_NAME
+from PIL.ImageTk import PhotoImage
 
 
 class OneButtonBox(Toplevel):

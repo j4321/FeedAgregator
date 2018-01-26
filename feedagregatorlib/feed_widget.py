@@ -26,12 +26,14 @@ from locale import getlocale
 from tkinter.font import Font
 from tkinter import Toplevel, BooleanVar, Menu, StringVar, Canvas, TclError
 from tkinter.ttk import Style, Label, Separator, Sizegrip, Frame, Button, Entry
-from feedagregatorlib.constants import CONFIG, FEEDS, APP_NAME, add_trace
+from feedagregatorlib.constants import CONFIG, FEEDS, APP_NAME, add_trace, load_data
 from feedagregatorlib.messagebox import askokcancel
 from feedagregatorlib.tkinterhtml import HtmlFrame
 from feedagregatorlib.toggledframe import ToggledFrame
 from ewmh import EWMH
 from webbrowser import open as webopen
+import configparser
+import pickle
 
 
 class FeedWidget(Toplevel):
@@ -132,6 +134,16 @@ class FeedWidget(Toplevel):
         self.update_idletasks()
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
 
+    def populate_widget(self):
+        try:
+            filename = FEEDS.get(self.feed_name, 'data')
+            latest, data = load_data(filename)
+        except (configparser.NoOptionError, pickle.UnpicklingError):
+            data = []
+        for entry_title, date, summary, link in data:
+            self.entry_add(entry_title, date, summary, link, -1)
+        self.sort_by_date()
+
     def remove_feed(self):
         rep = True
         if CONFIG.getboolean('General', 'confirm_remove', fallback=True):
@@ -231,6 +243,14 @@ class FeedWidget(Toplevel):
         feed_fg = CONFIG.get('Widget', 'feed_foreground', fallback='white')
 
         self._stylesheet = """
+ul {
+padding-left: 5px;
+}
+
+ol {
+padding-left: 5px;
+}
+
 body {
   background-color: %(bg)s;
   color: %(fg)s;

@@ -31,11 +31,12 @@ from multiprocessing import Process
 from webbrowser import open as webOpen
 from tkinter import Toplevel
 from tkinter.ttk import Label, Button, Frame, Checkbutton
-from feedagregatorlib.constants import CONFIG, save_config, IM_QUESTION_DATA, \
-    IM_ICON_SVG, APP_NAME, PhotoImage
+from feedagregatorlib.constants import CONFIG, save_config, ICONS, \
+    IM_ICON_SVG, APP_NAME
 from feedagregatorlib.version import __version__
 import feedparser
 import logging
+from PIL.ImageTk import PhotoImage
 
 
 class UpdateChecker(Toplevel):
@@ -53,7 +54,7 @@ class UpdateChecker(Toplevel):
         self.notify = notify
         self._version = __version__
 
-        self.img = PhotoImage(data=IM_QUESTION_DATA, master=self)
+        self.img = PhotoImage(file=ICONS['question'], master=self)
 
         frame = Frame(self)
         frame.grid(row=0, columnspan=2, sticky="ewsn")

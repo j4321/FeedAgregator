@@ -7,6 +7,11 @@ Copyright 2018 Juliette Monsel <j_4321@protonmail.com>
 Changelog
 ---------
 
+- Version 1.1.1
+    * Reduce left margin of bullet points in feed entries
+    * Change feed data saving because the content is not always compatible with configparser
+    * Use PIL.ImageTk to handle more image formats in feed entries
+
 - Version 1.1.0
     * Display time in locale timezone instead of UTC
     * Update feeds immediately after changing update delay

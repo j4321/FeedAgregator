@@ -257,14 +257,6 @@ body {
   font-style: %(slant)s;
 }
 
-ul {
-padding-left: 5px;
-}
-
-ol {
-padding-left: 5px;
-}
-
 #title {
   font-weight: bold;
   font-size: large;
