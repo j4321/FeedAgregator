@@ -7,6 +7,9 @@ Copyright 2018 Juliette Monsel <j_4321@protonmail.com>
 Changelog
 ---------
 
+- Version 1.1.2
+    * Fix error in messagebox due to the use of PIL.ImageTk
+
 - Version 1.1.1
     * Reduce left margin of bullet points in feed entries
     * Change feed data saving because the content is not always compatible with configparser
