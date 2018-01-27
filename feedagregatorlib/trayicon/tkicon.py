@@ -26,7 +26,7 @@ system tray manager.
 """
 
 import tkinter
-from feedagregatorlib.constants import PhotoImage
+from PIL.ImageTk import PhotoImage
 
 
 class SubMenu(tkinter.Menu):
