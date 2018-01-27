@@ -26,6 +26,7 @@ import dateutil.parser
 from datetime import datetime
 from tkinter import Tk, TclError
 from tkinter.ttk import Style
+from PIL.ImageTk import PhotoImage
 from feedagregatorlib.messagebox import showerror
 from feedagregatorlib.trayicon import TrayIcon, SubMenu
 import feedagregatorlib.constants as cst
@@ -60,7 +61,7 @@ class App(Tk):
 
         logging.info('Starting %s', cst.APP_NAME)
 
-        self.im_icon = cst.PhotoImage(master=self, file=cst.IM_ICON_48)
+        self.im_icon = PhotoImage(master=self, file=cst.IM_ICON_48)
         self.iconphoto(True, self.im_icon)
 
         # --- style

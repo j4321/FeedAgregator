@@ -49,11 +49,7 @@ class OneButtonBox(Toplevel):
         self.result = ""
         self.button = button
         if isinstance(image, str):
-            data = ICONS.get(image)
-            if data:
-                self.img = PhotoImage(master=self, data=data)
-            else:
-                self.img = PhotoImage(master=self, file=image)
+            self.img = PhotoImage(master=self, file=ICONS.get(image, image))
             image = self.img
         frame = Frame(self)
         frame.rowconfigure(0, weight=1)
@@ -120,11 +116,7 @@ class ShowError(Toplevel):
             style.theme_use('clam')
 
         if isinstance(image, str):
-            data = ICONS.get(image)
-            if data:
-                self.img = PhotoImage(master=self, data=data)
-            else:
-                self.img = PhotoImage(master=self, file=image)
+            self.img = PhotoImage(master=self, file=ICONS.get(image, image))
             image = self.img
         frame = Frame(self)
         frame.rowconfigure(0, weight=1)
@@ -229,11 +221,7 @@ class TwoButtonBox(Toplevel):
         self.button2 = button2
 
         if isinstance(image, str):
-            data = ICONS.get(image)
-            if data:
-                self.img = PhotoImage(master=self, data=data)
-            else:
-                self.img = PhotoImage(master=self, file=image)
+            self.img = PhotoImage(master=self, file=ICONS.get(image, image))
             image = self.img
         frame = Frame(self)
         frame.grid(row=0, columnspan=2, sticky="ewsn")
@@ -289,11 +277,7 @@ class AskYesNoCancel(Toplevel):
         self.result = None
 
         if isinstance(image, str):
-            data = ICONS.get(image)
-            if data:
-                self.img = PhotoImage(master=self, data=data)
-            else:
-                self.img = PhotoImage(master=self, file=image)
+            self.img = PhotoImage(master=self, file=ICONS.get(image, image))
             image = self.img
         frame = Frame(self)
         frame.grid(row=0, columnspan=3, sticky="ewsn")

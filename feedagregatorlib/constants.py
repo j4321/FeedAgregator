@@ -49,7 +49,6 @@ from glob import glob
 from tkinter import colorchooser
 import logging
 from logging.handlers import TimedRotatingFileHandler
-from PIL.ImageTk import PhotoImage
 
 
 APP_NAME = "FeedAgregator"
@@ -227,6 +226,7 @@ IM_OPENED_SEL = os.path.join(PATH_IMAGES, 'open_sel.png')
 
 ICONS = {key: os.path.join(PATH_IMAGES, '{}.png'.format(key))
          for key in ["information", "error", "question", "warning"]}
+
 
 # --- system tray icon
 def get_available_gui_toolkits():
