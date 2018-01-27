@@ -626,7 +626,8 @@ class App(Tk):
                         self.after_cancel(after_id)
             else:
                 date = datetime.strptime(updated, '%Y-%m-%d %H:%M')
-                if date > datetime.strptime(FEEDS.get(title, 'updated'), '%Y-%m-%d %H:%M'):
+                if (date > datetime.strptime(FEEDS.get(title, 'updated'), '%Y-%m-%d %H:%M') or
+                   not FEEDS.has_option(title, 'data')):
                     run(["notify-send", "-i", cst.IM_ICON_SVG, title,
                          cst.html2text(latest)])
                     FEEDS.set(title, 'updated', updated)
@@ -646,6 +647,7 @@ class App(Tk):
                     except configparser.NoOptionError:
                         filename = cst.new_data_file()
                         FEEDS.set(title, 'data', filename)
+                        cst.save_feeds()
                     cst.save_data(filename, latest, data)
                 else:
                     logging.info("Feed '%s' is up-to-date", title)
