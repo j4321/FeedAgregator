@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Main class
 """
+import pickle
 import feedparser
 import dateutil.parser
 from datetime import datetime
@@ -43,6 +44,7 @@ import configparser
 import traceback
 from multiprocessing import Process, Queue
 import logging
+import os
 
 
 CONFIG = cst.CONFIG
@@ -154,6 +156,7 @@ class App(Tk):
             self.menu_feeds.add_checkbutton(label=title,
                                             command=lambda t=title: self.toggle_feed_widget(t))
             self.feed_widgets[title] = FeedWidget(self, title)
+            self.feed_widgets[title].populate_widget()
             cst.add_trace(self.feed_widgets[title].variable, 'write',
                           lambda *args, t=title: self.feed_widget_trace(t))
             self.feed_widgets[title].variable.set(FEEDS.getboolean(title, 'visible', fallback=True))
@@ -284,7 +287,7 @@ class App(Tk):
         try:
             self.destroy()
         except TclError:
-            logging.exception("Error on quit")
+            logging.error("Error on quit")
             self.after(500, self.quit)
 
     def feed_widget_trace(self, title):
@@ -366,7 +369,11 @@ class App(Tk):
             summary = entries[0].get('summary', '')
             link = entries[0].get('link', '')
             latest = """<p id=title>{}</p>\n{}""".format(entry_title, summary)
-            updated = dateutil.parser.parse(entries[0].get('updated', today)).strftime('%Y-%m-%d %H:%M')
+            if 'updated' in entries[0]:
+                updated = entries[0].get('updated')
+            else:
+                updated = entries[0].get('published', today)
+            updated = dateutil.parser.parse(updated).strftime('%Y-%m-%d %H:%M')
         else:
             entry_title = ""
             summary = ""
@@ -420,9 +427,11 @@ class App(Tk):
                 run(["notify-send", "-i", cst.IM_ICON_SVG, name,
                      cst.html2text(latest)])
                 self.cat_widgets['All'].add_feed(name, latest, url, date)
+                filename = cst.new_data_file()
+                cst.save_data(filename, latest, data)
                 FEEDS.set(name, 'url', url)
                 FEEDS.set(name, 'updated', date)
-                FEEDS.set(name, 'latest', latest)
+                FEEDS.set(name, 'data', filename)
                 FEEDS.set(name, 'visible', 'True')
                 FEEDS.set(name, 'geometry', '')
                 FEEDS.set(name, 'position', 'normal')
@@ -484,8 +493,13 @@ class App(Tk):
                                   lambda *args: self.cat_widget_trace(new_cat))
                     self.cat_widgets[new_cat].variable.set(True)
                 else:
+                    try:
+                        filename = FEEDS.get(title, 'data')
+                        latest = cst.feed_get_latest(filename)
+                    except (configparser.NoOptionError, pickle.UnpicklingError):
+                        latest = ''
                     self.cat_widgets[new_cat].add_feed(title,
-                                                       FEEDS.get(title, 'latest'),
+                                                       latest,
                                                        FEEDS.get(title, 'url'),
                                                        FEEDS.get(title, 'updated'))
 
@@ -552,6 +566,10 @@ class App(Tk):
             del self._check_result_update_id[title]
         except KeyError:
             pass
+        try:
+            os.remove(os.path.join(cst.PATH_DATA, FEEDS.get(title, 'data')))
+        except FileNotFoundError:
+            pass
         self.menu_feeds.delete(title)
         logging.info("Removed feed '%s' %s", title, FEEDS.get(title, 'url'))
         category = FEEDS.get(title, 'category', fallback='')
@@ -608,23 +626,31 @@ class App(Tk):
                         self.after_cancel(after_id)
             else:
                 date = datetime.strptime(updated, '%Y-%m-%d %H:%M')
-                if date > datetime.strptime(FEEDS.get(title, 'updated'), '%Y-%m-%d %H:%M'):
+                if (date > datetime.strptime(FEEDS.get(title, 'updated'), '%Y-%m-%d %H:%M') or
+                   not FEEDS.has_option(title, 'data')):
                     run(["notify-send", "-i", cst.IM_ICON_SVG, title,
                          cst.html2text(latest)])
-                    FEEDS.set(title, 'latest', latest)
                     FEEDS.set(title, 'updated', updated)
                     category = FEEDS.get(title, 'category', fallback='')
                     self.cat_widgets['All'].update_display(title, latest, updated)
                     if category != '':
                         self.cat_widgets[category].update_display(title, latest, updated)
                     logging.info("Updated feed '%s'", title)
+                    self.feed_widgets[title].clear()
+                    for entry_title, date, summary, link in data:
+                        self.feed_widgets[title].entry_add(entry_title, date, summary, link, -1)
+                    logging.info("Populated widget for feed '%s'", title)
+                    self.feed_widgets[title].event_generate('<Configure>')
+                    self.feed_widgets[title].sort_by_date()
+                    try:
+                        filename = FEEDS.get(title, 'data')
+                    except configparser.NoOptionError:
+                        filename = cst.new_data_file()
+                        FEEDS.set(title, 'data', filename)
+                        cst.save_feeds()
+                    cst.save_data(filename, latest, data)
                 else:
                     logging.info("Feed '%s' is up-to-date", title)
-                for entry_title, date, summary, link in data:
-                    self.feed_widgets[title].entry_add(entry_title, date, summary, link, -1)
-                logging.info("Populated widget for feed '%s'", title)
-                self.feed_widgets[title].event_generate('<Configure>')
-                self.feed_widgets[title].sort_by_date()
 
     def feed_update(self):
         """Update feeds."""
@@ -676,7 +702,6 @@ class App(Tk):
                     logging.info("Updated feed '%s'", title)
                     run(["notify-send", "-i", cst.IM_ICON_SVG, title,
                          cst.html2text(latest)])
-                    FEEDS.set(title, 'latest', latest)
                     FEEDS.set(title, 'updated', updated)
                     category = FEEDS.get(title, 'category', fallback='')
                     self.cat_widgets['All'].update_display(title, latest, updated)
@@ -685,6 +710,18 @@ class App(Tk):
                     self.feed_widgets[title].entry_add(entry_title, updated,
                                                        summary, link, 0)
                     self.feed_widgets[title].sort_by_date()
+                    try:
+                        filename = FEEDS.get(title, 'data')
+                        old, data = cst.load_data(filename)
+                    except pickle.UnpicklingError:
+                        cst.save_data(filename, latest, [(entry_title, updated, summary, link)])
+                    except configparser.NoOptionError:
+                        filename = cst.new_data_file()
+                        FEEDS.set(title, 'data', filename)
+                        cst.save_data(filename, latest, [(entry_title, updated, summary, link)])
+                    else:
+                        data.insert(0, (entry_title, updated, summary, link))
+                        cst.save_data(filename, latest, data)
                 else:
                     logging.info("Feed '%s' is up-to-date", title)
 

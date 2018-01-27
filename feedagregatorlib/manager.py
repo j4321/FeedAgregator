@@ -23,12 +23,12 @@ Feed manager dialog
 from tkinter import Toplevel
 from tkinter.ttk import Entry, Button, Treeview
 from feedagregatorlib.constants import FEEDS, IM_MOINS, IM_PLUS, \
-    IM_MOINS_SEL, IM_MOINS_CLICKED, APP_NAME, PhotoImage, LATESTS, CONFIG
+    IM_MOINS_SEL, IM_MOINS_CLICKED, APP_NAME, LATESTS, CONFIG
 from feedagregatorlib.add import Add
 from feedagregatorlib.messagebox import askokcancel
 from feedagregatorlib.autoscrollbar import AutoScrollbar
 from feedagregatorlib.autocomplete import AutoCompleteCombobox
-
+from PIL.ImageTk import PhotoImage
 
 class Manager(Toplevel):
     def __init__(self, master):

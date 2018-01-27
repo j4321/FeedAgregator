@@ -6,7 +6,7 @@ Copyright 2018 Juliette Monsel <j_4321@protonmail.com>
 
 FeedAgregator periodically looks for RSS/Atom feed updates.
 If an update is found, a notification is sent. In addition, desktop widgets
-display either all the entries of one feed or the latest entry of each 
+display either all the entries of one feed or the latest entry of each
 feed of a given category.
 
 FeedAgregator is designed for Linux. It is written in Python 3 and relies
@@ -30,7 +30,7 @@ Install
         $ sudo add-apt-repository ppa:j-4321-i/ppa
         $ sudo apt-get update
         $ sudo apt-get install feedagregator
-        
+
 - Source code
 
     First, install the missing dependencies among:
@@ -41,6 +41,7 @@ Install
      - Beautifulsoup 4 https://pypi.python.org/pypi/beautifulsoup4/
      - babel https://pypi.python.org/pypi/Babel
      - feedparser https://pypi.python.org/pypi/feedparser
+     - Pillow https://pypi.python.org/pypi/Pillow
 
     You also need to have at least one of the following GUI toolkits for the system tray icon:
      - Tktray https://code.google.com/archive/p/tktray/downloads
@@ -53,12 +54,12 @@ Install
     For instance, in Ubuntu/Debian you will need to install the following packages:
     python3-tk, tk-tktray, libnotify-bin and the notification server of your choice,
     tk-html3, python3-bs4, python3-babel, python3-feedparser,
-    (python3-pil and python3-pil.imagek if tk < 8.6)
+    python3-pil and python3-pil.imagek
 
     In Archlinux, you will need to install the following packages:
     tk, tktray (`AUR <https://aur.archlinux.org/packages/tktray>`__),
     libnotify and the notification server of your choice,
-    python-beautifulsoup4, python-babel, python-feedparser,
+    python-beautifulsoup4, python-babel, python-feedparser, python-pillow,
     tkhtml3-git (`AUR <https://aur.archlinux.org/packages/tkhtml3-git>`__)
 
     Then install the application:

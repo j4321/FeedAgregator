@@ -24,9 +24,9 @@ About dialog.
 from webbrowser import open as webOpen
 from tkinter import Text, Toplevel
 from tkinter.ttk import Button, Label
-from feedagregatorlib.constants import IM_ICON_48, APP_NAME, PhotoImage
+from feedagregatorlib.constants import IM_ICON_48, APP_NAME
 from feedagregatorlib.version import __version__
-
+from PIL.ImageTk import PhotoImage
 
 class About(Toplevel):
     """About dialog."""

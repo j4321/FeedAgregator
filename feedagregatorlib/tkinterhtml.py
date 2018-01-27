@@ -30,6 +30,8 @@ from urllib.request import urlopen
 from webbrowser import open as webOpen
 import tkinter as tk
 from tkinter import ttk
+import logging
+from PIL.ImageTk import PhotoImage
 
 
 _tkhtml_loaded = False
@@ -172,8 +174,10 @@ class TkinterHtml(tk.Widget):
 
         with urlopen(url) as handle:
             data = handle.read()
-
-        self._images.add(tk.PhotoImage(name=name, data=data))
+        try:
+            self._images.add(PhotoImage(name=name, data=data))
+        except tk.TclError as e:
+            logging.error('Error in tkinterhtml: %s\nurl=%s', str(e), url)
 
         return name
 
