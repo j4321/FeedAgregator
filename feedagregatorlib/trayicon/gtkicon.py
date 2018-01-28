@@ -69,7 +69,7 @@ class SubMenu(Gtk.Menu):
         else:
             index2 = self.index(item2)
             c = self.get_children()
-            for i in range(index2, index2):
+            for i in range(index1, index2):
                 self.remove(c[i])
 
     def index(self, index):
