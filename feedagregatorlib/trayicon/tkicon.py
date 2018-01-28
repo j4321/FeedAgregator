@@ -96,7 +96,7 @@ class SubMenu(tkinter.Menu):
     def delete(self, index1, index2=None):
         if index2 == "end":
             index2 = tkinter.Menu.index(self, "end")
-        tkinter.Menu.delete(index1, index2)
+        tkinter.Menu.delete(self, index1, index2)
 
 
 class TrayIcon(tkinter.BaseWidget, tkinter.Wm):
