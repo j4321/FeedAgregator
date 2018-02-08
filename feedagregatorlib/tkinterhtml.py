@@ -69,6 +69,7 @@ class TkinterHtml(tk.Widget):
         self.bind("<FocusOut>", self._on_focus_out)
         self.bind("<Leave>", self._on_focus_out)
         self.bind("<<Copy>>", self.copy_selection_to_clipboard, True)
+        self.bind("<Control-c>", self._ctrl_c, True)
         self.bind_class('Html', '<Button-5>', lambda e: None)
         self.bind('Html', '<Button-4>', lambda e: None)
 
@@ -227,7 +228,7 @@ class TkinterHtml(tk.Widget):
             pass
 
     def _start_selection(self, event):
-        self.focus_set()
+        self.focus_force()
         self.tag("delete", "selection")
         try:
             self._selection_start_node, self._selection_start_offset = self.node(True, event.x, event.y)
@@ -297,7 +298,7 @@ class HtmlFrame(ttk.Frame):
     def set_content(self, html_source):
         self.html.reset()
         if "</body>" not in html_source:
-            content =  "<html><body>{}</body></html>".format(html_source)
+            content = "<html><body>{}</body></html>".format(html_source)
         else:
             content = html_source
         self.html.parse(content)
