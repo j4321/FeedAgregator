@@ -226,6 +226,7 @@ IM_OPENED_SEL = os.path.join(PATH_IMAGES, 'open_sel.png')
 
 ICONS = {key: os.path.join(PATH_IMAGES, '{}.png'.format(key))
          for key in ["information", "error", "question", "warning"]}
+IM_SCROLL_ALPHA = os.path.join(PATH_IMAGES, "scroll.png")
 
 
 # --- system tray icon
@@ -291,13 +292,16 @@ else:
 
 
 # --- colors
-def active_color(color):
+def active_color(color, output='HTML'):
     """Return a lighter shade of color (RGB triplet with value max 255) in HTML format."""
     r, g, b = color
     r += (255 - r) / 3
     g += (255 - g) / 3
     b += (255 - b) / 3
-    return ("#%2.2x%2.2x%2.2x" % (round(r), round(g), round(b))).upper()
+    if output == 'HTML':
+        return ("#%2.2x%2.2x%2.2x" % (round(r), round(g), round(b))).upper()
+    else:
+        return (round(r), round(g), round(b))
 
 
 ZENITY = False

@@ -31,6 +31,7 @@ from feedagregatorlib.constants import CONFIG, FEEDS, APP_NAME, add_trace, \
 from feedagregatorlib.messagebox import askokcancel
 from feedagregatorlib.tkinterhtml import HtmlFrame
 from feedagregatorlib.toggledframe import ToggledFrame
+from feedagregatorlib.autoscrollbar import AutoScrollbar
 from ewmh import EWMH
 from webbrowser import open as webopen
 import configparser
@@ -40,6 +41,8 @@ import pickle
 class CatWidget(Toplevel):
     def __init__(self, master, category):
         Toplevel.__init__(self, master, class_=APP_NAME)
+        self.rowconfigure(2, weight=1)
+        self.columnconfigure(0, weight=1)
         self.attributes('-type', 'splash')
         self.minsize(50, 50)
 
@@ -98,11 +101,16 @@ class CatWidget(Toplevel):
         title = _('Feeds: Latests') if category == 'All' else _('Feeds: {category}').format(category=category)
         label = Label(self, text=title, style='widget.title.TLabel',
                       anchor='center')
-        label.pack(pady=4, fill='x')
-        sep = Separator(self, style='widget.TSeparator')
-        sep.pack(fill='x')
+        label.grid(row=0, columnspan=2, padx=4, pady=4, sticky='ew')
+        sep = Separator(self, style='widget.Horizontal.TSeparator')
+        sep.grid(row=1, columnspan=2, sticky='ew')
         self.canvas = Canvas(self, highlightthickness=0)
-        self.canvas.pack(fill='both', expand=True, padx=(2, 8), pady=2)
+        self.canvas.grid(row=2, column=0, sticky='ewsn', padx=(2, 8), pady=(2, 4))
+        scroll = AutoScrollbar(self, orient='vertical',
+                               style='widget.Vertical.TScrollbar',
+                               command=self.canvas.yview)
+        scroll.grid(row=2, column=1, sticky='ns', pady=(2, 14))
+        self.canvas.configure(yscrollcommand=scroll.set)
         self.display = Frame(self.canvas, style='widget.TFrame')
         self.canvas.create_window(0, 0, anchor='nw', window=self.display, tags=('display',))
 

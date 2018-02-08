@@ -25,8 +25,10 @@ import feedparser
 import dateutil.parser
 from datetime import datetime
 from tkinter import Tk, TclError
+from tkinter import PhotoImage as tkPhotoImage
 from tkinter.ttk import Style
 from PIL.ImageTk import PhotoImage
+from PIL import Image
 from feedagregatorlib.messagebox import showerror
 from feedagregatorlib.trayicon import TrayIcon, SubMenu
 import feedagregatorlib.constants as cst
@@ -87,6 +89,53 @@ class App(Tk):
         self.style.layout('manager.Treeview.Row',
                           [('Treeitem.row', {'sticky': 'nswe'}),
                            ('Treeitem.image', {'side': 'right', 'sticky': 'e'})])
+
+        self._im_trough = tkPhotoImage(name='trough-scrollbar-vert',
+                                       width=15, height=15,
+                                       master=self)
+        bg = CONFIG.get("Widget", 'background', fallback='gray10')
+        widget_bg = self.winfo_rgb(bg)
+        widget_fg = CONFIG.get('Widget', 'foreground', fallback='white')
+        vmax = self.winfo_rgb('white')[0]
+        color = tuple(int(val / vmax * 255) for val in widget_bg)
+        active_bg = cst.active_color(color)
+#        slider_alpha = Image.open(cst.IM_SCROLL_ALPHA)
+        slider_vert_insens = Image.new('RGBA', (13, 28), widget_bg)
+        slider_vert = Image.new('RGBA', (13, 28), active_bg)
+#        slider_vert.putalpha(slider_alpha)
+        slider_vert_active = Image.new('RGBA', (13, 28), widget_fg)
+#        slider_vert_active.putalpha(slider_alpha)
+        slider_vert_prelight = Image.new('RGBA', (13, 28),
+                                         cst.active_color(cst.active_color(color, 'RGB')))
+#        slider_vert_prelight.putalpha(slider_alpha)
+
+        self._im_trough.put(" ".join(["{" + " ".join([bg] * 15) + "}"] * 15))
+
+        self._im_slider_vert_active = PhotoImage(slider_vert_active,
+                                                 name='slider-vert-active',
+                                                 master=self)
+        self._im_slider_vert = PhotoImage(slider_vert,
+                                          name='slider-vert',
+                                          master=self)
+        self._im_slider_vert_prelight = PhotoImage(slider_vert_prelight,
+                                                   name='slider-vert-prelight',
+                                                   master=self)
+        self._im_slider_vert_insens = PhotoImage(slider_vert_insens,
+                                                 name='slider-vert-insens',
+                                                 master=self)
+        self.style.element_create('widget.Vertical.Scrollbar.trough', 'image',
+                                  'trough-scrollbar-vert')
+        self.style.element_create('widget.Vertical.Scrollbar.thumb', 'image',
+                                  'slider-vert',
+                                  ('pressed', '!disabled', 'slider-vert-active'),
+                                  ('active', '!disabled', 'slider-vert-prelight'),
+                                  ('disabled', 'slider-vert-insens'), border=6,
+                                  sticky='ns')
+        self.style.layout('widget.Vertical.TScrollbar',
+                          [('widget.Vertical.Scrollbar.trough',
+                            {'children': [('widget.Vertical.Scrollbar.thumb', {'expand': '1'})],
+                             'sticky': 'ns'})])
+
         self.widget_style_init()
 
         # --- tray icon menu
@@ -171,17 +220,34 @@ class App(Tk):
 
     def widget_style_init(self):
         """Init widgets style."""
-        bg = CONFIG.get('Widget', 'background')
+        bg = CONFIG.get('Widget', 'background', fallback='gray10')
         feed_bg = CONFIG.get('Widget', 'feed_background', fallback='gray20')
         fg = CONFIG.get('Widget', 'foreground')
         vmax = self.winfo_rgb('white')[0]
-        color = tuple(int(val / vmax * 255) for val in self.winfo_rgb(bg))
-        active_bg = cst.active_color(color)
+        widget_bg = tuple(int(val / vmax * 255) for val in self.winfo_rgb(bg))
+        widget_fg = tuple(int(val / vmax * 255) for val in self.winfo_rgb(fg))
+        active_bg = cst.active_color(widget_bg)
+        slider_alpha = Image.open(cst.IM_SCROLL_ALPHA)
+        slider_vert_insens = Image.new('RGBA', (13, 28), widget_bg)
+        slider_vert = Image.new('RGBA', (13, 28), active_bg)
+        slider_vert.putalpha(slider_alpha)
+        slider_vert_active = Image.new('RGBA', (13, 28), widget_fg)
+        slider_vert_active.putalpha(slider_alpha)
+        slider_vert_prelight = Image.new('RGBA', (13, 28),
+                                         cst.active_color(cst.active_color(widget_bg, 'RGB')))
+        slider_vert_prelight.putalpha(slider_alpha)
+
+        self._im_slider_vert_active.paste(slider_vert_active)
+        self._im_slider_vert.paste(slider_vert)
+        self._im_slider_vert_prelight.paste(slider_vert_prelight)
+        self._im_slider_vert_insens.paste(slider_vert_insens)
+        self._im_trough.put(" ".join(["{" + " ".join([bg] * 15) + "}"] * 15))
+
         self.style.configure('widget.TFrame', background=bg)
         self.style.configure('widget.interior.TFrame',
                              background=feed_bg)
         self.style.configure('widget.TSizegrip', background=bg)
-        self.style.configure('widget.TSeparator', background=bg)
+        self.style.configure('widget.Horizontal.TSeparator', background=bg)
         self.style.configure('widget.TLabel', background=bg,
                              foreground=fg, font=CONFIG.get('Widget', 'font'))
         self.style.configure('widget.title.TLabel', background=bg, foreground=fg,
@@ -195,6 +261,8 @@ class App(Tk):
                        bordercolor=[('pressed', active_bg)],
                        darkcolor=[('pressed', bg)],
                        lightcolor=[('pressed', fg)])
+
+        self.update_idletasks()
 
     def hide_all(self):
         """Withdraw all widgets."""
