@@ -94,8 +94,8 @@ class App(Tk):
                                        width=15, height=15,
                                        master=self)
         bg = CONFIG.get("Widget", 'background', fallback='gray10')
-        widget_bg = self.winfo_rgb(bg)
-        widget_fg = CONFIG.get('Widget', 'foreground', fallback='white')
+        widget_bg = '#000000'
+        widget_fg = '#ffffff'
         vmax = self.winfo_rgb('white')[0]
         color = tuple(int(val / vmax * 255) for val in widget_bg)
         active_bg = cst.active_color(color)
