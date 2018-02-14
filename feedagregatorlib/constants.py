@@ -221,6 +221,8 @@ IM_PLUS = os.path.join(PATH_IMAGES, 'plus.png')
 IM_COLOR = os.path.join(PATH_IMAGES, 'color.png')
 IM_CLOSED = os.path.join(PATH_IMAGES, 'closed.png')
 IM_OPENED = os.path.join(PATH_IMAGES, 'open.png')
+IM_OPENED_ALPHA = os.path.join(PATH_IMAGES, 'open_alpha.png')
+IM_CLOSED_ALPHA = os.path.join(PATH_IMAGES, 'close_alpha.png')
 IM_CLOSED_SEL = os.path.join(PATH_IMAGES, 'closed_sel.png')
 IM_OPENED_SEL = os.path.join(PATH_IMAGES, 'open_sel.png')
 

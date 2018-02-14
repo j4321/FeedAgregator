@@ -226,6 +226,12 @@ class CatWidget(Toplevel):
         l.bind("<Configure>", resize)
         self.feeds[title] = tf, l
 
+    def hide_feed(self, title):
+        self.feeds[title][0].grid_remove()
+
+    def show_feed(self, title):
+        self.feeds[title][0].grid()
+
     def remove_feed(self, title):
         self.feeds[title][0].destroy()
         del self.feeds[title]

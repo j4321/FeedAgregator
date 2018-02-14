@@ -132,6 +132,7 @@ class FeedWidget(Toplevel):
         # --- bindings
         self.bind('<3>', lambda e: self.menu.tk_popup(e.x_root, e.y_root))
         for widget in [self.label, self.canvas, sep]:
+            widget.bind('<Alt-ButtonPress-1>', lambda e: print('ok'))
             widget.bind('<ButtonPress-1>', self._start_move)
             widget.bind('<ButtonRelease-1>', self._stop_move)
             widget.bind('<B1-Motion>', self._move)
