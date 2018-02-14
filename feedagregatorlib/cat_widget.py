@@ -99,9 +99,14 @@ class CatWidget(Toplevel):
 
         # --- elements
         title = _('Feeds: Latests') if category == 'All' else _('Feeds: {category}').format(category=category)
-        label = Label(self, text=title, style='widget.title.TLabel',
+        frame = Frame(self, style='widget.TFrame')
+        Button(frame, style='widget.close.TButton',
+               command=self.withdraw).pack(side='left')
+        label = Label(frame, text=title, style='widget.title.TLabel',
                       anchor='center')
-        label.grid(row=0, columnspan=2, padx=4, pady=4, sticky='ew')
+        label.pack(side='left', fill='x', expand=True)
+        frame.grid(row=0, columnspan=2, padx=4, pady=4, sticky='ew')
+
         sep = Separator(self, style='widget.Horizontal.TSeparator')
         sep.grid(row=1, columnspan=2, sticky='ew')
         self.canvas = Canvas(self, highlightthickness=0)

@@ -136,19 +136,21 @@ class App(Tk):
                             {'children': [('widget.Vertical.Scrollbar.thumb', {'expand': '1'})],
                              'sticky': 'ns'})])
 
+        hide = Image.new('RGBA', (12, 12), active_bg2)
+        hide_active = Image.new('RGBA', (12, 12), widget_fg)
+        hide_pressed = Image.new('RGBA', (12, 12), (150, 0, 0))
         toggle_open = Image.new('RGBA', (9, 9), widget_fg)
         toggle_open_active = Image.new('RGBA', (9, 9), active_bg2)
         toggle_close = Image.new('RGBA', (9, 9), widget_fg)
         toggle_close_active = Image.new('RGBA', (9, 9), active_bg2)
+        self._im_hide = PhotoImage(hide, master=self)
+        self._im_hide_active = PhotoImage(hide_active, master=self)
+        self._im_hide_pressed = PhotoImage(hide_pressed, master=self)
         self._im_open = PhotoImage(toggle_open, master=self)
         self._im_open_active = PhotoImage(toggle_open_active, master=self)
         self._im_close = PhotoImage(toggle_close, master=self)
         self._im_close_active = PhotoImage(toggle_close_active, master=self)
 
-        self._open_image = PhotoImage(file=cst.IM_OPENED, master=self)
-        self._closed_image = PhotoImage(file=cst.IM_CLOSED, master=self)
-        self._open_image_sel = PhotoImage(file=cst.IM_OPENED_SEL, master=self)
-        self._closed_image_sel = PhotoImage(file=cst.IM_CLOSED_SEL, master=self)
         self.style.element_create("toggle", "image", self._im_close,
                                   ("!hover", "selected", "!disabled", self._im_open),
                                   ("hover", "!selected", "!disabled", self._im_close_active),
@@ -161,6 +163,11 @@ class App(Tk):
                                                           {'sticky': 'nswe'})],
                                             'sticky': 'nswe'})],
                              'sticky': 'nswe'})])
+        self.style.configure('widget.close.TButton', background=bg,
+                             relief='flat', image=self._im_hide, padding=0)
+        self.style.map('widget.close.TButton', background=[], relief=[],
+                       image=[('active', '!pressed', self._im_hide_active),
+                              ('active', 'pressed', self._im_hide_pressed)])
 
         self.widget_style_init()
 
@@ -269,6 +276,13 @@ class App(Tk):
         self._im_slider_vert_insens.paste(slider_vert_insens)
         self._im_trough.put(" ".join(["{" + " ".join([bg] * 15) + "}"] * 15))
 
+        hide_alpha = Image.open(cst.IM_HIDE_ALPHA)
+        hide = Image.new('RGBA', (12, 12), active_bg)
+        hide.putalpha(hide_alpha)
+        hide_active = Image.new('RGBA', (12, 12), active_bg2)
+        hide_active.putalpha(hide_alpha)
+        hide_pressed = Image.new('RGBA', (12, 12), widget_fg)
+        hide_pressed.putalpha(hide_alpha)
         toggle_open_alpha = Image.open(cst.IM_OPENED_ALPHA)
         toggle_open = Image.new('RGBA', (9, 9), widget_fg)
         toggle_open.putalpha(toggle_open_alpha)
@@ -279,12 +293,20 @@ class App(Tk):
         toggle_close.putalpha(toggle_close_alpha)
         toggle_close_active = Image.new('RGBA', (9, 9), active_bg2)
         toggle_close_active.putalpha(toggle_close_alpha)
+        self._im_hide.paste(hide)
+        self._im_hide_active.paste(hide_active)
+        self._im_hide_pressed.paste(hide_pressed)
         self._im_open.paste(toggle_open)
         self._im_open_active.paste(toggle_open_active)
         self._im_close.paste(toggle_close)
         self._im_close_active.paste(toggle_close_active)
 
         self.style.configure('widget.TFrame', background=bg)
+        self.style.configure('widget.close.TButton', background=bg)
+#                             relief='flat', image=self._im_hide, padding=0)
+#        self.style.map('widget.close.TButton', background=[], relief=[],
+#                       image=[('active', '!pressed', self._im_hide_active),
+#                              ('active', 'pressed', self._im_hide_pressed)])
         self.style.configure('widget.interior.TFrame',
                              background=feed_bg)
         self.style.configure('widget.TSizegrip', background=bg)

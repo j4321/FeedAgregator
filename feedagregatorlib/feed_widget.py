@@ -96,9 +96,13 @@ class FeedWidget(Toplevel):
         self.menu.add_command(label=_('Remove feed'), command=self.remove_feed)
 
         # --- elements
-        self.label = Label(self, text=feed_name, style='widget.title.TLabel',
+        frame = Frame(self, style='widget.TFrame')
+        Button(frame, style='widget.close.TButton',
+               command=self.withdraw).pack(side='left')
+        self.label = Label(frame, text=feed_name, style='widget.title.TLabel',
                            anchor='center')
-        self.label.grid(row=0, columnspan=2, padx=4, pady=4, sticky='ew')
+        self.label.pack(side='left', fill='x', expand=True)
+        frame.grid(row=0, columnspan=2, padx=4, pady=4, sticky='ew')
         self.label.bind('<Double-1>', self.rename)
         sep = Separator(self, style='widget.Horizontal.TSeparator')
         sep.grid(row=1, columnspan=2, sticky='ew')
