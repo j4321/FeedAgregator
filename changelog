@@ -1,3 +1,4 @@
+
 FeedAgregator
 =============
 RSS and Atom feed agregator in desktop widgets + notifications
@@ -7,6 +8,11 @@ Copyright 2018 Juliette Monsel <j_4321@protonmail.com>
 Changelog
 ---------
 
+- Version 1.1.4
+    * Improve style
+    * Add hide button to widgets
+    * Add possibility to deactivate feeds from manager
+
 - Version 1.1.3
     * Fix PhotoImage import in trayicon.tkicon
 
@@ -15,7 +21,8 @@ Changelog
 
 - Version 1.1.1
     * Reduce left margin of bullet points in feed entries
-    * Change feed data saving because the content is not always compatible with configparser
+    * Change feed data saving because the content is n
+    ot always compatible with configparser
     * Use PIL.ImageTk to handle more image formats in feed entries
 
 - Version 1.1.0
