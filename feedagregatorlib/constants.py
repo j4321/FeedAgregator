@@ -30,6 +30,10 @@ The images in ICONS were taken from "icons.tcl":
 
     Copyright (c) 2009 Pat Thoyts <patthoyts@users.sourceforge.net>
 
+The scroll.png image is a modified version of the slider-vert.png assets from
+the arc-theme https://github.com/horst3180/arc-theme
+Copyright 2015 horst3180 (https://github.com/horst3180)
+
 The other icons are modified versions of icons from the elementary project
 Copyright 2007-2013 elementary LLC.
 

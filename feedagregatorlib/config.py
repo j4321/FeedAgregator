@@ -288,8 +288,8 @@ class Config(Toplevel):
                                                             sticky='e', padx=4,
                                                             pady=4)
         Separator(frame_color, orient='horizontal').grid(row=2, columnspan=4,
-                                                        sticky='ew', padx=4,
-                                                        pady=4)
+                                                         sticky='ew', padx=4,
+                                                         pady=4)
         Label(frame_color,
               text=_('Feed entry')).grid(row=3, column=0, sticky='w', padx=4, pady=4)
         Label(frame_color, text=_('Background color')).grid(row=3, column=1,
