@@ -372,7 +372,10 @@ class App(Tk):
             after_ids.extend(self._check_result_update_id.values())
             after_ids.extend(self._check_result_init_id.values())
             for after_id in after_ids:
-                self.after_cancel(after_id)
+                try:
+                    self.after_cancel(after_id)
+                except ValueError:
+                    pass
             self.icon.menu.set_item_label(4, _("Restart"))
             self.icon.menu.disable_item(1)
             self.icon.menu.disable_item(2)
@@ -407,7 +410,10 @@ class App(Tk):
 
     def quit(self):
         for after_id in self.tk.call('after', 'info'):
-            self.after_cancel(after_id)
+            try:
+                self.after_cancel(after_id)
+            except ValueError:
+                pass
         for thread in self.threads.values():
             try:
                 thread.terminate()
@@ -777,7 +783,10 @@ class App(Tk):
                     after_ids.extend(self._check_result_update_id.values())
                     after_ids.extend(self._check_result_init_id.values())
                     for after_id in after_ids:
-                        self.after_cancel(after_id)
+                        try:
+                            self.after_cancel(after_id)
+                        except ValueError:
+                            pass
             else:
                 date = datetime.strptime(updated, '%Y-%m-%d %H:%M')
                 if (date > datetime.strptime(FEEDS.get(title, 'updated'), '%Y-%m-%d %H:%M') or
@@ -818,7 +827,10 @@ class App(Tk):
 
     def feed_update(self):
         """Update all feeds."""
-        self.after_cancel(self._update_id)
+        try:
+            self.after_cancel(self._update_id)
+        except ValueError:
+            pass
         for thread in self.threads.values():
             try:
                 thread.terminate()
@@ -854,7 +866,10 @@ class App(Tk):
                     after_ids.extend(self._check_result_update_id.values())
                     after_ids.extend(self._check_result_init_id.values())
                     for after_id in after_ids:
-                        self.after_cancel(after_id)
+                        try:
+                            self.after_cancel(after_id)
+                        except ValueError:
+                            pass
             else:
                 date = datetime.strptime(updated, '%Y-%m-%d %H:%M')
                 if date > datetime.strptime(FEEDS.get(title, 'updated'), '%Y-%m-%d %H:%M'):

@@ -104,7 +104,10 @@ class Manager(Toplevel):
         self._check_add_id = ''
 
     def destroy(self):
-        self.after_cancel(self._check_add_id)
+        try:
+            self.after_cancel(self._check_add_id)
+        except ValueError:
+            pass
         Toplevel.destroy(self)
 
     def _edit(self, event, item):
