@@ -52,4 +52,5 @@ shows all entries.
 """,
       requires=["tkinter", "sys", "os", "re", "locale", "gettext", "babel",
                 "beautifulsoup4", "logging", 'configparser', "feedparser",
-                'multiprocessing', 'subprocess', 'pillow', 'dateutil'])
+                'multiprocessing', 'subprocess', 'pillow', 'dateutil',
+                'ewmh'])
