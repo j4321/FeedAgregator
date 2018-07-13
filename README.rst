@@ -40,6 +40,7 @@ Install
        (see https://wiki.archlinux.org/index.php/Desktop_notifications for more details)
      - Beautifulsoup 4 https://pypi.python.org/pypi/beautifulsoup4/
      - babel https://pypi.python.org/pypi/Babel
+     - dateutil https://pypi.python.org/pypi/python-dateutil
      - feedparser https://pypi.python.org/pypi/feedparser
      - Pillow https://pypi.python.org/pypi/Pillow
 
@@ -53,12 +54,12 @@ Install
 
     For instance, in Ubuntu/Debian you will need to install the following packages:
     python3-tk, tk-tktray, libnotify-bin and the notification server of your choice,
-    tk-html3, python3-bs4, python3-babel, python3-feedparser,
+    tk-html3, python3-bs4, python3-babel, python3-feedparser, python3-dateutil,
     python3-pil and python3-pil.imagek
 
     In Archlinux, you will need to install the following packages:
     tk, tktray (`AUR <https://aur.archlinux.org/packages/tktray>`__),
-    libnotify and the notification server of your choice,
+    libnotify and the notification server of your choice, python-dateutil,
     python-beautifulsoup4, python-babel, python-feedparser, python-pillow,
     tkhtml3-git (`AUR <https://aur.archlinux.org/packages/tkhtml3-git>`__)
 
