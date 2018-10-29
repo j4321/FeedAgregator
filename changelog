@@ -21,8 +21,7 @@ Changelog
 
 - Version 1.1.1
     * Reduce left margin of bullet points in feed entries
-    * Change feed data saving because the content is n
-    ot always compatible with configparser
+    * Change feed data saving because the content is not always compatible with configparser
     * Use PIL.ImageTk to handle more image formats in feed entries
 
 - Version 1.1.0
