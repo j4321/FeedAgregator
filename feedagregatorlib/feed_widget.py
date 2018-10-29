@@ -26,12 +26,12 @@ from locale import getlocale
 from tkinter.font import Font
 from tkinter import Toplevel, BooleanVar, Menu, StringVar, Canvas, TclError
 from tkinter.ttk import Style, Label, Separator, Sizegrip, Frame, Button, Entry
-from feedagregatorlib.constants import CONFIG, FEEDS, APP_NAME, add_trace, load_data
+from feedagregatorlib.constants import CONFIG, FEEDS, APP_NAME, add_trace, load_data, save_feeds
 from feedagregatorlib.messagebox import askokcancel
 from feedagregatorlib.tkinterhtml import HtmlFrame
 from feedagregatorlib.toggledframe import ToggledFrame
 from feedagregatorlib.autoscrollbar import AutoScrollbar
-from ewmh import EWMH
+from ewmh import EWMH, ewmh
 from webbrowser import open as webopen
 import configparser
 import pickle
@@ -52,8 +52,7 @@ class FeedWidget(Toplevel):
         self.variable = BooleanVar(self, False)
 
         self._position = StringVar(self, FEEDS.get(feed_name, 'position', fallback='normal'))
-        add_trace(self._position, 'write',
-                  lambda *x: FEEDS.set(feed_name, 'position', self._position.get()))
+        add_trace(self._position, 'write', self._position_trace)
 
         self.ewmh = EWMH()
         self.title('feedagregator.widget.{}'.format(feed_name.replace(' ', '_')))
@@ -67,8 +66,7 @@ class FeedWidget(Toplevel):
                                             FEEDS.getboolean(self.feed_name,
                                                              'sort_is_reversed',
                                                              fallback=False))
-        add_trace(self._sort_is_reversed, 'write',
-                  lambda *args: FEEDS.set(self.feed_name, 'sort_is_reversed', str(self._sort_is_reversed.get())))
+        add_trace(self._sort_is_reversed, 'write', self._sort_trace)
 
         # --- menu
         self.menu = Menu(self, tearoff=False)
@@ -315,28 +313,40 @@ a:hover {
         top = min(max(top, 0), 1)
         self.canvas.yview_moveto(top)
 
+    def _position_trace(self, *args):
+        FEEDS.set(self.feed_name, 'position', self._position.get())
+        save_feeds()
+
+    def _sort_trace(self, *args):
+        FEEDS.set(self.feed_name, 'sort_is_reversed', str(self._sort_is_reversed.get()))
+        save_feeds()
+
     def _change_position(self, event=None):
         '''Make widget sticky and set its position with respects to the other windows.'''
         pos = self._position.get()
-        for w in self.ewmh.getClientList():
-            if w.get_wm_name() == self.title():
-                self.ewmh.setWmState(w, 1, '_NET_WM_STATE_STICKY')
-                if pos == 'above':
-                    self.ewmh.setWmState(w, 1, '_NET_WM_STATE_ABOVE')
-                    self.ewmh.setWmState(w, 0, '_NET_WM_STATE_BELOW')
-                elif pos == 'below':
-                    self.ewmh.setWmState(w, 0, '_NET_WM_STATE_ABOVE')
-                    self.ewmh.setWmState(w, 1, '_NET_WM_STATE_BELOW')
-                else:
-                    self.ewmh.setWmState(w, 0, '_NET_WM_STATE_BELOW')
-                    self.ewmh.setWmState(w, 0, '_NET_WM_STATE_ABOVE')
-        self.ewmh.display.flush()
+        try:
+            for w in self.ewmh.getClientList():
+                if w.get_wm_name() == self.title():
+                    self.ewmh.setWmState(w, 1, '_NET_WM_STATE_STICKY')
+                    if pos == 'above':
+                        self.ewmh.setWmState(w, 1, '_NET_WM_STATE_ABOVE')
+                        self.ewmh.setWmState(w, 0, '_NET_WM_STATE_BELOW')
+                    elif pos == 'below':
+                        self.ewmh.setWmState(w, 0, '_NET_WM_STATE_ABOVE')
+                        self.ewmh.setWmState(w, 1, '_NET_WM_STATE_BELOW')
+                    else:
+                        self.ewmh.setWmState(w, 0, '_NET_WM_STATE_BELOW')
+                        self.ewmh.setWmState(w, 0, '_NET_WM_STATE_ABOVE')
+            self.ewmh.display.flush()
+        except ewmh.display.error.BadWindow:
+            pass
 
     def _on_configure(self, event):
         if event.widget is self:
             geometry = self.geometry()
             if geometry != '1x1+0+0':
                 FEEDS.set(self.feed_name, 'geometry', geometry)
+                save_feeds()
         elif event.widget in [self.canvas, self.display]:
             self.canvas.configure(scrollregion=self.canvas.bbox('all'))
             self.canvas.itemconfigure('display', width=self.canvas.winfo_width() - 4)

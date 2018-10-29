@@ -27,12 +27,12 @@ from tkinter.font import Font
 from tkinter import Toplevel, BooleanVar, Menu, StringVar, Canvas, TclError
 from tkinter.ttk import Style, Label, Separator, Sizegrip, Frame, Button
 from feedagregatorlib.constants import CONFIG, FEEDS, APP_NAME, add_trace, \
-    LATESTS, feed_get_latest
+    LATESTS, feed_get_latest, save_latests
 from feedagregatorlib.messagebox import askokcancel
 from feedagregatorlib.tkinterhtml import HtmlFrame
 from feedagregatorlib.toggledframe import ToggledFrame
 from feedagregatorlib.autoscrollbar import AutoScrollbar
-from ewmh import EWMH
+from ewmh import EWMH, ewmh
 from webbrowser import open as webopen
 import configparser
 import pickle
@@ -52,8 +52,7 @@ class CatWidget(Toplevel):
         self.variable = BooleanVar(self, False)
 
         self._position = StringVar(self, LATESTS.get(self.category, 'position'))
-        add_trace(self._position, 'write',
-                  lambda *x: LATESTS.set(self.category, 'position', self._position.get()))
+        add_trace(self._position, 'write', self._position_trace)
 
         self.ewmh = EWMH()
         self.title('feedagregator.widget.{}'.format(self.category.replace(' ', '_')))
@@ -64,8 +63,7 @@ class CatWidget(Toplevel):
         self.y = None
 
         self._sort_order = StringVar(self, LATESTS.get(category, 'sort_order', fallback='A-Z'))
-        add_trace(self._sort_order, 'write',
-                  lambda *args: LATESTS.set(self.category, 'sort_order', self._sort_order.get()))
+        add_trace(self._sort_order, 'write', self._order_trace)
 
         # --- menu
         self.menu = Menu(self, tearoff=False)
@@ -333,6 +331,14 @@ a:hover {
         else:
             self._sort_by_date(True)
 
+    def _position_trace(self, *args):
+        LATESTS.set(self.category, 'position', self._position.get())
+        save_latests()
+
+    def _order_trace(self, *args):
+        LATESTS.set(self.category, 'sort_order', self._sort_order.get())
+        save_latests()
+
     def _sort_by_date(self, reverse):
         titles = sorted(self.feeds, reverse=reverse, key=lambda x: FEEDS.get(x, 'updated'))
         for i, title in enumerate(titles):
@@ -347,25 +353,29 @@ a:hover {
     def _change_position(self, event=None):
         '''Make widget sticky and set its position with respects to the other windows.'''
         pos = self._position.get()
-        for w in self.ewmh.getClientList():
-            if w.get_wm_name() == self.title():
-                self.ewmh.setWmState(w, 1, '_NET_WM_STATE_STICKY')
-                if pos == 'above':
-                    self.ewmh.setWmState(w, 1, '_NET_WM_STATE_ABOVE')
-                    self.ewmh.setWmState(w, 0, '_NET_WM_STATE_BELOW')
-                elif pos == 'below':
-                    self.ewmh.setWmState(w, 0, '_NET_WM_STATE_ABOVE')
-                    self.ewmh.setWmState(w, 1, '_NET_WM_STATE_BELOW')
-                else:
-                    self.ewmh.setWmState(w, 0, '_NET_WM_STATE_BELOW')
-                    self.ewmh.setWmState(w, 0, '_NET_WM_STATE_ABOVE')
-        self.ewmh.display.flush()
+        try:
+            for w in self.ewmh.getClientList():
+                if w.get_wm_name() == self.title():
+                    self.ewmh.setWmState(w, 1, '_NET_WM_STATE_STICKY')
+                    if pos == 'above':
+                        self.ewmh.setWmState(w, 1, '_NET_WM_STATE_ABOVE')
+                        self.ewmh.setWmState(w, 0, '_NET_WM_STATE_BELOW')
+                    elif pos == 'below':
+                        self.ewmh.setWmState(w, 0, '_NET_WM_STATE_ABOVE')
+                        self.ewmh.setWmState(w, 1, '_NET_WM_STATE_BELOW')
+                    else:
+                        self.ewmh.setWmState(w, 0, '_NET_WM_STATE_BELOW')
+                        self.ewmh.setWmState(w, 0, '_NET_WM_STATE_ABOVE')
+            self.ewmh.display.flush()
+        except ewmh.display.error.BadWindow:
+            pass
 
     def _on_configure(self, event):
         if event.widget is self:
             geometry = self.geometry()
             if geometry != '1x1+0+0':
                 LATESTS.set(self.category, 'geometry', geometry)
+                save_latests()
         elif event.widget in [self.canvas, self.display]:
             self.canvas.configure(scrollregion=self.canvas.bbox('all'))
             self.canvas.itemconfigure('display', width=self.canvas.winfo_width() - 4)

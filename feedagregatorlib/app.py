@@ -426,20 +426,25 @@ class App(Tk):
         try:
             self.destroy()
         except TclError:
-            logging.error("Error on quit")
+            logging.exception("Error on quit")
             self.after(500, self.quit)
 
     def feed_widget_trace(self, title):
-        self.menu_feeds.set_item_value(title,
-                                       self.feed_widgets[title].variable.get())
+        value = self.feed_widgets[title].variable.get()
+        self.menu_feeds.set_item_value(title, value)
+        FEEDS.set(title, 'visible', str(value))
+        cst.save_feeds()
 
     def cat_widget_trace(self, category):
-        self.menu_categories.set_item_value(category,
-                                            self.cat_widgets[category].variable.get())
+        value = self.cat_widgets[category].variable.get()
+        self.menu_categories.set_item_value(category, value)
+        LATESTS.set(category, 'visible', str(value))
 
     def latests_widget_trace(self, *args):
-        self.menu_widgets.set_item_value(_('Latests'),
-                                         self.cat_widgets['All'].variable.get())
+        value = self.cat_widgets['All'].variable.get()
+        self.menu_widgets.set_item_value(_('Latests'), value)
+        LATESTS.set('All', 'visible', str(value))
+        cst.save_latests()
 
     def toggle_category_widget(self, category):
         value = self.menu_categories.get_item_value(category)
@@ -463,6 +468,7 @@ class App(Tk):
             self.feed_widgets[title].deiconify()
         else:
             self.feed_widgets[title].withdraw()
+        self.update_idletasks()
 
     def report_callback_exception(self, *args):
         """Log exceptions."""
