@@ -34,6 +34,7 @@ Install
 - Source code
 
     First, install the missing dependencies among:
+    
      - Tkinter (Python wrapper for Tk)
      - Tkhtml3 http://tkhtml.tcl.tk/
      - libnotify and a notification server if your desktop environment does not provide one.
@@ -46,6 +47,7 @@ Install
      - Pillow https://pypi.python.org/pypi/Pillow
 
     You also need to have at least one of the following GUI toolkits for the system tray icon:
+    
      - Tktray https://code.google.com/archive/p/tktray/downloads
      - PyGTK http://www.pygtk.org/downloads.html
      - PyQt5, PyQt4 or PySide
@@ -66,7 +68,9 @@ Install
     python-ewmh (`AUR <https://aur.archlinux.org/packages/python-ewmh>`__)
 
     Then install the application:
+    
     ::
+    
         $ sudo python3 setup.py install
 
     You can now launch it from `Menu > Network > FeedAgregator`. You can launch
