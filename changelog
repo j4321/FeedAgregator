@@ -12,6 +12,7 @@ Changelog
     * Add scrollbar to widgets
     * Add hide button to widgets
     * Add possibility to deactivate feeds from manager
+    * Add color preview in config dialog
     * Save config more often to avoid loosing info in case of crash 
 
 - Version 1.1.3
