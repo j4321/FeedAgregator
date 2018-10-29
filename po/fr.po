@@ -46,7 +46,7 @@ msgstr ""
 
 #: feedagregatorlib/config.py:108
 msgid "Feed update delay (min)"
-msgstr "Délai entre mises à jour des flux"
+msgstr "Délai entre mises à jour des flux (min)"
 
 #: feedagregatorlib/config.py:118
 msgid "Show confirmation dialog before removing feed"
