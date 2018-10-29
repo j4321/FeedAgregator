@@ -426,7 +426,7 @@ class App(Tk):
         try:
             self.destroy()
         except TclError:
-            logging.exception("Error on quit")
+            logging.error("Error on quit")
             self.after(500, self.quit)
 
     def feed_widget_trace(self, title):

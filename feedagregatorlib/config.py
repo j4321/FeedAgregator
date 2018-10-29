@@ -22,6 +22,7 @@ Config dialog
 """
 import tkinter.font as tkfont
 from tkinter import Toplevel, Menu, StringVar, TclError
+from tkinter import Frame as tkFrame
 from tkinter.ttk import Separator, Menubutton, Button, Label, Frame, \
     Notebook, Entry, Scale, Style, Checkbutton, Combobox
 from feedagregatorlib.constants import CONFIG, TOOLKITS, IM_COLOR, APP_NAME,\
@@ -274,11 +275,11 @@ class Config(Toplevel):
         frame_color = Frame(frame_widget)
         frame_color.columnconfigure(1, weight=1)
         frame_color.columnconfigure(3, weight=1)
-        self.entry_bg = Entry(frame_color, width=9, justify='center')
-        self.entry_fg = Entry(frame_color, width=9, justify='center')
-        self.entry_feed_bg = Entry(frame_color, width=9, justify='center')
-        self.entry_feed_fg = Entry(frame_color, width=9, justify='center')
-        self.entry_link = Entry(frame_color, width=9, justify='center')
+        self.preview_bg = tkFrame(frame_color, width=60, height=20, bg=CONFIG.get("Widget", "background"))
+        self.preview_fg = tkFrame(frame_color, width=60, height=20, bg=CONFIG.get("Widget", "foreground"))
+        self.preview_feed_bg = tkFrame(frame_color, width=60, height=20, bg=CONFIG.get("Widget", "feed_background"))
+        self.preview_feed_fg = tkFrame(frame_color, width=60, height=20, bg=CONFIG.get("Widget", "feed_foreground"))
+        self.preview_link = tkFrame(frame_color, width=60, height=20, bg=CONFIG.get("Widget", "link_color"))
         Label(frame_color,
               text=_('General')).grid(row=0, column=0, sticky='w', padx=4, pady=4)
         Label(frame_color, text=_('Background color')).grid(row=0, column=1,
@@ -301,36 +302,27 @@ class Config(Toplevel):
         Label(frame_color, text=_('Link color')).grid(row=5, column=1,
                                                       sticky='e', padx=4,
                                                       pady=4)
-        self.entry_bg.grid(row=0, column=2, sticky='w', padx=4, pady=4)
-        self.entry_fg.grid(row=1, column=2, sticky='w', padx=4, pady=4)
-        self.entry_feed_bg.grid(row=3, column=2, sticky='w', padx=4, pady=4)
-        self.entry_feed_fg.grid(row=4, column=2, sticky='w', padx=4, pady=4)
-        self.entry_link.grid(row=5, column=2, sticky='w', padx=4, pady=4)
-        self.entry_bg.insert(0, CONFIG.get("Widget", "background"))
-        self.entry_feed_fg.insert(0, CONFIG.get("Widget", "feed_foreground", fallback='white'))
-        self.entry_feed_bg.insert(0, CONFIG.get("Widget", "feed_background", fallback='gray20'))
-        self.entry_fg.insert(0, CONFIG.get("Widget", "foreground"))
-        self.entry_link.insert(0, CONFIG.get("Widget", "link_color"))
-        Button(frame_color, image=self.img_color, padding=0,
-               command=lambda: self.askcolor(self.entry_bg)).grid(row=0, column=3,
-                                                                  sticky='w',
-                                                                  padx=4, pady=4)
-        Button(frame_color, image=self.img_color, padding=0,
-               command=lambda: self.askcolor(self.entry_fg)).grid(row=1, column=3,
-                                                                  sticky='w',
-                                                                  padx=4, pady=4)
-        Button(frame_color, image=self.img_color, padding=0,
-               command=lambda: self.askcolor(self.entry_feed_bg)).grid(row=3, column=3,
-                                                                       sticky='w',
-                                                                       padx=4, pady=4)
-        Button(frame_color, image=self.img_color, padding=0,
-               command=lambda: self.askcolor(self.entry_feed_fg)).grid(row=4, column=3,
-                                                                       sticky='w',
-                                                                       padx=4, pady=4)
-        Button(frame_color, image=self.img_color, padding=0,
-               command=lambda: self.askcolor(self.entry_link)).grid(row=5, column=3,
-                                                                    sticky='w',
-                                                                    padx=4, pady=4)
+        self.preview_bg.grid(row=0, column=2, sticky='w', padx=4, pady=4)
+        self.preview_fg.grid(row=1, column=2, sticky='w', padx=4, pady=4)
+        self.preview_feed_bg.grid(row=3, column=2, sticky='w', padx=4, pady=4)
+        self.preview_feed_fg.grid(row=4, column=2, sticky='w', padx=4, pady=4)
+        self.preview_link.grid(row=5, column=2, sticky='w', padx=4, pady=4)
+
+        Button(frame_color, image=self.img_color,
+               command=lambda: self.askcolor(self.preview_bg),
+               padding=0).grid(row=0, column=3, sticky='w', padx=4, pady=4)
+        Button(frame_color, image=self.img_color,
+               command=lambda: self.askcolor(self.preview_fg),
+               padding=0).grid(row=1, column=3, sticky='w', padx=4, pady=4)
+        Button(frame_color, image=self.img_color,
+               command=lambda: self.askcolor(self.preview_feed_bg),
+               padding=0).grid(row=3, column=3, sticky='w', padx=4, pady=4)
+        Button(frame_color, image=self.img_color,
+               command=lambda: self.askcolor(self.preview_feed_fg),
+               padding=0).grid(row=4, column=3, sticky='w', padx=4, pady=4)
+        Button(frame_color, image=self.img_color,
+               command=lambda: self.askcolor(self.preview_link),
+               padding=0).grid(row=5, column=3, sticky='w', padx=4, pady=4)
 
         # --- pack
         Label(frame_widget, text=_('Font'),
@@ -343,14 +335,13 @@ class Config(Toplevel):
               font='TkDefaultFont 9 bold', anchor='w').pack(padx=4, fill='x')
         frame_color.pack(fill='x', padx=14)
 
-    def askcolor(self, entry):
+    def askcolor(self, preview):
         try:
-            color = askcolor(entry.get(), parent=self, title=_('Color'))
+            color = askcolor(preview.cget('bg'), parent=self, title=_('Color'))
         except TclError:
             color = askcolor(parent=self, title=_('Color'))
         if color is not None:
-            entry.delete(0, 'end')
-            entry.insert(0, color)
+            preview.configure(bg=color)
 
     def display_label(self, value):
         self.opacity_label.configure(text=" {val} %".format(val=int(float(value))))
@@ -412,9 +403,9 @@ class Config(Toplevel):
         font_text_dic = self.text_font.actual()
         font_text_dic['family'] = font_text_dic['family'].replace(' ', '\ ')
         CONFIG.set("Widget", "font", "{family} {size}".format(**font_text_dic))
-        CONFIG.set("Widget", "foreground", self.entry_fg.get())
-        CONFIG.set("Widget", "background", self.entry_bg.get())
-        CONFIG.set("Widget", "feed_foreground", self.entry_feed_fg.get())
-        CONFIG.set("Widget", "feed_background", self.entry_feed_bg.get())
-        CONFIG.set("Widget", "link_color", self.entry_link.get())
+        CONFIG.set("Widget", "foreground", self.preview_fg.cget('bg'))
+        CONFIG.set("Widget", "background", self.preview_bg.cget('bg'))
+        CONFIG.set("Widget", "feed_foreground", self.preview_feed_fg.cget('bg'))
+        CONFIG.set("Widget", "feed_background", self.preview_feed_bg.cget('bg'))
+        CONFIG.set("Widget", "link_color", self.preview_link.cget('bg'))
         self.destroy()
