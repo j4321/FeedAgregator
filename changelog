@@ -7,13 +7,15 @@ Copyright 2018 Juliette Monsel <j_4321@protonmail.com>
 Changelog
 ---------
 
-- Version 1.1.4
+- Version 1.2.0
     * Improve style
     * Add scrollbar to widgets
     * Add hide button to widgets
     * Add possibility to deactivate feeds from manager
     * Add color preview in config dialog
-    * Save config more often to avoid loosing info in case of crash 
+    * Add copy on Ctrl+C in html frame
+    * Save config more often to avoid loosing info in case of crash
+    * Fix ValueError in after_cancel 
 
 - Version 1.1.3
     * Fix PhotoImage import in trayicon.tkicon
