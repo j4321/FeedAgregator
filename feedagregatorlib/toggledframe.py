@@ -25,9 +25,6 @@ ToggledFrame class.
 
 
 from tkinter.ttk import Frame, Checkbutton, Style, Label
-from feedagregatorlib.constants import IM_CLOSED, IM_OPENED, \
-    IM_CLOSED_SEL, IM_OPENED_SEL
-from PIL.ImageTk import PhotoImage
 
 
 class ToggledFrame(Frame):
@@ -43,26 +40,9 @@ class ToggledFrame(Frame):
         self.columnconfigure(1, weight=1)
         self.rowconfigure(1, weight=1)
         self.style = Style(self)
-        if "toggle" not in self.style.element_names():
-            self._open_image = PhotoImage(file=IM_OPENED, master=self)
-            self._closed_image = PhotoImage(file=IM_CLOSED, master=self)
-            self._open_image_sel = PhotoImage(file=IM_OPENED_SEL, master=self)
-            self._closed_image_sel = PhotoImage(file=IM_CLOSED_SEL, master=self)
-            self.style.element_create("toggle", "image", self._closed_image,
-                                      ("selected", "!disabled", self._open_image),
-                                      ("active", "!selected", "!disabled", self._closed_image_sel),
-                                      ("active", "selected", "!disabled", self._open_image_sel),
-                                      border=2, sticky='')
-            self.style.configure(self.toggle_style_name,
-                                 background=self.style.lookup(self.style_name, 'background'))
-            self.style.map(self.toggle_style_name, background=[])
-            self.style.layout('Toggle',
-                              [('Toggle.border',
-                                {'children': [('Toggle.padding',
-                                               {'children': [('Toggle.toggle',
-                                                              {'sticky': 'nswe'})],
-                                                'sticky': 'nswe'})],
-                                 'sticky': 'nswe'})])
+        self.style.configure(self.toggle_style_name,
+                             background=self.style.lookup(self.style_name, 'background'))
+        self.style.map(self.toggle_style_name, background=[])
         self.__checkbutton = Checkbutton(self,
                                          style=self.toggle_style_name,
                                          command=self.toggle,
@@ -78,8 +58,7 @@ class ToggledFrame(Frame):
 
     def _theme_changed(self, event):
         self.style.configure(self.toggle_style_name,
-                             background=self.style.lookup(self.style_name,
-                                                          'background'))
+                             background=self.style.lookup(self.style_name, 'background'))
 
     def _wrap(self, event):
         self.label.configure(wraplength=self.label.winfo_width())

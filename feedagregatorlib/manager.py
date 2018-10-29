@@ -30,6 +30,7 @@ from feedagregatorlib.autoscrollbar import AutoScrollbar
 from feedagregatorlib.autocomplete import AutoCompleteCombobox
 from PIL.ImageTk import PhotoImage
 
+
 class Manager(Toplevel):
     def __init__(self, master):
         Toplevel.__init__(self, master, class_=APP_NAME)
@@ -52,7 +53,7 @@ class Manager(Toplevel):
 
         # --- treeview
         self.tree = Treeview(self, columns=('Title', 'URL', 'Category', 'Remove'),
-                             style='manager.Treeview', show='headings',
+                             style='manager.Treeview',
                              selectmode='none')
         self.tree.heading('Title', text=_('Title'),
                           command=lambda: self._sort_column('Title', False))
@@ -60,6 +61,7 @@ class Manager(Toplevel):
                           command=lambda: self._sort_column('URL', False))
         self.tree.heading('Category', text=_('Category'),
                           command=lambda: self._sort_column('Category', False))
+        self.tree.column('#0', width=6)
         self.tree.column('Title', width=250)
         self.tree.column('URL', width=350)
         self.tree.column('Category', width=150)
@@ -75,12 +77,15 @@ class Manager(Toplevel):
         self.tree.bind('<Motion>', self._highlight_active)
         self.tree.bind('<Leave>', self._leave)
         self._last_active_item = None
+
         # --- populate treeview
         for title in sorted(FEEDS.sections(), key=lambda x: x.lower()):
             item = self.tree.insert('', 'end',
                                     values=(title, FEEDS.get(title, 'url'),
                                             FEEDS.get(title, 'category', fallback=''),
                                             ''))
+            if FEEDS.getboolean(title, 'active', fallback=True):
+                self.tree.selection_add(item)
             self.tree.item(item, tags=item)
             self.tree.tag_configure(item, image=self.im_moins)
             self.tree.tag_bind(item, '<ButtonRelease-1>',
@@ -99,7 +104,10 @@ class Manager(Toplevel):
         self._check_add_id = ''
 
     def destroy(self):
-        self.after_cancel(self._check_add_id)
+        try:
+            self.after_cancel(self._check_add_id)
+        except ValueError:
+            pass
         Toplevel.destroy(self)
 
     def _edit(self, event, item):
@@ -179,6 +187,15 @@ class Manager(Toplevel):
                     self.master.feed_remove(title)
                     self.tree.delete(item)
                     self.change_made = True
+            elif self.tree.identify_element(event.x, event.y) == 'Checkbutton.indicator':
+                sel = self.tree.selection()
+                if item in sel:
+                    self.tree.selection_remove(item)
+                    self.master.feed_set_active(self.tree.set(item, '#1'), False)
+                else:
+                    self.tree.selection_add(item)
+                    self.master.feed_set_active(self.tree.set(item, '#1'), True)
+                self.change_made = True
         else:
             self.tree.tag_configure(item, image=self.im_moins)
 

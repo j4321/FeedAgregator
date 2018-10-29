@@ -30,6 +30,10 @@ The images in ICONS were taken from "icons.tcl":
 
     Copyright (c) 2009 Pat Thoyts <patthoyts@users.sourceforge.net>
 
+The scroll.png image is a modified version of the slider-vert.png assets from
+the arc-theme https://github.com/horst3180/arc-theme
+Copyright 2015 horst3180 (https://github.com/horst3180)
+
 The other icons are modified versions of icons from the elementary project
 Copyright 2007-2013 elementary LLC.
 
@@ -219,13 +223,13 @@ IM_MOINS_SEL = os.path.join(PATH_IMAGES, 'moins_sel.png')
 IM_MOINS = os.path.join(PATH_IMAGES, 'moins.png')
 IM_PLUS = os.path.join(PATH_IMAGES, 'plus.png')
 IM_COLOR = os.path.join(PATH_IMAGES, 'color.png')
-IM_CLOSED = os.path.join(PATH_IMAGES, 'closed.png')
-IM_OPENED = os.path.join(PATH_IMAGES, 'open.png')
-IM_CLOSED_SEL = os.path.join(PATH_IMAGES, 'closed_sel.png')
-IM_OPENED_SEL = os.path.join(PATH_IMAGES, 'open_sel.png')
+IM_HIDE_ALPHA = os.path.join(PATH_IMAGES, 'hide_alpha.png')
+IM_OPENED_ALPHA = os.path.join(PATH_IMAGES, 'open_alpha.png')
+IM_CLOSED_ALPHA = os.path.join(PATH_IMAGES, 'close_alpha.png')
 
 ICONS = {key: os.path.join(PATH_IMAGES, '{}.png'.format(key))
          for key in ["information", "error", "question", "warning"]}
+IM_SCROLL_ALPHA = os.path.join(PATH_IMAGES, "scroll.png")
 
 
 # --- system tray icon
@@ -291,13 +295,27 @@ else:
 
 
 # --- colors
-def active_color(color):
+def is_color_light(color):
+    r, g, b = color
+    p = ((0.299 * r ** 2 + 0.587 * g ** 2 + 0.114 * b ** 2) ** 0.5) / 255
+    return p > 0.5
+
+
+def active_color(color, output='HTML'):
     """Return a lighter shade of color (RGB triplet with value max 255) in HTML format."""
     r, g, b = color
-    r += (255 - r) / 3
-    g += (255 - g) / 3
-    b += (255 - b) / 3
-    return ("#%2.2x%2.2x%2.2x" % (round(r), round(g), round(b))).upper()
+    if is_color_light(color):
+        r *= 3 / 4
+        g *= 3 / 4
+        b *= 3 / 4
+    else:
+        r += (255 - r) / 3
+        g += (255 - g) / 3
+        b += (255 - b) / 3
+    if output == 'HTML':
+        return ("#%2.2x%2.2x%2.2x" % (round(r), round(g), round(b))).upper()
+    else:
+        return (round(r), round(g), round(b))
 
 
 ZENITY = False

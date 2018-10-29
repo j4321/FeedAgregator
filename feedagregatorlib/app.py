@@ -25,8 +25,10 @@ import feedparser
 import dateutil.parser
 from datetime import datetime
 from tkinter import Tk, TclError
+from tkinter import PhotoImage as tkPhotoImage
 from tkinter.ttk import Style
 from PIL.ImageTk import PhotoImage
+from PIL import Image
 from feedagregatorlib.messagebox import showerror
 from feedagregatorlib.trayicon import TrayIcon, SubMenu
 import feedagregatorlib.constants as cst
@@ -87,6 +89,86 @@ class App(Tk):
         self.style.layout('manager.Treeview.Row',
                           [('Treeitem.row', {'sticky': 'nswe'}),
                            ('Treeitem.image', {'side': 'right', 'sticky': 'e'})])
+        self.style.layout('manager.Treeview.Item',
+                          [('Treeitem.padding',
+                            {'children': [('Checkbutton.indicator',
+                                           {'side': 'left', 'sticky': ''}),
+                                          ('Treeitem.text', {'side': 'left', 'sticky': ''})],
+                             'sticky': 'nswe'})])
+
+        self._im_trough = tkPhotoImage(name='trough-scrollbar-vert',
+                                       width=15, height=15,
+                                       master=self)
+        bg = CONFIG.get("Widget", 'background', fallback='gray10')
+        widget_bg = (0, 0, 0)
+        widget_fg = (255, 255, 255)
+        vmax = self.winfo_rgb('white')[0]
+        color = tuple(int(val / vmax * 255) for val in widget_bg)
+        active_bg = cst.active_color(color)
+        active_bg2 = cst.active_color(cst.active_color(color, 'RGB'))
+        slider_vert_insens = Image.new('RGBA', (13, 28), widget_bg)
+        slider_vert = Image.new('RGBA', (13, 28), active_bg)
+        slider_vert_active = Image.new('RGBA', (13, 28), widget_fg)
+        slider_vert_prelight = Image.new('RGBA', (13, 28), active_bg2)
+        self._im_trough.put(" ".join(["{" + " ".join([bg] * 15) + "}"] * 15))
+        self._im_slider_vert_active = PhotoImage(slider_vert_active,
+                                                 name='slider-vert-active',
+                                                 master=self)
+        self._im_slider_vert = PhotoImage(slider_vert,
+                                          name='slider-vert',
+                                          master=self)
+        self._im_slider_vert_prelight = PhotoImage(slider_vert_prelight,
+                                                   name='slider-vert-prelight',
+                                                   master=self)
+        self._im_slider_vert_insens = PhotoImage(slider_vert_insens,
+                                                 name='slider-vert-insens',
+                                                 master=self)
+        self.style.element_create('widget.Vertical.Scrollbar.trough', 'image',
+                                  'trough-scrollbar-vert')
+        self.style.element_create('widget.Vertical.Scrollbar.thumb', 'image',
+                                  'slider-vert',
+                                  ('pressed', '!disabled', 'slider-vert-active'),
+                                  ('active', '!disabled', 'slider-vert-prelight'),
+                                  ('disabled', 'slider-vert-insens'), border=6,
+                                  sticky='ns')
+        self.style.layout('widget.Vertical.TScrollbar',
+                          [('widget.Vertical.Scrollbar.trough',
+                            {'children': [('widget.Vertical.Scrollbar.thumb', {'expand': '1'})],
+                             'sticky': 'ns'})])
+
+        hide = Image.new('RGBA', (12, 12), active_bg2)
+        hide_active = Image.new('RGBA', (12, 12), widget_fg)
+        hide_pressed = Image.new('RGBA', (12, 12), (150, 0, 0))
+        toggle_open = Image.new('RGBA', (9, 9), widget_fg)
+        toggle_open_active = Image.new('RGBA', (9, 9), active_bg2)
+        toggle_close = Image.new('RGBA', (9, 9), widget_fg)
+        toggle_close_active = Image.new('RGBA', (9, 9), active_bg2)
+        self._im_hide = PhotoImage(hide, master=self)
+        self._im_hide_active = PhotoImage(hide_active, master=self)
+        self._im_hide_pressed = PhotoImage(hide_pressed, master=self)
+        self._im_open = PhotoImage(toggle_open, master=self)
+        self._im_open_active = PhotoImage(toggle_open_active, master=self)
+        self._im_close = PhotoImage(toggle_close, master=self)
+        self._im_close_active = PhotoImage(toggle_close_active, master=self)
+
+        self.style.element_create("toggle", "image", self._im_close,
+                                  ("!hover", "selected", "!disabled", self._im_open),
+                                  ("hover", "!selected", "!disabled", self._im_close_active),
+                                  ("hover", "selected", "!disabled", self._im_open_active),
+                                  border=2, sticky='')
+        self.style.layout('Toggle',
+                          [('Toggle.border',
+                            {'children': [('Toggle.padding',
+                                           {'children': [('Toggle.toggle',
+                                                          {'sticky': 'nswe'})],
+                                            'sticky': 'nswe'})],
+                             'sticky': 'nswe'})])
+        self.style.configure('widget.close.TButton', background=bg,
+                             relief='flat', image=self._im_hide, padding=0)
+        self.style.map('widget.close.TButton', background=[], relief=[],
+                       image=[('active', '!pressed', self._im_hide_active),
+                              ('active', 'pressed', self._im_hide_pressed)])
+
         self.widget_style_init()
 
         # --- tray icon menu
@@ -171,17 +253,64 @@ class App(Tk):
 
     def widget_style_init(self):
         """Init widgets style."""
-        bg = CONFIG.get('Widget', 'background')
+        bg = CONFIG.get('Widget', 'background', fallback='gray10')
         feed_bg = CONFIG.get('Widget', 'feed_background', fallback='gray20')
         fg = CONFIG.get('Widget', 'foreground')
         vmax = self.winfo_rgb('white')[0]
-        color = tuple(int(val / vmax * 255) for val in self.winfo_rgb(bg))
-        active_bg = cst.active_color(color)
+        widget_bg = tuple(int(val / vmax * 255) for val in self.winfo_rgb(bg))
+        widget_fg = tuple(int(val / vmax * 255) for val in self.winfo_rgb(fg))
+        active_bg = cst.active_color(widget_bg)
+        active_bg2 = cst.active_color(cst.active_color(widget_bg, 'RGB'))
+        slider_alpha = Image.open(cst.IM_SCROLL_ALPHA)
+        slider_vert_insens = Image.new('RGBA', (13, 28), widget_bg)
+        slider_vert = Image.new('RGBA', (13, 28), active_bg)
+        slider_vert.putalpha(slider_alpha)
+        slider_vert_active = Image.new('RGBA', (13, 28), widget_fg)
+        slider_vert_active.putalpha(slider_alpha)
+        slider_vert_prelight = Image.new('RGBA', (13, 28), active_bg2)
+        slider_vert_prelight.putalpha(slider_alpha)
+
+        self._im_slider_vert_active.paste(slider_vert_active)
+        self._im_slider_vert.paste(slider_vert)
+        self._im_slider_vert_prelight.paste(slider_vert_prelight)
+        self._im_slider_vert_insens.paste(slider_vert_insens)
+        self._im_trough.put(" ".join(["{" + " ".join([bg] * 15) + "}"] * 15))
+
+        hide_alpha = Image.open(cst.IM_HIDE_ALPHA)
+        hide = Image.new('RGBA', (12, 12), active_bg)
+        hide.putalpha(hide_alpha)
+        hide_active = Image.new('RGBA', (12, 12), active_bg2)
+        hide_active.putalpha(hide_alpha)
+        hide_pressed = Image.new('RGBA', (12, 12), widget_fg)
+        hide_pressed.putalpha(hide_alpha)
+        toggle_open_alpha = Image.open(cst.IM_OPENED_ALPHA)
+        toggle_open = Image.new('RGBA', (9, 9), widget_fg)
+        toggle_open.putalpha(toggle_open_alpha)
+        toggle_open_active = Image.new('RGBA', (9, 9), active_bg2)
+        toggle_open_active.putalpha(toggle_open_alpha)
+        toggle_close_alpha = Image.open(cst.IM_CLOSED_ALPHA)
+        toggle_close = Image.new('RGBA', (9, 9), widget_fg)
+        toggle_close.putalpha(toggle_close_alpha)
+        toggle_close_active = Image.new('RGBA', (9, 9), active_bg2)
+        toggle_close_active.putalpha(toggle_close_alpha)
+        self._im_hide.paste(hide)
+        self._im_hide_active.paste(hide_active)
+        self._im_hide_pressed.paste(hide_pressed)
+        self._im_open.paste(toggle_open)
+        self._im_open_active.paste(toggle_open_active)
+        self._im_close.paste(toggle_close)
+        self._im_close_active.paste(toggle_close_active)
+
         self.style.configure('widget.TFrame', background=bg)
+        self.style.configure('widget.close.TButton', background=bg)
+#                             relief='flat', image=self._im_hide, padding=0)
+#        self.style.map('widget.close.TButton', background=[], relief=[],
+#                       image=[('active', '!pressed', self._im_hide_active),
+#                              ('active', 'pressed', self._im_hide_pressed)])
         self.style.configure('widget.interior.TFrame',
                              background=feed_bg)
         self.style.configure('widget.TSizegrip', background=bg)
-        self.style.configure('widget.TSeparator', background=bg)
+        self.style.configure('widget.Horizontal.TSeparator', background=bg)
         self.style.configure('widget.TLabel', background=bg,
                              foreground=fg, font=CONFIG.get('Widget', 'font'))
         self.style.configure('widget.title.TLabel', background=bg, foreground=fg,
@@ -189,12 +318,15 @@ class App(Tk):
         self.style.configure('widget.TButton', background=bg, foreground=fg,
                              padding=1, relief='flat')
         self.style.map('widget.TButton', background=[('disabled', active_bg),
-                                                     ('pressed', bg),
+                                                     ('pressed', fg),
                                                      ('active', active_bg)],
-                       relief=[('pressed', 'sunken')],
-                       bordercolor=[('pressed', active_bg)],
-                       darkcolor=[('pressed', bg)],
-                       lightcolor=[('pressed', fg)])
+                       foreground=[('pressed', bg)])
+#                       relief=[('pressed', 'sunken')])
+#                       bordercolor=[('pressed', active_bg)],
+#                       darkcolor=[('pressed', bg)],
+#                       lightcolor=[('pressed', fg)])
+
+        self.update_idletasks()
 
     def hide_all(self):
         """Withdraw all widgets."""
@@ -240,7 +372,10 @@ class App(Tk):
             after_ids.extend(self._check_result_update_id.values())
             after_ids.extend(self._check_result_init_id.values())
             for after_id in after_ids:
-                self.after_cancel(after_id)
+                try:
+                    self.after_cancel(after_id)
+                except ValueError:
+                    pass
             self.icon.menu.set_item_label(4, _("Restart"))
             self.icon.menu.disable_item(1)
             self.icon.menu.disable_item(2)
@@ -275,7 +410,10 @@ class App(Tk):
 
     def quit(self):
         for after_id in self.tk.call('after', 'info'):
-            self.after_cancel(after_id)
+            try:
+                self.after_cancel(after_id)
+            except ValueError:
+                pass
         for thread in self.threads.values():
             try:
                 thread.terminate()
@@ -438,6 +576,7 @@ class App(Tk):
                 FEEDS.set(name, 'position', 'normal')
                 FEEDS.set(name, 'category', '')
                 FEEDS.set(name, 'sort_is_reversed', 'False')
+                FEEDS.set(name, 'active', 'True')
                 cst.save_feeds()
                 self.queues[name] = queue
                 self.feed_widgets[name] = FeedWidget(self, name)
@@ -473,6 +612,25 @@ class App(Tk):
             self._check_result_add(thread, queue, url, manager_queue)
             if manager:
                 return manager_queue
+
+    def feed_set_active(self, title, active):
+        FEEDS.set(title, 'active', str(active))
+        cst.save_feeds()
+        cat = FEEDS.get(title, 'category', fallback='')
+        if active:
+            self.menu_feeds.enable_item(title)
+            if FEEDS.getboolean(title, 'visible'):
+                self.feed_widgets[title].deiconify()
+            if cat != '':
+                self.cat_widgets[cat].show_feed(title)
+            self.cat_widgets['All'].show_feed(title)
+            self._feed_update(title)
+        else:
+            self.menu_feeds.disable_item(title)
+            self.feed_widgets[title].withdraw()
+            if cat != '':
+                self.cat_widgets[cat].hide_feed(title)
+            self.cat_widgets['All'].hide_feed(title)
 
     def feed_change_cat(self, title, old_cat, new_cat):
         if old_cat != new_cat:
@@ -591,13 +749,14 @@ class App(Tk):
     def feed_init(self):
         """Update feeds."""
         for title in FEEDS.sections():
-            logging.info("Updating feed '%s'", title)
-            self.threads[title] = Process(target=self.feed_get_info,
-                                          args=(FEEDS.get(title, 'url'),
-                                                self.queues[title], 'all'),
-                                          daemon=True)
-            self.threads[title].start()
-            self._check_result_init(title)
+            if FEEDS.getboolean(title, 'active', fallback=True):
+                logging.info("Updating feed '%s'", title)
+                self.threads[title] = Process(target=self.feed_get_info,
+                                              args=(FEEDS.get(title, 'url'),
+                                                    self.queues[title], 'all'),
+                                              daemon=True)
+                self.threads[title].start()
+                self._check_result_init(title)
         self._check_end_update_id = self.after(2000, self._check_end_update)
 
     def _check_result_init(self, title):
@@ -624,7 +783,10 @@ class App(Tk):
                     after_ids.extend(self._check_result_update_id.values())
                     after_ids.extend(self._check_result_init_id.values())
                     for after_id in after_ids:
-                        self.after_cancel(after_id)
+                        try:
+                            self.after_cancel(after_id)
+                        except ValueError:
+                            pass
             else:
                 date = datetime.strptime(updated, '%Y-%m-%d %H:%M')
                 if (date > datetime.strptime(FEEDS.get(title, 'updated'), '%Y-%m-%d %H:%M') or
@@ -653,9 +815,22 @@ class App(Tk):
                 else:
                     logging.info("Feed '%s' is up-to-date", title)
 
+    def _feed_update(self, title):
+        """Update feed with given title."""
+        logging.info("Updating feed '%s'", title)
+        self.threads[title] = Process(target=self.feed_get_info,
+                                      args=(FEEDS.get(title, 'url'),
+                                            self.queues[title]),
+                                      daemon=True)
+        self.threads[title].start()
+        self._check_result_update(title)
+
     def feed_update(self):
-        """Update feeds."""
-        self.after_cancel(self._update_id)
+        """Update all feeds."""
+        try:
+            self.after_cancel(self._update_id)
+        except ValueError:
+            pass
         for thread in self.threads.values():
             try:
                 thread.terminate()
@@ -663,13 +838,8 @@ class App(Tk):
                 pass
         self.threads.clear()
         for title in FEEDS.sections():
-            logging.info("Updating feed '%s'", title)
-            self.threads[title] = Process(target=self.feed_get_info,
-                                          args=(FEEDS.get(title, 'url'),
-                                                self.queues[title]),
-                                          daemon=True)
-            self.threads[title].start()
-            self._check_result_update(title)
+            if FEEDS.getboolean(title, 'active', fallback=True):
+                self._feed_update(title)
         self._check_end_update_id = self.after(2000, self._check_end_update)
 
     def _check_result_update(self, title):
@@ -696,7 +866,10 @@ class App(Tk):
                     after_ids.extend(self._check_result_update_id.values())
                     after_ids.extend(self._check_result_init_id.values())
                     for after_id in after_ids:
-                        self.after_cancel(after_id)
+                        try:
+                            self.after_cancel(after_id)
+                        except ValueError:
+                            pass
             else:
                 date = datetime.strptime(updated, '%Y-%m-%d %H:%M')
                 if date > datetime.strptime(FEEDS.get(title, 'updated'), '%Y-%m-%d %H:%M'):
@@ -727,7 +900,7 @@ class App(Tk):
                     logging.info("Feed '%s' is up-to-date", title)
 
     def _check_end_update(self):
-        b = [t.is_alive() for t in self.threads.values()]
+        b = [t.is_alive() for t in self.threads.values() if t is not None]
         if sum(b):
             self._check_end_update_id = self.after(1000, self._check_end_update)
         else:
