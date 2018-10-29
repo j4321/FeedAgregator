@@ -52,9 +52,6 @@ Install
      - PyGTK http://www.pygtk.org/downloads.html
      - PyQt5, PyQt4 or PySide
 
-    If you are using a Tcl/Tk version < 8.6, you will also need PIL.
-
-
     For instance, in Ubuntu/Debian you will need to install the following packages:
     python3-tk, tk-tktray, libnotify-bin and the notification server of your choice,
     tk-html3, python3-bs4, python3-babel, python3-feedparser, python3-dateutil,
@@ -73,7 +70,7 @@ Install
     
         $ sudo python3 setup.py install
 
-    You can now launch it from `Menu > Network > FeedAgregator`. You can launch
+    You can now launch it from *Menu > Network > FeedAgregator*. You can launch
     it from the command line with `feedagregator`.
 
 
