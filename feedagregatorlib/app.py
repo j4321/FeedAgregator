@@ -210,6 +210,8 @@ class App(Tk):
         self._check_result_init_id = {}
         self.queues = {}
         self.threads = {}
+
+        # --- category widgets
         self.cat_widgets = {}
         self.cat_widgets['All'] = CatWidget(self, 'All')
         self.cat_widgets['All'].event_generate('<Configure>')
@@ -230,6 +232,7 @@ class App(Tk):
                           lambda *args, c=category: self.cat_widget_trace(c))
             self.cat_widgets[category].variable.set(LATESTS.getboolean(category, 'visible'))
 
+        # --- feed widgets
         self.feed_widgets = {}
         for title in FEEDS.sections():
             self._check_result_update_id[title] = ''

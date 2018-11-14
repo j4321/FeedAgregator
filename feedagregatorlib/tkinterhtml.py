@@ -172,13 +172,16 @@ class TkinterHtml(tk.Widget):
         assert len(args) == 1
         url = args[0]
         name = self._image_name_prefix + str(len(self._images))
-
-        with urlopen(url) as handle:
-            data = handle.read()
         try:
-            self._images.add(PhotoImage(name=name, data=data))
-        except tk.TclError as e:
-            logging.error('Error in tkinterhtml: %s\nurl=%s', str(e), url)
+            with urlopen(url) as handle:
+                data = handle.read()
+        except Exception as e:
+            logging.error('Error: %s\nurl=%s', str(e), url)
+        else:
+            try:
+                self._images.add(PhotoImage(name=name, data=data))
+            except tk.TclError as e:
+                logging.error('Error in tkinterhtml: %s\nurl=%s', str(e), url)
 
         return name
 
