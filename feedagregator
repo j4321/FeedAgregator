@@ -38,19 +38,25 @@ import logging
 pid = str(os.getpid())
 
 if os.path.isfile(PIDFILE):
-    with open(PIDFILE) as fich:
-        old_pid = fich.read().strip()
+    with open(PIDFILE) as file:
+        old_pid = file.read().strip()
     if os.path.exists("/proc/%s" % old_pid):
-        # feedagregator is already runnning
-        root = Tk()
-        root.withdraw()
-        s = Style(root)
-        s.theme_use("clam")
-        logging.error("%s is already running", APP_NAME)
-        showerror(_("Error"), _("{app_name} is already running, if not delete ~/.feedagregator/feedagregator.pid.").format(app_name=APP_NAME))
-        sys.exit()
+        with open("/proc/%s/cmdline" % old_pid) as file:
+            cmdline = file.read()
+        if 'feedagregator' in cmdline:
+            # feedagregator is already runnning
+            root = Tk()
+            root.withdraw()
+            s = Style(root)
+            s.theme_use("clam")
+            logging.error("%s is already running", APP_NAME)
+            showerror(_("Error"), _("{app_name} is already running, if not delete ~/.feedagregator/feedagregator.pid.").format(app_name=APP_NAME))
+            sys.exit()
+        else:
+            # it is an old pid file
+            os.remove(PIDFILE)
     else:
-        # it is an old pid file (certainly due to session logout then login)
+        # it is an old pid file
         os.remove(PIDFILE)
 
 open(PIDFILE, 'w').write(pid)
