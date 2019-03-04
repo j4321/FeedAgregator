@@ -34,7 +34,7 @@ Install
 - Source code
 
     First, install the missing dependencies among:
-    
+
      - Tkinter (Python wrapper for Tk)
      - Tkhtml3 http://tkhtml.tcl.tk/
      - libnotify and a notification server if your desktop environment does not provide one.
@@ -47,7 +47,7 @@ Install
      - Pillow https://pypi.python.org/pypi/Pillow
 
     You also need to have at least one of the following GUI toolkits for the system tray icon:
-    
+
      - Tktray https://code.google.com/archive/p/tktray/downloads
      - PyGTK http://www.pygtk.org/downloads.html
      - PyQt5, PyQt4 or PySide
@@ -80,7 +80,7 @@ Feeds can be managed by clicking on *Manage feeds* in the main menu
 (right click on the tray icon). A window containing the list of feeds 
 opens:
 
-- Tick / untick the box on the left to activate / deactivate the feed.
+- Tick / untick the box on the left to activate / deactivate a feed.
 - Double click on the feed title to edit it.
 - Double click on the category to edit it. The latest entry of each feed
   in the same category can be displayed in a widget.
@@ -93,9 +93,6 @@ Troubleshooting
 Several gui toolkits are available to display the system tray icon, so if the
 icon does not behave properly, try to change toolkit, they are not all fully
 compatible with every desktop environment.
-
-If there is a problem with the font of the number of unread mails, try to change
-the font from the settings.
 
 If you encounter bugs or if you have suggestions, please open an issue on
 `GitHub <https://github.com/j4321/FeedAgregator/issues>`__ or write me an email
