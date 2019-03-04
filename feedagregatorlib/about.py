@@ -28,6 +28,7 @@ from feedagregatorlib.constants import IM_ICON_48, APP_NAME
 from feedagregatorlib.version import __version__
 from PIL.ImageTk import PhotoImage
 
+
 class About(Toplevel):
     """About dialog."""
     def __init__(self, master):
@@ -37,7 +38,7 @@ class About(Toplevel):
         self.image = PhotoImage(file=IM_ICON_48, master=self)
         Label(self, image=self.image).grid(row=0, columnspan=2, pady=10)
 
-        Label(self, text="{app_name} {version}".format(version= __version__,
+        Label(self, text="{app_name} {version}".format(version=__version__,
                                                        app_name=APP_NAME)).grid(row=1, columnspan=2)
         Label(self, text=_("RSS and Atom feed agregator in desktop widgets + notifications")).grid(row=2, columnspan=2, padx=10)
         Label(self, text="Copyright (C) Juliette Monsel 2018").grid(row=3, columnspan=2)
