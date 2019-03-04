@@ -73,6 +73,19 @@ Install
     You can now launch it from *Menu > Network > FeedAgregator*. You can launch
     it from the command line with `feedagregator`.
 
+Feed management
+---------------
+
+Feeds can be managed by clicking on *Manage feeds* in the main menu 
+(right click on the tray icon). A window containing the list of feeds 
+opens:
+
+- Tick / untick the box on the left to activate / deactivate the feed.
+- Double click on the feed title to edit it.
+- Double click on the category to edit it. The latest entry of each feed
+  in the same category can be displayed in a widget.
+- Click on the red minus sign on the right of a feed to delete it.
+- Click on the green plus sign to add a feed.
 
 Troubleshooting
 ---------------
