@@ -90,7 +90,7 @@ opens:
 Troubleshooting
 ---------------
 
-Several gui toolkits are available to display the system tray icon, so if the
+Several GUI toolkits are available to display the system tray icon, so if the
 icon does not behave properly, try to change toolkit, they are not all fully
 compatible with every desktop environment.
 

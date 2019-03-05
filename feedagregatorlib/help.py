@@ -87,7 +87,7 @@ The latest entry of each feed in the same category can be displayed in a widget.
                     'list')
         text.insert("end", _("Troubleshooting") + "\n\n", "title2")
         text.insert("end",
-                    _("Several gui toolkits are available to display the system tray icon, \
+                    _("Several GUI toolkits are available to display the system tray icon, \
 so if the icon does not behave properly, try to change toolkit, they are not all fully \
 compatible with every desktop environment.") + "\n\n")
         text.insert("end",
