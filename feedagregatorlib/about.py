@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 FeedAgregator - RSS and Atom feed agregator in desktop widgets + notifications
-Copyright 2018 Juliette Monsel <j_4321@protonmail.com>
+Copyright 2018-2019 Juliette Monsel <j_4321@protonmail.com>
 
 FeedAgregator is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ class About(Toplevel):
         Label(self, text="{app_name} {version}".format(version=__version__,
                                                        app_name=APP_NAME)).grid(row=1, columnspan=2)
         Label(self, text=_("RSS and Atom feed agregator in desktop widgets + notifications")).grid(row=2, columnspan=2, padx=10)
-        Label(self, text="Copyright (C) Juliette Monsel 2018").grid(row=3, columnspan=2)
+        Label(self, text="Copyright (C) Juliette Monsel 2018-2019").grid(row=3, columnspan=2)
         Label(self, text="j_4321@protonmail.com").grid(row=4, columnspan=2)
         Button(self, text=_("License"), command=self._license).grid(row=5, column=0, pady=20, padx=4, sticky='e')
         Button(self, text=_("Close"), command=self.exit).grid(row=5, column=1, pady=20, padx=4, sticky='w')

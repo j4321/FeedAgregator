@@ -7,6 +7,11 @@ Copyright 2018 Juliette Monsel <j_4321@protonmail.com>
 Changelog
 ---------
 
+-Version 1.3.0
+	* Make image loading timeout customizable
+	* Fix error when an image cannot be loaded
+	* Add help dialog
+	
 -Version 1.2.1
     * Improve detection of already running instances (less often ask to delete pidfile)
     
