@@ -115,10 +115,20 @@ class Config(Toplevel):
                                  validatecommand=(self._validate, '%P'))
         self.entry_delay.grid(row=4, column=1, padx=8, pady=4, sticky='w')
         self.entry_delay.insert(0, CONFIG.getint('General', 'update_delay') // 60000)
+        # --- image loading timeout
+        Label(frame_general,
+              text=_("Image loading timeout (s)")).grid(row=5, column=0,
+                                                        padx=8, pady=4,
+                                                        sticky="e")
+        self.entry_timeout = Entry(frame_general, width=10, justify='center',
+                                   validate='key',
+                                   validatecommand=(self._validate, '%P'))
+        self.entry_timeout.grid(row=5, column=1, padx=8, pady=4, sticky='w')
+        self.entry_timeout.insert(0, CONFIG.getint('General', 'img_timeout', fallback=10))
         # --- Confirm remove feed
         self.confirm_feed_rem = Checkbutton(frame_general,
                                             text=_("Show confirmation dialog before removing feed"))
-        self.confirm_feed_rem.grid(row=5, column=0, padx=8, pady=4, columnspan=2, sticky='w')
+        self.confirm_feed_rem.grid(row=6, column=0, padx=8, pady=4, columnspan=2, sticky='w')
         if CONFIG.getboolean('General', 'confirm_feed_remove', fallback=True):
             self.confirm_feed_rem.state(('selected', '!alternate'))
         else:
@@ -126,7 +136,7 @@ class Config(Toplevel):
         # --- Confirm remove cat
         self.confirm_cat_rem = Checkbutton(frame_general,
                                            text=_("Show confirmation dialog before removing category"))
-        self.confirm_cat_rem.grid(row=6, column=0, padx=8, pady=4, columnspan=2, sticky='w')
+        self.confirm_cat_rem.grid(row=7, column=0, padx=8, pady=4, columnspan=2, sticky='w')
         if CONFIG.getboolean('General', 'confirm_cat_remove', fallback=True):
             self.confirm_cat_rem.state(('selected', '!alternate'))
         else:
@@ -134,7 +144,7 @@ class Config(Toplevel):
         # --- Confirm update
         self.confirm_update = Checkbutton(frame_general,
                                           text=_("Check for updates on start-up"))
-        self.confirm_update.grid(row=7, column=0, padx=8, pady=4, columnspan=2, sticky='w')
+        self.confirm_update.grid(row=8, column=0, padx=8, pady=4, columnspan=2, sticky='w')
         if CONFIG.getboolean('General', 'check_update', fallback=True):
             self.confirm_update.state(('selected', '!alternate'))
         else:
@@ -390,6 +400,7 @@ class Config(Toplevel):
         CONFIG.set("General", "language", REV_LANGUAGES[self.lang.get()])
         CONFIG.set("General", "trayicon", self.gui.get().lower())
         CONFIG.set("General", "update_delay", "%i" % (int(self.entry_delay.get()) * 60000))
+        CONFIG.set("General", "img_timeout", "%i" % (int(self.entry_timeout.get())))
         CONFIG.set('General', 'confirm_feed_remove', str(self.confirm_feed_rem.instate(('selected',))))
         CONFIG.set('General', 'confirm_cat_remove', str(self.confirm_cat_rem.instate(('selected',))))
         CONFIG.set('General', 'check_update', str(self.confirm_update.instate(('selected',))))
