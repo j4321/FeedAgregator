@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-05 13:31+0100\n"
-"PO-Revision-Date: 2019-03-05 12:51+0100\n"
+"POT-Creation-Date: 2019-03-05 18:07+0100\n"
+"PO-Revision-Date: 2019-03-05 18:07+0100\n"
 "Last-Translator:  <j_4321@protonmail.com>\n"
 "Language-Team: French\n"
 "Language: fr\n"
@@ -30,7 +30,7 @@ msgstr "Ok"
 msgid "Cancel"
 msgstr "Annuler"
 
-#: feedagregatorlib/config.py:73 feedagregatorlib/config.py:284
+#: feedagregatorlib/config.py:73 feedagregatorlib/config.py:294
 msgid "General"
 msgstr "Général"
 
@@ -49,83 +49,87 @@ msgid "Feed update delay (min)"
 msgstr "Délai entre mises à jour des flux (min)"
 
 #: feedagregatorlib/config.py:120
+msgid "Image loading timeout (s)"
+msgstr "Délai d'expiration du chargement des images (s)"
+
+#: feedagregatorlib/config.py:130
 msgid "Show confirmation dialog before removing feed"
 msgstr "Demander confirmation avant de supprimer un flux"
 
-#: feedagregatorlib/config.py:128
+#: feedagregatorlib/config.py:138
 msgid "Show confirmation dialog before removing category"
 msgstr "Demander confirmation avant de supprimer une catégorie"
 
-#: feedagregatorlib/config.py:136
+#: feedagregatorlib/config.py:146
 msgid "Check for updates on start-up"
 msgstr "Vérifier les mises à jour au démarrage"
 
-#: feedagregatorlib/config.py:145
+#: feedagregatorlib/config.py:155
 msgid "Widget"
 msgstr "Widget"
 
-#: feedagregatorlib/config.py:152 feedagregatorlib/config.py:214
+#: feedagregatorlib/config.py:162 feedagregatorlib/config.py:224
 msgid "Sample text"
 msgstr "Exemple de texte"
 
-#: feedagregatorlib/config.py:195
+#: feedagregatorlib/config.py:205
 msgid "Bold"
 msgstr "Gras"
 
-#: feedagregatorlib/config.py:198
+#: feedagregatorlib/config.py:208
 msgid "Italic"
 msgstr "Italique"
 
-#: feedagregatorlib/config.py:201
+#: feedagregatorlib/config.py:211
 msgid "Underline"
 msgstr "Souligné"
 
-#: feedagregatorlib/config.py:250 feedagregatorlib/manager.py:58
+#: feedagregatorlib/config.py:260 feedagregatorlib/manager.py:58
 msgid "Title"
 msgstr "Titre"
 
-#: feedagregatorlib/config.py:256
+#: feedagregatorlib/config.py:266
 msgid "Text"
 msgstr "Texte"
 
-#: feedagregatorlib/config.py:269
+#: feedagregatorlib/config.py:279
 msgid "Opacity"
 msgstr "Opacité"
 
-#: feedagregatorlib/config.py:285 feedagregatorlib/config.py:296
+#: feedagregatorlib/config.py:295 feedagregatorlib/config.py:306
 msgid "Background color"
 msgstr "Couleur du fond"
 
-#: feedagregatorlib/config.py:288 feedagregatorlib/config.py:299
+#: feedagregatorlib/config.py:298 feedagregatorlib/config.py:309
 msgid "Foreground color"
 msgstr "Couleur du texte"
 
-#: feedagregatorlib/config.py:295
+#: feedagregatorlib/config.py:305
 msgid "Feed entry"
 msgstr "Article de flux"
 
-#: feedagregatorlib/config.py:302
+#: feedagregatorlib/config.py:312
 msgid "Link color"
 msgstr "Couleur des liens"
 
-#: feedagregatorlib/config.py:328
+#: feedagregatorlib/config.py:338
 msgid "Font"
 msgstr "Police"
 
-#: feedagregatorlib/config.py:334
+#: feedagregatorlib/config.py:344
 msgid "Colors"
 msgstr "Couleurs"
 
-#: feedagregatorlib/config.py:340 feedagregatorlib/config.py:342
+#: feedagregatorlib/config.py:350 feedagregatorlib/config.py:352
 msgid "Color"
 msgstr "Couleur"
 
-#: feedagregatorlib/config.py:351
+#: feedagregatorlib/config.py:361
 msgid "The language setting will take effect after restarting the application"
 msgstr ""
 "Le changement de langue prendra effet au prochain démarrage de l'application"
 
-#: feedagregatorlib/config.py:385
+#: feedagregatorlib/config.py:395
 msgid ""
 "The GUI Toolkit setting will take effect after restarting the application"
 msgstr ""

@@ -53,6 +53,7 @@ from glob import glob
 from tkinter import colorchooser
 import logging
 from logging.handlers import TimedRotatingFileHandler
+from dateutil.tz import gettz
 
 
 APP_NAME = "FeedAgregator"
@@ -104,6 +105,7 @@ else:
     CONFIG.add_section("General")
     CONFIG.set("General", "trayicon", "")
     CONFIG.set("General", "update_delay", "3600000")
+    CONFIG.set("General", "img_timeout", "10")
     CONFIG.set("General", "language", getdefaultlocale()[0])
     CONFIG.set("General", "check_update", "True")
     CONFIG.set("General", "confirm_cat_remove", "True")
@@ -148,6 +150,9 @@ gettext.textdomain(APP_NAME)
 gettext.translation(APP_NAME, PATH_LOCALE,
                     languages=[CONFIG.get("General", "language")],
                     fallback=True).install()
+
+# --- Time zone info
+TZINFOS = {"AST": gettz('Atlantic Standard Time')}
 
 # --- feed file
 FEEDS = ConfigParser()
@@ -223,6 +228,7 @@ IM_MOINS_SEL = os.path.join(PATH_IMAGES, 'moins_sel.png')
 IM_MOINS = os.path.join(PATH_IMAGES, 'moins.png')
 IM_PLUS = os.path.join(PATH_IMAGES, 'plus.png')
 IM_COLOR = os.path.join(PATH_IMAGES, 'color.png')
+IM_IMG_MISSING = os.path.join(PATH_IMAGES, 'image_missing.png')
 IM_HIDE_ALPHA = os.path.join(PATH_IMAGES, 'hide_alpha.png')
 IM_OPENED_ALPHA = os.path.join(PATH_IMAGES, 'open_alpha.png')
 IM_CLOSED_ALPHA = os.path.join(PATH_IMAGES, 'close_alpha.png')

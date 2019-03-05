@@ -523,7 +523,7 @@ class App(Tk):
                 updated = entries[0].get('updated')
             else:
                 updated = entries[0].get('published', today)
-            updated = dateutil.parser.parse(updated).strftime('%Y-%m-%d %H:%M')
+            updated = dateutil.parser.parse(updated, tzinfos=cst.TZINFOS).strftime('%Y-%m-%d %H:%M')
         else:
             entry_title = ""
             summary = ""
@@ -540,7 +540,7 @@ class App(Tk):
                     date = entry.get('updated')
                 else:
                     date = entry.get('published', today)
-                date = dateutil.parser.parse(date).strftime('%Y-%m-%d %H:%M')
+                date = dateutil.parser.parse(date, tzinfos=cst.TZINFOS).strftime('%Y-%m-%d %H:%M')
                 link = entry.get('link', '')
                 data.append((title, date, summary, link))
             queue.put((feed_title, latest, updated, data))

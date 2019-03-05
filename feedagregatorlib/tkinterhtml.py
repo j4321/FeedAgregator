@@ -32,6 +32,7 @@ import tkinter as tk
 from tkinter import ttk
 import logging
 from PIL.ImageTk import PhotoImage
+from .constants import IM_IMG_MISSING, CONFIG
 
 
 _tkhtml_loaded = False
@@ -75,6 +76,8 @@ class TkinterHtml(tk.Widget):
 
         self._image_name_prefix = str(id(self)) + "_img_"
         self._images = set()  # to avoid garbage collecting images
+        # self._images.add(PhotoImage(data=IMG_MISSING, name=self._image_name_prefix + 'missing'))
+        self._images.add(PhotoImage(file=IM_IMG_MISSING, name=self._image_name_prefix + 'missing'))
 
         self._last_node = None
 
@@ -168,21 +171,21 @@ class TkinterHtml(tk.Widget):
         return self.tk.call(self._w, "style", *args)
 
     def _fetch_image(self, *args):
-
         assert len(args) == 1
         url = args[0]
         name = self._image_name_prefix + str(len(self._images))
         try:
-            with urlopen(url) as handle:
+            with urlopen(url, timeout=CONFIG.getint("General", "img_timeout", fallback=10)) as handle:
                 data = handle.read()
         except Exception as e:
             logging.error('Error: %s\nurl=%s', str(e), url)
+            name = self._image_name_prefix + 'missing'
         else:
             try:
                 self._images.add(PhotoImage(name=name, data=data))
             except tk.TclError as e:
                 logging.error('Error in tkinterhtml: %s\nurl=%s', str(e), url)
-
+                name = self._image_name_prefix + 'missing'
         return name
 
     def _get_node_text(self, node_handle):
