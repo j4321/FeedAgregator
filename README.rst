@@ -2,7 +2,7 @@ FeedAgregator
 =============
 RSS and Atom feed agregator in desktop widgets + notifications
 --------------------------------------------------------------
-Copyright 2018 -2019 Juliette Monsel <j_4321@protonmail.com>
+Copyright 2018-2019 Juliette Monsel <j_4321@protonmail.com>
 
 FeedAgregator periodically looks for RSS/Atom feed updates.
 If an update is found, a notification is sent. In addition, desktop widgets
