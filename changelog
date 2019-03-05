@@ -11,8 +11,6 @@ Changelog
 	* Make image loading timeout customizable
 	* Fix error when an image cannot be loaded
 	* Add help dialog
-	
--Version 1.2.1
     * Improve detection of already running instances (less often ask to delete pidfile)
     
 - Version 1.2.0
