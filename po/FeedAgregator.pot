@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-05 11:50+0100\n"
+"POT-Creation-Date: 2019-03-05 18:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: feedagregatorlib/config.py:38 feedagregatorlib/app.py:196
+#: feedagregatorlib/config.py:38 feedagregatorlib/app.py:197
 msgid "Settings"
 msgstr ""
 
@@ -161,6 +161,94 @@ msgstr ""
 msgid "{app_name} is up-to-date."
 msgstr ""
 
+#: feedagregatorlib/help.py:39 feedagregatorlib/app.py:200
+msgid "Help"
+msgstr ""
+
+#: feedagregatorlib/help.py:56 feedagregatorlib/about.py:43
+msgid "RSS and Atom feed agregator in desktop widgets + notifications"
+msgstr ""
+
+#: feedagregatorlib/help.py:59
+msgid ""
+"FeedAgregator periodically looks for RSS/Atom feed updates. If an update is "
+"found, a notification is sent. In addition, desktop widgets display either "
+"all the entries of one feed or the latest entry of each feed of a given "
+"category."
+msgstr ""
+
+#: feedagregatorlib/help.py:64
+msgid ""
+"FeedAgregator is designed for Linux. It is written in Python 3 and relies "
+"mostly upon Tk GUI toolkit. The application is in the system tray, so it "
+"might not work with all desktop environments (see Troubleshooting)."
+msgstr ""
+
+#: feedagregatorlib/help.py:67
+msgid "Feed management"
+msgstr ""
+
+#: feedagregatorlib/help.py:68
+msgid "Feeds can be managed by clicking on "
+msgstr ""
+
+#: feedagregatorlib/help.py:69 feedagregatorlib/app.py:193
+msgid "Manage feeds"
+msgstr ""
+
+#: feedagregatorlib/help.py:70
+msgid ""
+" in the main menu (right click on the tray icon). A window containing the "
+"list of feeds opens:"
+msgstr ""
+
+#: feedagregatorlib/help.py:73
+msgid "\t•\tTick / untick the box on the left to activate / deactivate a feed."
+msgstr ""
+
+#: feedagregatorlib/help.py:76
+msgid "\t•\tDouble click on the feed title to edit it."
+msgstr ""
+
+#: feedagregatorlib/help.py:79
+msgid ""
+"\t•\tDouble click on the category to edit it. The latest entry of each feed "
+"in the same category can be displayed in a widget."
+msgstr ""
+
+#: feedagregatorlib/help.py:83
+msgid "\t•\tClick on the red minus sign on the right of a feed to delete it."
+msgstr ""
+
+#: feedagregatorlib/help.py:86
+msgid "\t•\tClick on the green plus sign to add a feed."
+msgstr ""
+
+#: feedagregatorlib/help.py:88
+msgid "Troubleshooting"
+msgstr ""
+
+#: feedagregatorlib/help.py:90
+msgid ""
+"Several GUI toolkits are available to display the system tray icon, so if "
+"the icon does not behave properly, try to change toolkit, they are not all "
+"fully compatible with every desktop environment."
+msgstr ""
+
+#: feedagregatorlib/help.py:94
+msgid ""
+"If you encounter bugs or if you have suggestions, please open an issue on "
+msgstr ""
+
+#: feedagregatorlib/help.py:96
+msgid " or write me an email at "
+msgstr ""
+
+#: feedagregatorlib/help.py:101 feedagregatorlib/about.py:47
+#: feedagregatorlib/about.py:97
+msgid "Close"
+msgstr ""
+
 #: feedagregatorlib/add.py:31
 msgid "Add Feed"
 msgstr ""
@@ -232,24 +320,16 @@ msgstr ""
 msgid "Do you want to remove the category {category}?"
 msgstr ""
 
-#: feedagregatorlib/about.py:36
+#: feedagregatorlib/about.py:37
 #, python-brace-format
 msgid "About {app_name}"
 msgstr ""
 
-#: feedagregatorlib/about.py:42
-msgid "RSS and Atom feed agregator in desktop widgets + notifications"
-msgstr ""
-
-#: feedagregatorlib/about.py:45 feedagregatorlib/about.py:70
+#: feedagregatorlib/about.py:46 feedagregatorlib/about.py:71
 msgid "License"
 msgstr ""
 
-#: feedagregatorlib/about.py:46 feedagregatorlib/about.py:96
-msgid "Close"
-msgstr ""
-
-#: feedagregatorlib/about.py:79
+#: feedagregatorlib/about.py:80
 #, python-brace-format
 msgid ""
 "{app_name} is free software: you can redistribute it and/or modify it under "
@@ -259,7 +339,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: feedagregatorlib/about.py:81
+#: feedagregatorlib/about.py:82
 #, python-brace-format
 msgid ""
 "{app_name} is distributed in the hope that it will be useful, but WITHOUT "
@@ -269,7 +349,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: feedagregatorlib/about.py:83
+#: feedagregatorlib/about.py:84
 msgid ""
 "You should have received a copy of the GNU General Public License along with "
 "this program. If not, see http://www.gnu.org/licenses/."
@@ -279,81 +359,77 @@ msgstr ""
 msgid "Please report this bug on "
 msgstr ""
 
-#: feedagregatorlib/app.py:178 feedagregatorlib/app.py:181
-#: feedagregatorlib/app.py:186
+#: feedagregatorlib/app.py:179 feedagregatorlib/app.py:182
+#: feedagregatorlib/app.py:187
 msgid "Hide all"
 msgstr ""
 
-#: feedagregatorlib/app.py:179 feedagregatorlib/app.py:182
-#: feedagregatorlib/app.py:187
+#: feedagregatorlib/app.py:180 feedagregatorlib/app.py:183
+#: feedagregatorlib/app.py:188
 msgid "Show all"
 msgstr ""
 
-#: feedagregatorlib/app.py:184
+#: feedagregatorlib/app.py:185
 msgid "Categories"
 msgstr ""
 
-#: feedagregatorlib/app.py:185
+#: feedagregatorlib/app.py:186
 msgid "Feeds"
 msgstr ""
 
-#: feedagregatorlib/app.py:189
+#: feedagregatorlib/app.py:190
 msgid "Widgets"
 msgstr ""
 
-#: feedagregatorlib/app.py:190
+#: feedagregatorlib/app.py:191
 msgid "Add feed"
 msgstr ""
 
-#: feedagregatorlib/app.py:191
+#: feedagregatorlib/app.py:192
 msgid "Update feeds"
 msgstr ""
 
-#: feedagregatorlib/app.py:192
-msgid "Manage feeds"
-msgstr ""
-
-#: feedagregatorlib/app.py:194 feedagregatorlib/app.py:372
-#: feedagregatorlib/app.py:387
+#: feedagregatorlib/app.py:195 feedagregatorlib/app.py:374
+#: feedagregatorlib/app.py:389
 msgid "Suspend"
 msgstr ""
 
-#: feedagregatorlib/app.py:197
+#: feedagregatorlib/app.py:198
 msgid "Check for updates"
 msgstr ""
 
-#: feedagregatorlib/app.py:199
+#: feedagregatorlib/app.py:201
 msgid "About"
 msgstr ""
 
-#: feedagregatorlib/app.py:200
+#: feedagregatorlib/app.py:202
 msgid "Quit"
 msgstr ""
 
-#: feedagregatorlib/app.py:218 feedagregatorlib/app.py:448
-#: feedagregatorlib/app.py:461
+#: feedagregatorlib/app.py:220 feedagregatorlib/app.py:450
+#: feedagregatorlib/app.py:463
 msgid "Latests"
 msgstr ""
 
-#: feedagregatorlib/app.py:382
+#: feedagregatorlib/app.py:384
 msgid "Restart"
 msgstr ""
 
-#: feedagregatorlib/app.py:480 feedagregatorlib/app.py:604
-#: feedagregatorlib/app.py:607 feedagregatorlib/app.py:780
-#: feedagregatorlib/app.py:785 feedagregatorlib/app.py:863
-#: feedagregatorlib/app.py:868 feedagregator.py:53 feedagregator.py:69
+#: feedagregatorlib/app.py:482 feedagregatorlib/app.py:606
+#: feedagregatorlib/app.py:609 feedagregatorlib/app.py:782
+#: feedagregatorlib/app.py:787 feedagregatorlib/app.py:865
+#: feedagregatorlib/app.py:870 feedagregator.py:53 feedagregator.py:69
 msgid "Error"
 msgstr ""
 
-#: feedagregatorlib/app.py:604 feedagregatorlib/app.py:781
-#: feedagregatorlib/app.py:864
+#: feedagregatorlib/app.py:606 feedagregatorlib/app.py:783
+#: feedagregatorlib/app.py:866
 #, python-brace-format
 msgid "{url} is not a valid feed."
 msgstr ""
 
-#: feedagregatorlib/app.py:607 feedagregatorlib/app.py:786
-#: feedagregatorlib/app.py:869
+#: feedagregatorlib/app.py:609 feedagregatorlib/app.py:788
+#: feedagregatorlib/app.py:871
 msgid "No Internet connection."
 msgstr ""
 

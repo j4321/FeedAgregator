@@ -240,7 +240,7 @@ IM_SCROLL_ALPHA = os.path.join(PATH_IMAGES, "scroll.png")
 
 # --- system tray icon
 def get_available_gui_toolkits():
-    """Check which gui toolkits are available to create a system tray icon."""
+    """Check which GUI toolkits are available to create a system tray icon."""
     toolkits = {'gtk': True, 'qt': True, 'tk': True}
     b = False
     try:

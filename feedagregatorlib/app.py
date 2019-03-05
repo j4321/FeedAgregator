@@ -39,6 +39,7 @@ from feedagregatorlib.cat_widget import CatWidget
 from feedagregatorlib.feed_widget import FeedWidget
 from feedagregatorlib.version_check import UpdateChecker
 from feedagregatorlib.about import About
+from feedagregatorlib.help import Help
 try:
     from subprocess import run
 except ImportError:
@@ -196,6 +197,7 @@ class App(Tk):
         self.icon.menu.add_command(label=_('Settings'), command=self.settings)
         self.icon.menu.add_command(label=_("Check for updates"),
                                    command=lambda: UpdateChecker(self, True))
+        self.icon.menu.add_command(label=_("Help"), command=lambda: Help(self))
         self.icon.menu.add_command(label=_("About"), command=lambda: About(self))
         self.icon.menu.add_command(label=_('Quit'), command=self.quit)
         self.icon.loop(self)
