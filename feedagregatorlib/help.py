@@ -70,7 +70,7 @@ might not work with all desktop environments (see Troubleshooting).") + "\n\n\n"
         text.insert("end", _(" in the main menu (right click on the tray icon). \
 A window containing the list of feeds opens:") + "\n")
         text.insert("end",
-                    _("\t•\tTick / untick the box on the left to activate / deactivate a feed.") + "\n",
+                    _("\t•\tCheck / uncheck the box on the left to activate / deactivate a feed.") + "\n",
                     'list')
         text.insert("end",
                     _("\t•\tDouble click on the feed title to edit it.") + "\n",
@@ -90,6 +90,8 @@ The latest entry of each feed in the same category can be displayed in a widget.
                     _("Several GUI toolkits are available to display the system tray icon, \
 so if the icon does not behave properly, try to change toolkit, they are not all fully \
 compatible with every desktop environment.") + "\n\n")
+        text.insert("end",
+                    _("If the widgets disappear when you click on them, open the setting dialog from the menu and check the box 'Check this box if the widgets disappear when you click'.") + "\n\n")
         text.insert("end",
                     _("If you encounter bugs or if you have suggestions, please open an issue on "))
         text.insert("end", "Github", ("url", "link"))
