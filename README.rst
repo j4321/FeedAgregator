@@ -94,6 +94,10 @@ Several GUI toolkits are available to display the system tray icon, so if the
 icon does not behave properly, try to change toolkit, they are not all fully
 compatible with every desktop environment.
 
+If the widgets disappear when you click on them, open the setting dialog 
+from the menu and check the box 'Check this box if the widgets disappear 
+when you click'.
+
 If you encounter bugs or if you have suggestions, please open an issue on
 `GitHub <https://github.com/j4321/FeedAgregator/issues>`__ or write me an email
 at <j_4321@protonmail.com>.
