@@ -150,6 +150,15 @@ class Config(Toplevel):
         else:
             self.confirm_update.state(('!selected', '!alternate'))
 
+        # --- Splash supported
+        self.splash_support = Checkbutton(frame_general,
+                                          text=_("Check this box if the widgets disappear when clicked"))
+        self.splash_support.grid(row=9, column=0, padx=8, pady=4, columnspan=2, sticky='w')
+        if not CONFIG.getboolean('General', 'splash_supported', fallback=True):
+            self.splash_support.state(('selected', '!alternate'))
+        else:
+            self.splash_support.state(('!selected', '!alternate'))
+
     def _init_widget(self):
         frame_widget = Frame(self)
         self.notebook.add(frame_widget, text=_('Widget'))
@@ -404,6 +413,7 @@ class Config(Toplevel):
         CONFIG.set('General', 'confirm_feed_remove', str(self.confirm_feed_rem.instate(('selected',))))
         CONFIG.set('General', 'confirm_cat_remove', str(self.confirm_cat_rem.instate(('selected',))))
         CONFIG.set('General', 'check_update', str(self.confirm_update.instate(('selected',))))
+        CONFIG.set('General', 'splash_supported', str(not self.splash_support.instate(('selected',))))
         # --- widget
         CONFIG.set("Widget", "alpha", "%i" % float(self.opacity_scale.get()))
 

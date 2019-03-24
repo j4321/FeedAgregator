@@ -34,8 +34,8 @@ The scroll.png image is a modified version of the slider-vert.png assets from
 the arc-theme https://github.com/horst3180/arc-theme
 Copyright 2015 horst3180 (https://github.com/horst3180)
 
-feedagregator.svg and its .png derivatives come from 
-https://commons.wikimedia.org/wiki/File:Rss-feed.svg which is in the 
+feedagregator.svg and its .png derivatives come from
+https://commons.wikimedia.org/wiki/File:Rss-feed.svg which is in the
 public domain.
 
 The other icons are modified versions of icons from the elementary project
@@ -115,6 +115,7 @@ else:
     CONFIG.set("General", "confirm_cat_remove", "True")
     CONFIG.set("General", "confirm_feed_remove", "True")
     CONFIG.set("General", "categories", "")
+    CONFIG.set("General", "splash_supported", str(os.environ.get('DESKTOP_SESSION') != 'plasma'))
     CONFIG.add_section("Widget")
     CONFIG.set("Widget", "alpha", "80")
     CONFIG.set("Widget", 'font', 'Liberation\ Sans 10')
