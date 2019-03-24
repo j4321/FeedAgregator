@@ -152,7 +152,7 @@ class Config(Toplevel):
 
         # --- Splash supported
         self.splash_support = Checkbutton(frame_general,
-                                          text=_("Check this box if the widgets disappear when clicked"))
+                                          text=_("Check this box if the widgets disappear when you click"))
         self.splash_support.grid(row=9, column=0, padx=8, pady=4, columnspan=2, sticky='w')
         if not CONFIG.getboolean('General', 'splash_supported', fallback=True):
             self.splash_support.state(('selected', '!alternate'))
