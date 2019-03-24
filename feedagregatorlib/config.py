@@ -44,7 +44,6 @@ class Config(Toplevel):
 
         style = Style(self)
         self._bg = style.lookup('TFrame', 'background')
-        self.configure(bg=self._bg)
 
         self.notebook = Notebook(self)
         self._validate = self.register(self._validate_entry_nb)

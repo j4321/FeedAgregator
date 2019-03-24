@@ -169,7 +169,8 @@ class App(Tk):
         self.style.map('widget.close.TButton', background=[], relief=[],
                        image=[('active', '!pressed', self._im_hide_active),
                               ('active', 'pressed', self._im_hide_pressed)])
-
+        self.option_add('*Toplevel.background', self.style.lookup('TFrame', 'background'))
+        self.option_add('*{app_name}.background'.format(app_name=cst.APP_NAME), self.style.lookup('TFrame', 'background'))
         self.widget_style_init()
 
         # --- tray icon menu
