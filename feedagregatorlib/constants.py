@@ -34,6 +34,10 @@ The scroll.png image is a modified version of the slider-vert.png assets from
 the arc-theme https://github.com/horst3180/arc-theme
 Copyright 2015 horst3180 (https://github.com/horst3180)
 
+feedagregator.svg and its .png derivatives come from 
+https://commons.wikimedia.org/wiki/File:Rss-feed.svg which is in the 
+public domain.
+
 The other icons are modified versions of icons from the elementary project
 Copyright 2007-2013 elementary LLC.
 
