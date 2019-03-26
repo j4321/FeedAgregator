@@ -153,7 +153,7 @@ class CatWidget(Toplevel):
 
         self.update_idletasks()
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
-        
+
         if not CONFIG.getboolean('General', 'splash_supported', fallback=True) and LATESTS.getboolean(self.category, 'visible'):
             Toplevel.withdraw(self)
             Toplevel.deiconify(self)
@@ -265,6 +265,15 @@ class CatWidget(Toplevel):
                 l.configure(height=l.html.bbox()[-1])
             except TclError:
                 self.after(10, self._on_configure, None)
+
+    def update_position(self):
+        if self._position.get() == 'normal':
+            if CONFIG.getboolean('General', 'splash_supported', fallback=True):
+                self.attributes('-type', 'splash')
+            else:
+                self.attributes('-type', 'toolbar')
+        self.withdraw()
+        self.deiconify()
 
     def update_style(self):
         self.attributes('-alpha', CONFIG.getint('Widget', 'alpha') / 100)

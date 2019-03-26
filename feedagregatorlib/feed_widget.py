@@ -147,11 +147,11 @@ class FeedWidget(Toplevel):
 
         self.update_idletasks()
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
-        
+
         if not CONFIG.getboolean('General', 'splash_supported', fallback=True) and FEEDS.getboolean(self.feed_name, 'visible', fallback=True):
             Toplevel.withdraw(self)
             Toplevel.deiconify(self)
-        
+
     def populate_widget(self):
         try:
             filename = FEEDS.get(self.feed_name, 'data')
@@ -252,6 +252,15 @@ class FeedWidget(Toplevel):
         self.feed_name = new_name
         self.title('feedagregator.widget.{}'.format(new_name.replace(' ', '_')))
         self.label.configure(text=new_name)
+
+    def update_position(self):
+        if self._position.get() == 'normal':
+            if CONFIG.getboolean('General', 'splash_supported', fallback=True):
+                self.attributes('-type', 'splash')
+            else:
+                self.attributes('-type', 'toolbar')
+        self.withdraw()
+        self.deiconify()
 
     def update_style(self):
         self.attributes('-alpha', CONFIG.getint('Widget', 'alpha') / 100)

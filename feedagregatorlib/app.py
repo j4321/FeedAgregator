@@ -484,14 +484,20 @@ class App(Tk):
 
     def settings(self):
         update_delay = CONFIG.get('General', 'update_delay')
+        splash_supp = CONFIG.get('General', 'splash_supported', fallback=True)
         dialog = Config(self)
         self.wait_window(dialog)
         cst.save_config()
         self.widget_style_init()
+        splash_change = splash_supp != CONFIG.get('General', 'splash_supported')
         for widget in self.cat_widgets.values():
             widget.update_style()
+            if splash_change:
+                widget.update_position()
         for widget in self.feed_widgets.values():
             widget.update_style()
+            if splash_change:
+                widget.update_position()
         if update_delay != CONFIG.get('General', 'update_delay'):
             self.feed_update()
 
