@@ -259,8 +259,9 @@ class FeedWidget(Toplevel):
                 self.attributes('-type', 'splash')
             else:
                 self.attributes('-type', 'toolbar')
-        self.withdraw()
-        self.deiconify()
+        if self.variable.get():
+            self.withdraw()
+            self.deiconify()
 
     def update_style(self):
         self.attributes('-alpha', CONFIG.getint('Widget', 'alpha') / 100)
