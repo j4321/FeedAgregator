@@ -2,7 +2,7 @@
 # -*- coding:Utf-8 -*-
 """
 FeedAgregator - RSS and Atom feed agregator in desktop widgets + notifications
-Copyright 2018 Juliette Monsel <j_4321@protonmail.com>
+Copyright 2018-2019 Juliette Monsel <j_4321@protonmail.com>
 
 FeedAgregator is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -44,7 +44,6 @@ class Config(Toplevel):
 
         style = Style(self)
         self._bg = style.lookup('TFrame', 'background')
-        self.configure(bg=self._bg)
 
         self.notebook = Notebook(self)
         self._validate = self.register(self._validate_entry_nb)
@@ -149,6 +148,15 @@ class Config(Toplevel):
             self.confirm_update.state(('selected', '!alternate'))
         else:
             self.confirm_update.state(('!selected', '!alternate'))
+
+        # --- Splash supported
+        self.splash_support = Checkbutton(frame_general,
+                                          text=_("Check this box if the widgets disappear when you click"))
+        self.splash_support.grid(row=9, column=0, padx=8, pady=4, columnspan=2, sticky='w')
+        if not CONFIG.getboolean('General', 'splash_supported', fallback=True):
+            self.splash_support.state(('selected', '!alternate'))
+        else:
+            self.splash_support.state(('!selected', '!alternate'))
 
     def _init_widget(self):
         frame_widget = Frame(self)
@@ -404,6 +412,7 @@ class Config(Toplevel):
         CONFIG.set('General', 'confirm_feed_remove', str(self.confirm_feed_rem.instate(('selected',))))
         CONFIG.set('General', 'confirm_cat_remove', str(self.confirm_cat_rem.instate(('selected',))))
         CONFIG.set('General', 'check_update', str(self.confirm_update.instate(('selected',))))
+        CONFIG.set('General', 'splash_supported', str(not self.splash_support.instate(('selected',))))
         # --- widget
         CONFIG.set("Widget", "alpha", "%i" % float(self.opacity_scale.get()))
 

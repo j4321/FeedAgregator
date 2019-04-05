@@ -2,7 +2,7 @@
 # -*- coding:Utf-8 -*-
 """
 FeedAgregator - RSS and Atom feed agregator in desktop widgets + notifications
-Copyright 2018 Juliette Monsel <j_4321@protonmail.com>
+Copyright 2018-2019 Juliette Monsel <j_4321@protonmail.com>
 
 FeedAgregator is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -43,8 +43,12 @@ class CatWidget(Toplevel):
         Toplevel.__init__(self, master, class_=APP_NAME)
         self.rowconfigure(2, weight=1)
         self.columnconfigure(0, weight=1)
-        self.attributes('-type', 'splash')
+        if CONFIG.getboolean('General', 'splash_supported', fallback=True):
+            self.attributes('-type', 'splash')
+        else:
+            self.attributes('-type', 'toolbar')
         self.minsize(50, 50)
+        self.protocol('WM_DELETE_WINDOW', self.withdraw)
 
         self.category = category
 
@@ -143,12 +147,16 @@ class CatWidget(Toplevel):
             widget.bind('<ButtonRelease-1>', self._stop_move)
             widget.bind('<B1-Motion>', self._move)
         self.bind('<Configure>', self._on_configure)
-        self.bind('<Map>', self._change_position)
+        label.bind('<Map>', self._change_position)
         self.bind('<4>', lambda e: self._scroll(-1))
         self.bind('<5>', lambda e: self._scroll(1))
 
         self.update_idletasks()
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
+
+        if not CONFIG.getboolean('General', 'splash_supported', fallback=True) and LATESTS.getboolean(self.category, 'visible'):
+            Toplevel.withdraw(self)
+            Toplevel.deiconify(self)
 
     def remove_cat(self):
         rep = True
@@ -258,6 +266,16 @@ class CatWidget(Toplevel):
             except TclError:
                 self.after(10, self._on_configure, None)
 
+    def update_position(self):
+        if self._position.get() == 'normal':
+            if CONFIG.getboolean('General', 'splash_supported', fallback=True):
+                self.attributes('-type', 'splash')
+            else:
+                self.attributes('-type', 'toolbar')
+        if self.variable.get():
+            self.withdraw()
+            self.deiconify()
+
     def update_style(self):
         self.attributes('-alpha', CONFIG.getint('Widget', 'alpha') / 100)
         text_font = Font(self, font=CONFIG.get('Widget', 'font')).actual()
@@ -353,20 +371,32 @@ a:hover {
     def _change_position(self, event=None):
         '''Make widget sticky and set its position with respects to the other windows.'''
         pos = self._position.get()
+        splash_supp = CONFIG.getboolean('General', 'splash_supported', fallback=True)
         try:
             for w in self.ewmh.getClientList():
                 if w.get_wm_name() == self.title():
                     self.ewmh.setWmState(w, 1, '_NET_WM_STATE_STICKY')
+                    self.ewmh.setWmState(w, 1, '_NET_WM_STATE_SKIP_TASKBAR')
+                    self.ewmh.setWmState(w, 1, '_NET_WM_STATE_SKIP_PAGER')
                     if pos == 'above':
+                        self.attributes('-type', 'dock')
                         self.ewmh.setWmState(w, 1, '_NET_WM_STATE_ABOVE')
                         self.ewmh.setWmState(w, 0, '_NET_WM_STATE_BELOW')
                     elif pos == 'below':
+                        self.attributes('-type', 'desktop')
                         self.ewmh.setWmState(w, 0, '_NET_WM_STATE_ABOVE')
                         self.ewmh.setWmState(w, 1, '_NET_WM_STATE_BELOW')
                     else:
+                        if splash_supp:
+                            self.attributes('-type', 'splash')
+                        else:
+                            self.attributes('-type', 'toolbar')
                         self.ewmh.setWmState(w, 0, '_NET_WM_STATE_BELOW')
                         self.ewmh.setWmState(w, 0, '_NET_WM_STATE_ABOVE')
             self.ewmh.display.flush()
+            if event is None and not splash_supp:
+                Toplevel.withdraw(self)
+                Toplevel.deiconify(self)
         except ewmh.display.error.BadWindow:
             pass
 

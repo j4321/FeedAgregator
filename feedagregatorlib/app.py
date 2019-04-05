@@ -2,7 +2,7 @@
 # -*- coding:Utf-8 -*-
 """
 FeedAgregator - RSS and Atom feed agregator in desktop widgets + notifications
-Copyright 2018 Juliette Monsel <j_4321@protonmail.com>
+Copyright 2018-2019 Juliette Monsel <j_4321@protonmail.com>
 
 FeedAgregator is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -169,7 +169,8 @@ class App(Tk):
         self.style.map('widget.close.TButton', background=[], relief=[],
                        image=[('active', '!pressed', self._im_hide_active),
                               ('active', 'pressed', self._im_hide_pressed)])
-
+        self.option_add('*Toplevel.background', self.style.lookup('TFrame', 'background'))
+        self.option_add('*{app_name}.background'.format(app_name=cst.APP_NAME), self.style.lookup('TFrame', 'background'))
         self.widget_style_init()
 
         # --- tray icon menu
@@ -483,14 +484,20 @@ class App(Tk):
 
     def settings(self):
         update_delay = CONFIG.get('General', 'update_delay')
+        splash_supp = CONFIG.get('General', 'splash_supported', fallback=True)
         dialog = Config(self)
         self.wait_window(dialog)
         cst.save_config()
         self.widget_style_init()
+        splash_change = splash_supp != CONFIG.get('General', 'splash_supported')
         for widget in self.cat_widgets.values():
             widget.update_style()
+            if splash_change:
+                widget.update_position()
         for widget in self.feed_widgets.values():
             widget.update_style()
+            if splash_change:
+                widget.update_position()
         if update_delay != CONFIG.get('General', 'update_delay'):
             self.feed_update()
 

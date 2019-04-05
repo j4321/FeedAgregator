@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 FeedAgregator - RSS and Atom feed agregator in desktop widgets + notifications
-Copyright 2018 Juliette Monsel <j_4321@protonmail.com>
+Copyright 2018-2019 Juliette Monsel <j_4321@protonmail.com>
 
 FeedAgregator is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ might not work with all desktop environments (see Troubleshooting).") + "\n\n\n"
         text.insert("end", _(" in the main menu (right click on the tray icon). \
 A window containing the list of feeds opens:") + "\n")
         text.insert("end",
-                    _("\t•\tTick / untick the box on the left to activate / deactivate a feed.") + "\n",
+                    _("\t•\tCheck / uncheck the box on the left to activate / deactivate a feed.") + "\n",
                     'list')
         text.insert("end",
                     _("\t•\tDouble click on the feed title to edit it.") + "\n",
@@ -90,6 +90,8 @@ The latest entry of each feed in the same category can be displayed in a widget.
                     _("Several GUI toolkits are available to display the system tray icon, \
 so if the icon does not behave properly, try to change toolkit, they are not all fully \
 compatible with every desktop environment.") + "\n\n")
+        text.insert("end",
+                    _("If the widgets disappear when you click on them, open the setting dialog from the menu and check the box 'Check this box if the widgets disappear when you click'.") + "\n\n")
         text.insert("end",
                     _("If you encounter bugs or if you have suggestions, please open an issue on "))
         text.insert("end", "Github", ("url", "link"))
