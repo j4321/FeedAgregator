@@ -2,7 +2,7 @@
 # -*- coding:Utf-8 -*-
 """
 FeedAgregator - RSS and Atom feed agregator in desktop widgets + notifications
-Copyright 2018-2019 Juliette Monsel <j_4321@protonmail.com>
+Copyright 2019 Juliette Monsel <j_4321@protonmail.com>
 
 FeedAgregator is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,32 +18,28 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-Desktop widget for a single feed
+Base desktop widget
 """
-from babel.dates import format_datetime
-from datetime import datetime
-from locale import getlocale
+from tkinter import Toplevel, BooleanVar, Menu, StringVar, Canvas
+from tkinter.ttk import Style, Label, Separator, Sizegrip, Frame, Button
 from tkinter.font import Font
-from tkinter import Toplevel, BooleanVar, Menu, StringVar, Canvas, TclError
-from tkinter.ttk import Style, Label, Separator, Sizegrip, Frame, Button, Entry
-from feedagregatorlib.constants import CONFIG, FEEDS, APP_NAME, add_trace, load_data, save_feeds
-from feedagregatorlib.messagebox import askokcancel
-from feedagregatorlib.tkinterhtml import HtmlFrame
-from feedagregatorlib.toggledframe import ToggledFrame
+from feedagregatorlib.constants import CONFIG, APP_NAME, add_trace, load_data
 from feedagregatorlib.autoscrollbar import AutoScrollbar
 from ewmh import EWMH, ewmh
-from webbrowser import open as webopen
 import configparser
 import pickle
 
 
-class FeedWidget(Toplevel):
-    def __init__(self, master, feed_name):
+class BaseWidget(Toplevel):
+    def __init__(self, master, name, config, save_config):
         Toplevel.__init__(self, master, class_=APP_NAME)
         self.rowconfigure(2, weight=1)
         self.columnconfigure(0, weight=1)
 
-        self.feed_name = feed_name
+        self.name = name
+        self.config = config
+        self.save_config = save_config
+
         if CONFIG.getboolean('General', 'splash_supported', fallback=True):
             self.attributes('-type', 'splash')
         else:
@@ -54,57 +50,27 @@ class FeedWidget(Toplevel):
         # control main menu checkbutton
         self.variable = BooleanVar(self, False)
 
-        self._position = StringVar(self, FEEDS.get(feed_name, 'position', fallback='normal'))
+        self._position = StringVar(self, self.config.get(name, 'position', fallback='normal'))
         add_trace(self._position, 'write', self._position_trace)
 
         self.ewmh = EWMH()
-        self.title('feedagregator.widget.{}'.format(feed_name.replace(' ', '_')))
+        self.title('feedagregator.widget.{}'.format(name.replace(' ', '_')))
         self.withdraw()
 
-        self.entries = []
         self.x = None
         self.y = None
 
-        self._sort_is_reversed = BooleanVar(self,
-                                            FEEDS.getboolean(self.feed_name,
-                                                             'sort_is_reversed',
-                                                             fallback=False))
-        add_trace(self._sort_is_reversed, 'write', self._sort_trace)
-
         # --- menu
-        self.menu = Menu(self, tearoff=False)
-        menu_sort = Menu(self.menu, tearoff=False)
-        menu_sort.add_radiobutton(label=_('Oldest first'),
-                                  variable=self._sort_is_reversed,
-                                  value=True,
-                                  command=self.sort_by_date)
-        menu_sort.add_radiobutton(label=_('Most recent first'),
-                                  variable=self._sort_is_reversed,
-                                  value=False,
-                                  command=self.sort_by_date)
-        menu_pos = Menu(self.menu, tearoff=False)
-        menu_pos.add_radiobutton(label=_('Normal'), value='normal',
-                                 variable=self._position, command=self._change_position)
-        menu_pos.add_radiobutton(label=_('Above'), value='above',
-                                 variable=self._position, command=self._change_position)
-        menu_pos.add_radiobutton(label=_('Below'), value='below',
-                                 variable=self._position, command=self._change_position)
-        self.menu.add_cascade(label=_('Sort'), menu=menu_sort)
-        self.menu.add_cascade(label=_('Position'), menu=menu_pos)
-        self.menu.add_command(label=_('Hide'), command=self.withdraw)
-        self.menu.add_command(label=_('Open all'), command=self.open_all)
-        self.menu.add_command(label=_('Close all'), command=self.close_all)
-        self.menu.add_command(label=_('Remove feed'), command=self.remove_feed)
+        self._create_menu()
 
         # --- elements
         frame = Frame(self, style='widget.TFrame')
         Button(frame, style='widget.close.TButton',
                command=self.withdraw).pack(side='left')
-        self.label = Label(frame, text=feed_name, style='widget.title.TLabel',
+        self.label = Label(frame, text=name, style='widget.title.TLabel',
                            anchor='center')
         self.label.pack(side='left', fill='x', expand=True)
         frame.grid(row=0, columnspan=2, padx=4, pady=4, sticky='ew')
-        self.label.bind('<Double-1>', self.rename)
         sep = Separator(self, style='widget.Horizontal.TSeparator')
         sep.grid(row=1, columnspan=2, sticky='ew')
         self.canvas = Canvas(self, highlightthickness=0)
@@ -127,11 +93,11 @@ class FeedWidget(Toplevel):
         corner = Sizegrip(self, style="widget.TSizegrip")
         corner.place(relx=1, rely=1, anchor='se', bordermode='outside')
 
-        geometry = FEEDS.get(self.feed_name, 'geometry')
+        geometry = self.config.get(self.name, 'geometry')
         if geometry:
             self.geometry(geometry)
         self.update_idletasks()
-        if FEEDS.getboolean(self.feed_name, 'visible', fallback=True):
+        if self.config.getboolean(self.name, 'visible', fallback=True):
             self.deiconify()
 
         # --- bindings
@@ -148,13 +114,30 @@ class FeedWidget(Toplevel):
         self.update_idletasks()
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
 
-        if not CONFIG.getboolean('General', 'splash_supported', fallback=True) and FEEDS.getboolean(self.feed_name, 'visible', fallback=True):
+        if not CONFIG.getboolean('General', 'splash_supported', fallback=True) and self.config.getboolean(self.name, 'visible', fallback=True):
             Toplevel.withdraw(self)
             Toplevel.deiconify(self)
 
+    def _create_menu(self):
+        self.menu = Menu(self, tearoff=False)
+        self.menu_sort = Menu(self.menu, tearoff=False)
+
+        menu_pos = Menu(self.menu, tearoff=False)
+        menu_pos.add_radiobutton(label=_('Normal'), value='normal',
+                                 variable=self._position, command=self._change_position)
+        menu_pos.add_radiobutton(label=_('Above'), value='above',
+                                 variable=self._position, command=self._change_position)
+        menu_pos.add_radiobutton(label=_('Below'), value='below',
+                                 variable=self._position, command=self._change_position)
+        self.menu.add_cascade(label=_('Sort'), menu=self.menu_sort)
+        self.menu.add_cascade(label=_('Position'), menu=menu_pos)
+        self.menu.add_command(label=_('Hide'), command=self.withdraw)
+        self.menu.add_command(label=_('Open all'), command=self.open_all)
+        self.menu.add_command(label=_('Close all'), command=self.close_all)
+
     def populate_widget(self):
         try:
-            filename = FEEDS.get(self.feed_name, 'data')
+            filename = self.config.get(self.name, 'data')
             latest, data = load_data(filename)
         except (configparser.NoOptionError, pickle.UnpicklingError):
             data = []
@@ -162,96 +145,11 @@ class FeedWidget(Toplevel):
             self.entry_add(entry_title, date, summary, link, -1)
         self.sort_by_date()
 
-    def remove_feed(self):
-        rep = True
-        if CONFIG.getboolean('General', 'confirm_remove', fallback=True):
-            rep = askokcancel(_('Confirmation'),
-                              _('Do you want to remove the feed {feed}?').format(feed=self.feed_name))
-        if rep:
-            self.master.feed_remove(self.feed_name)
-
     def open_all(self):
-        for tf, l in self.entries:
-            tf.open()
-        self.update_idletasks()
-        self.canvas.configure(scrollregion=self.canvas.bbox('all'))
+        pass  # to be overriden by subclasses
 
     def close_all(self):
-        for tf, l in self.entries:
-            tf.close()
-        self.update_idletasks()
-        self.canvas.configure(scrollregion=self.canvas.bbox('all'))
-
-    def clear(self):
-        for tf, l in self.entries:
-            tf.destroy()
-        self.entries.clear()
-
-    def entry_add(self, title, date, summary, url, index=0):
-        """Display entry."""
-
-        def unwrap(event):
-            l.update_idletasks()
-            try:
-                h = l.html.bbox()[-1]
-            except TclError:
-                pass
-            else:
-                l.configure(height=h + 2)
-
-        def resize(event):
-            if l.winfo_viewable():
-                try:
-                    h = l.html.bbox()[-1]
-                except TclError:
-                    pass
-                else:
-                    l.configure(height=h + 2)
-
-        formatted_date = format_datetime(datetime.strptime(date, '%Y-%m-%d %H:%M').astimezone(tz=None),
-                                         'short', locale=getlocale()[0])
-
-        tf = ToggledFrame(self.display, text="{} - {}".format(title, formatted_date),
-                          style='widget.TFrame')
-        l = HtmlFrame(tf.interior, height=50, style='widget.interior.TFrame')
-        l.set_content(summary)
-        l.set_style(self._stylesheet)
-        l.set_font_size(self._font_size)
-        tf.interior.configure(style='widget.interior.TFrame')
-        tf.interior.rowconfigure(0, weight=1)
-        tf.interior.columnconfigure(0, weight=1)
-        l.grid(padx=4, sticky='eswn')
-        Button(tf.interior, text='Open', style='widget.TButton',
-               command=lambda: webopen(url)).grid(pady=4, padx=6, sticky='e')
-        tf.grid(sticky='we', row=len(self.entries), pady=2, padx=(8, 4))
-        tf.bind("<<ToggledFrameOpen>>", unwrap)
-        l.bind("<Configure>", resize)
-        if index == -1:
-            self.entries.append((tf, l))
-        else:
-            self.entries.insert(index, (tf, l))
-
-    def rename(self, event):
-
-        def ok(event):
-            name = entry.get()
-            entry.destroy()
-            if name:
-                self.master.feed_rename(self.feed_name, name)
-
-        entry = Entry(self, justify='center')
-        entry.insert(0, self.feed_name)
-        entry.selection_range(0, 'end')
-        entry.place(in_=self.label, relwidth=1, relheight=1, x=0, y=0, anchor='nw')
-        entry.bind('<Return>', ok)
-        entry.bind('<Escape>', lambda e: entry.destroy())
-        entry.bind('<FocusOut>', lambda e: entry.destroy())
-        entry.focus_force()
-
-    def rename_feed(self, new_name):
-        self.feed_name = new_name
-        self.title('feedagregator.widget.{}'.format(new_name.replace(' ', '_')))
-        self.label.configure(text=new_name)
+        pass  # to be overriden by subclasses
 
     def update_position(self):
         if self._position.get() == 'normal':
@@ -303,9 +201,6 @@ a:hover {
         self.configure(bg=bg)
         self.canvas.configure(background=bg)
         self._font_size = text_font['size']
-        for tf, l in self.entries:
-            l.set_style(self._stylesheet)
-            l.set_font_size(self._font_size)
 
     def withdraw(self):
         Toplevel.withdraw(self)
@@ -315,14 +210,6 @@ a:hover {
         Toplevel.deiconify(self)
         self.variable.set(True)
 
-    def sort_by_date(self):
-        if self._sort_is_reversed.get():
-            l = reversed(self.entries)
-        else:
-            l = self.entries
-        for i, (tf, l) in enumerate(l):
-            tf.grid_configure(row=i)
-
     def _scroll(self, delta):
         top, bottom = self.canvas.yview()
         top += delta * 0.05
@@ -330,12 +217,8 @@ a:hover {
         self.canvas.yview_moveto(top)
 
     def _position_trace(self, *args):
-        FEEDS.set(self.feed_name, 'position', self._position.get())
-        save_feeds()
-
-    def _sort_trace(self, *args):
-        FEEDS.set(self.feed_name, 'sort_is_reversed', str(self._sort_is_reversed.get()))
-        save_feeds()
+        self.config.set(self.name, 'position', self._position.get())
+        self.save_config()
 
     def _change_position(self, event=None):
         '''Make widget sticky and set its position with respects to the other windows.'''
@@ -373,8 +256,8 @@ a:hover {
         if event.widget is self:
             geometry = self.geometry()
             if geometry != '1x1+0+0':
-                FEEDS.set(self.feed_name, 'geometry', geometry)
-                save_feeds()
+                self.config.set(self.name, 'geometry', geometry)
+                self.save_config()
         elif event.widget in [self.canvas, self.display]:
             self.canvas.configure(scrollregion=self.canvas.bbox('all'))
             self.canvas.itemconfigure('display', width=self.canvas.winfo_width() - 4)

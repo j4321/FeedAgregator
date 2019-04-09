@@ -20,26 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Main class
 """
-import pickle
-import feedparser
-import dateutil.parser
-from datetime import datetime
-from tkinter import Tk, TclError
-from tkinter import PhotoImage as tkPhotoImage
-from tkinter.ttk import Style
-from PIL.ImageTk import PhotoImage
-from PIL import Image
-from feedagregatorlib.messagebox import showerror
-from feedagregatorlib.trayicon import TrayIcon, SubMenu
-import feedagregatorlib.constants as cst
-from feedagregatorlib.add import Add
-from feedagregatorlib.manager import Manager
-from feedagregatorlib.config import Config
-from feedagregatorlib.cat_widget import CatWidget
-from feedagregatorlib.feed_widget import FeedWidget
-from feedagregatorlib.version_check import UpdateChecker
-from feedagregatorlib.about import About
-from feedagregatorlib.help import Help
 try:
     from subprocess import run
 except ImportError:
@@ -49,6 +29,27 @@ import traceback
 from multiprocessing import Process, Queue
 import logging
 import os
+import pickle
+from datetime import datetime
+from tkinter import Tk, TclError
+from tkinter import PhotoImage as tkPhotoImage
+from tkinter.ttk import Style
+
+from PIL.ImageTk import PhotoImage
+from PIL import Image
+import feedparser
+import dateutil.parser
+
+from feedagregatorlib.messagebox import showerror
+from feedagregatorlib.trayicon import TrayIcon, SubMenu
+import feedagregatorlib.constants as cst
+from feedagregatorlib.add import Add
+from feedagregatorlib.manager import Manager
+from feedagregatorlib.config import Config
+from feedagregatorlib.widgets import CatWidget, FeedWidget
+from feedagregatorlib.version_check import UpdateChecker
+from feedagregatorlib.about import About
+from feedagregatorlib.help import Help
 
 
 CONFIG = cst.CONFIG
