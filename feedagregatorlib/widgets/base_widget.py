@@ -23,11 +23,9 @@ Base desktop widget
 from tkinter import Toplevel, BooleanVar, Menu, StringVar, Canvas
 from tkinter.ttk import Style, Label, Separator, Sizegrip, Frame, Button
 from tkinter.font import Font
-from feedagregatorlib.constants import CONFIG, APP_NAME, add_trace, load_data
+from feedagregatorlib.constants import CONFIG, APP_NAME, add_trace
 from feedagregatorlib.autoscrollbar import AutoScrollbar
 from ewmh import EWMH, ewmh
-import configparser
-import pickle
 
 
 class BaseWidget(Toplevel):
@@ -135,21 +133,11 @@ class BaseWidget(Toplevel):
         self.menu.add_command(label=_('Open all'), command=self.open_all)
         self.menu.add_command(label=_('Close all'), command=self.close_all)
 
-    def populate_widget(self):
-        try:
-            filename = self.config.get(self.name, 'data')
-            latest, data = load_data(filename)
-        except (configparser.NoOptionError, pickle.UnpicklingError):
-            data = []
-        for entry_title, date, summary, link in data:
-            self.entry_add(entry_title, date, summary, link, -1)
-        self.sort_by_date()
-
     def open_all(self):
-        pass  # to be overriden by subclasses
+        pass  # to be overriden by subclass
 
     def close_all(self):
-        pass  # to be overriden by subclasses
+        pass  # to be overriden by subclass
 
     def update_position(self):
         if self._position.get() == 'normal':
@@ -158,8 +146,8 @@ class BaseWidget(Toplevel):
             else:
                 self.attributes('-type', 'toolbar')
         if self.variable.get():
-            self.withdraw()
-            self.deiconify()
+            Toplevel.withdraw(self)
+            Toplevel.deiconify(self)
 
     def update_style(self):
         self.attributes('-alpha', CONFIG.getint('Widget', 'alpha') / 100)
@@ -169,6 +157,14 @@ class BaseWidget(Toplevel):
         feed_fg = CONFIG.get('Widget', 'feed_foreground', fallback='white')
 
         self._stylesheet = """
+body {
+  background-color: %(bg)s;
+  color: %(fg)s;
+  font-family: %(family)s;
+  font-weight: %(weight)s;
+  font-style: %(slant)s;
+}
+
 ul {
 padding-left: 5px;
 }
@@ -177,12 +173,9 @@ ol {
 padding-left: 5px;
 }
 
-body {
-  background-color: %(bg)s;
-  color: %(fg)s;
-  font-family: %(family)s;
-  font-weight: %(weight)s;
-  font-style: %(slant)s;
+#title {
+  font-weight: bold;
+  font-size: large;
 }
 
 a {
