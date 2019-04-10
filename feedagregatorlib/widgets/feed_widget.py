@@ -20,20 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Desktop widget for a single feed
 """
-from webbrowser import open as webopen
 import configparser
 import pickle
-from datetime import datetime
-from locale import getlocale
-from tkinter import BooleanVar, TclError
-from tkinter.ttk import Button, Entry
-
-from babel.dates import format_datetime
+from tkinter import BooleanVar
+from tkinter.ttk import Entry
 
 from feedagregatorlib.constants import CONFIG, FEEDS, add_trace, load_data, save_feeds
 from feedagregatorlib.messagebox import askokcancel
-from feedagregatorlib.tkinterhtml import HtmlFrame
-from feedagregatorlib.toggledframe import ToggledFrame
 from .base_widget import BaseWidget
 
 
@@ -99,43 +92,8 @@ class FeedWidget(BaseWidget):
 
     def entry_add(self, title, date, summary, url, index=0):
         """Display entry."""
-
-        def unwrap(event):
-            l.update_idletasks()
-            try:
-                h = l.html.bbox()[-1]
-            except TclError:
-                pass
-            else:
-                l.configure(height=h + 2)
-
-        def resize(event):
-            if l.winfo_viewable():
-                try:
-                    h = l.html.bbox()[-1]
-                except TclError:
-                    pass
-                else:
-                    l.configure(height=h + 2)
-
-        formatted_date = format_datetime(datetime.strptime(date, '%Y-%m-%d %H:%M').astimezone(tz=None),
-                                         'short', locale=getlocale()[0])
-
-        tf = ToggledFrame(self.display, text="{} - {}".format(title, formatted_date),
-                          style='widget.TFrame')
-        l = HtmlFrame(tf.interior, height=50, style='widget.interior.TFrame')
-        l.set_content(summary)
-        l.set_style(self._stylesheet)
-        l.set_font_size(self._font_size)
-        tf.interior.configure(style='widget.interior.TFrame')
-        tf.interior.rowconfigure(0, weight=1)
-        tf.interior.columnconfigure(0, weight=1)
-        l.grid(padx=4, sticky='eswn')
-        Button(tf.interior, text='Open', style='widget.TButton',
-               command=lambda: webopen(url)).grid(pady=4, padx=6, sticky='e')
-        tf.grid(sticky='we', row=len(self.entries), pady=2, padx=(8, 4))
-        tf.bind("<<ToggledFrameOpen>>", unwrap)
-        l.bind("<Configure>", resize)
+        print(title)
+        tf, l = BaseWidget.entry_add(self, title, date, summary, url)
         if index == -1:
             self.entries.append((tf, l))
         else:

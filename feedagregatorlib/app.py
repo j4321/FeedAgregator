@@ -246,7 +246,6 @@ class App(Tk):
             self.menu_feeds.add_checkbutton(label=title,
                                             command=lambda t=title: self.toggle_feed_widget(t))
             self.feed_widgets[title] = FeedWidget(self, title)
-            self.feed_widgets[title].populate_widget()
             cst.add_trace(self.feed_widgets[title].variable, 'write',
                           lambda *args, t=title: self.feed_widget_trace(t))
             self.feed_widgets[title].variable.set(FEEDS.getboolean(title, 'visible', fallback=True))
@@ -584,7 +583,7 @@ class App(Tk):
                 logging.info("Added feed '%s' %s", name, url)
                 run(["notify-send", "-i", cst.IM_ICON_SVG, name,
                      cst.html2text(latest)])
-                self.cat_widgets['All'].add_feed(name, latest, url, date)
+                self.cat_widgets['All'].entry_add(name, date, latest, url)
                 filename = cst.new_data_file()
                 cst.save_data(filename, latest, data)
                 FEEDS.set(name, 'url', url)
@@ -676,10 +675,10 @@ class App(Tk):
                         latest = cst.feed_get_latest(filename)
                     except (configparser.NoOptionError, pickle.UnpicklingError):
                         latest = ''
-                    self.cat_widgets[new_cat].add_feed(title,
-                                                       latest,
-                                                       FEEDS.get(title, 'url'),
-                                                       FEEDS.get(title, 'updated'))
+                    self.cat_widgets[new_cat].entry_add(title,
+                                                        FEEDS.get(title, 'updated'),
+                                                        latest,
+                                                        FEEDS.get(title, 'url'))
 
     def feed_rename(self, old_name, new_name):
         options = {opt: FEEDS.get(old_name, opt) for opt in FEEDS.options(old_name)}

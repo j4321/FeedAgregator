@@ -20,41 +20,54 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Base desktop widget
 """
-from tkinter import Toplevel, BooleanVar, Menu, StringVar, Canvas
+from datetime import datetime
+from locale import getlocale
+from webbrowser import open as webopen
+from tkinter import Toplevel, BooleanVar, Menu, StringVar, Canvas, TclError
 from tkinter.ttk import Style, Label, Separator, Sizegrip, Frame, Button
 from tkinter.font import Font
+
+from ewmh import EWMH, ewmh
+from babel.dates import format_datetime
+
 from feedagregatorlib.constants import CONFIG, APP_NAME, add_trace
 from feedagregatorlib.autoscrollbar import AutoScrollbar
-from ewmh import EWMH, ewmh
+from feedagregatorlib.toggledframe import ToggledFrame
+from feedagregatorlib.tkinterhtml import HtmlFrame
 
 
 class BaseWidget(Toplevel):
     def __init__(self, master, name, config, save_config):
+        """Create base desktop widget."""
         Toplevel.__init__(self, master, class_=APP_NAME)
+
         self.rowconfigure(2, weight=1)
         self.columnconfigure(0, weight=1)
+        self.minsize(50, 50)
+        self.protocol('WM_DELETE_WINDOW', self.withdraw)
+
+        self.ewmh = EWMH()
 
         self.name = name
-        self.config = config
-        self.save_config = save_config
+        self.config = config            # configparser
+        self.save_config = save_config  # save config method
 
+        # get splash window type compatibility
         if CONFIG.getboolean('General', 'splash_supported', fallback=True):
             self.attributes('-type', 'splash')
         else:
             self.attributes('-type', 'toolbar')
-        self.minsize(50, 50)
-        self.protocol('WM_DELETE_WINDOW', self.withdraw)
 
         # control main menu checkbutton
         self.variable = BooleanVar(self, False)
-
+        # save widget's position
         self._position = StringVar(self, self.config.get(name, 'position', fallback='normal'))
         add_trace(self._position, 'write', self._position_trace)
 
-        self.ewmh = EWMH()
         self.title('feedagregator.widget.{}'.format(name.replace(' ', '_')))
         self.withdraw()
 
+        # window dragging
         self.x = None
         self.y = None
 
@@ -62,6 +75,7 @@ class BaseWidget(Toplevel):
         self._create_menu()
 
         # --- elements
+        # --- --- title bar
         frame = Frame(self, style='widget.TFrame')
         Button(frame, style='widget.close.TButton',
                command=self.withdraw).pack(side='left')
@@ -69,8 +83,10 @@ class BaseWidget(Toplevel):
                            anchor='center')
         self.label.pack(side='left', fill='x', expand=True)
         frame.grid(row=0, columnspan=2, padx=4, pady=4, sticky='ew')
+
         sep = Separator(self, style='widget.Horizontal.TSeparator')
         sep.grid(row=1, columnspan=2, sticky='ew')
+        # --- --- widget body
         self.canvas = Canvas(self, highlightthickness=0)
         self.canvas.grid(row=2, column=0, sticky='ewsn', padx=(2, 8), pady=(2, 4))
         scroll = AutoScrollbar(self, orient='vertical',
@@ -88,6 +104,7 @@ class BaseWidget(Toplevel):
         self._font_size = 10
         self.update_style()
 
+        # --- resizing and geometry
         corner = Sizegrip(self, style="widget.TSizegrip")
         corner.place(relx=1, rely=1, anchor='se', bordermode='outside')
 
@@ -112,6 +129,8 @@ class BaseWidget(Toplevel):
         self.update_idletasks()
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
 
+        self.populate_widget()
+
         if not CONFIG.getboolean('General', 'splash_supported', fallback=True) and self.config.getboolean(self.name, 'visible', fallback=True):
             Toplevel.withdraw(self)
             Toplevel.deiconify(self)
@@ -133,11 +152,55 @@ class BaseWidget(Toplevel):
         self.menu.add_command(label=_('Open all'), command=self.open_all)
         self.menu.add_command(label=_('Close all'), command=self.close_all)
 
+    def populate_widget(self):
+        pass  # to be overriden by subclass
+
     def open_all(self):
         pass  # to be overriden by subclass
 
     def close_all(self):
         pass  # to be overriden by subclass
+
+    def entry_add(self, title, date, summary, url):
+        """Display entry and return the toggleframe and htmlframe."""
+
+        def unwrap(event):
+            l.update_idletasks()
+            try:
+                h = l.html.bbox()[-1]
+            except TclError:
+                pass
+            else:
+                l.configure(height=h + 2)
+
+        def resize(event):
+            if l.winfo_viewable():
+                try:
+                    h = l.html.bbox()[-1]
+                except TclError:
+                    pass
+                else:
+                    l.configure(height=h + 2)
+        # convert date to locale time
+        formatted_date = format_datetime(datetime.strptime(date, '%Y-%m-%d %H:%M').astimezone(tz=None),
+                                         'short', locale=getlocale()[0])
+
+        tf = ToggledFrame(self.display, text="{} - {}".format(title, formatted_date),
+                          style='widget.TFrame')
+        l = HtmlFrame(tf.interior, height=50, style='widget.interior.TFrame')
+        l.set_content(summary)
+        l.set_style(self._stylesheet)
+        l.set_font_size(self._font_size)
+        tf.interior.configure(style='widget.interior.TFrame')
+        tf.interior.rowconfigure(0, weight=1)
+        tf.interior.columnconfigure(0, weight=1)
+        l.grid(padx=4, sticky='eswn')
+        Button(tf.interior, text='Open', style='widget.TButton',
+               command=lambda: webopen(url)).grid(pady=4, padx=6, sticky='e')
+        tf.grid(sticky='we', row=len(self.entries), pady=2, padx=(8, 4))
+        tf.bind("<<ToggledFrameOpen>>", unwrap)
+        l.bind("<Configure>", resize)
+        return tf, l
 
     def update_position(self):
         if self._position.get() == 'normal':
