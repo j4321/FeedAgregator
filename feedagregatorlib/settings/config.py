@@ -20,18 +20,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Config dialog
 """
-import tkinter.font as tkfont
-from tkinter import Toplevel, Menu, StringVar, TclError
-from tkinter import Frame as tkFrame
+from tkinter import Toplevel, Menu, StringVar
 from tkinter.ttk import Separator, Menubutton, Button, Label, Frame, \
-    Notebook, Entry, Scale, Style, Checkbutton, Combobox
+    Notebook, Entry, Style, Checkbutton
 
 from PIL.ImageTk import PhotoImage
 
 from feedagregatorlib.constants import CONFIG, TOOLKITS, IM_COLOR, APP_NAME,\
-    LANGUAGES, REV_LANGUAGES, add_trace, askcolor
+    LANGUAGES, REV_LANGUAGES
 from feedagregatorlib.messagebox import showinfo
-from feedagregatorlib.autocomplete import AutoCompleteCombobox
+from .color import ColorFrame
+from .opacity import OpacityFrame
+from .font import FontFrame
 
 
 class Config(Toplevel):
@@ -42,7 +42,8 @@ class Config(Toplevel):
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
         self.rowconfigure(0, weight=1)
-        self.resizable(False, True)
+        self.resizable(True, True)
+        self.minsize(470, 574)
 
         style = Style(self)
         self._bg = style.lookup('TFrame', 'background')
@@ -64,7 +65,8 @@ class Config(Toplevel):
         Button(self, text=_('Ok'), command=self.ok).grid(row=1, column=0,
                                                          sticky='e', padx=4,
                                                          pady=10)
-        Button(self, text=_('Cancel'), command=self.destroy).grid(row=1, column=1,
+        Button(self, text=_('Cancel'), command=self.destroy).grid(row=1,
+                                                                  column=1,
                                                                   sticky='w',
                                                                   padx=4,
                                                                   pady=10)
@@ -77,18 +79,13 @@ class Config(Toplevel):
                                                       padx=8, pady=4, sticky="e")
 
         menu_lang = Menu(frame_general, tearoff=False, background=self._bg)
-        mb = Menubutton(frame_general, menu=menu_lang, width=9,
-                        textvariable=self.lang)
+        mb = Menubutton(frame_general, menu=menu_lang, textvariable=self.lang)
         mb.grid(row=0, column=1, padx=8, pady=4, sticky="w")
-        width = 0
         for lang in LANGUAGES:
             language = LANGUAGES[lang]
-            width = max(width, len(language))
             menu_lang.add_radiobutton(label=language, value=language,
                                       variable=self.lang, command=self.translate)
-        mb.configure(width=width)
 
-        # Separator(self, orient='horizontal').grid(row=1, columnspan=2, sticky='ew')
         # --- gui toolkit
         Label(frame_general,
               text=_("GUI Toolkit for the system tray icon")).grid(row=2, column=0,
@@ -105,7 +102,6 @@ class Config(Toplevel):
                                          value=toolkit.capitalize(),
                                          variable=self.gui,
                                          command=self.change_gui)
-        # Separator(self, orient='horizontal').grid(row=3, columnspan=2, sticky='ew')
         # --- Update delay
         Label(frame_general,
               text=_("Feed update delay (min)")).grid(row=4, column=0,
@@ -166,202 +162,65 @@ class Config(Toplevel):
 
         # --- font
         frame_font = Frame(frame_widget)
-        # ------- title
-        fonttitle_frame = Frame(frame_font)
-        self.title_font = tkfont.Font(self, font=CONFIG.get("Widget", "font_title"))
-        sampletitle = Label(fonttitle_frame, text=_("Sample text"),
-                            anchor="center", font=self.title_font,
-                            style="prev.TLabel", relief="groove")
-
-        sampletitle.grid(row=2, columnspan=2, padx=4, pady=6,
-                         ipadx=4, ipady=4, sticky="eswn")
-        self.fonts = list(set(tkfont.families()))
-        self.fonts.append("TkDefaultFont")
-        self.fonts.sort()
-
-        self.title_font_family = StringVar(self, value=self.title_font.cget('family'))
-        add_trace(self.title_font_family, 'write',
-                  lambda *args: self.title_font.configure(family=self.title_font_family.get()))
-        self.title_font_size = StringVar(self, value=self.title_font.cget('size'))
-        add_trace(self.title_font_size, 'write',
-                  lambda *args: self._config_size(self.title_font_size, self.title_font))
-        self.title_font_bold = StringVar(self, value=self.title_font.cget('weight'))
-        add_trace(self.title_font_bold, 'write',
-                  lambda *args: self.title_font.configure(weight=self.title_font_bold.get()))
-        self.title_font_italic = StringVar(self, value=self.title_font.cget('slant'))
-        add_trace(self.title_font_italic, 'write',
-                  lambda *args: self.title_font.configure(slant=self.title_font_italic.get()))
-
-        w = max([len(f) for f in self.fonts])
-        self.sizes = ["%i" % i for i in (list(range(6, 17)) + list(range(18, 32, 2)))]
-
-        self.fonttitle_family = AutoCompleteCombobox(fonttitle_frame, values=self.fonts,
-                                                     width=(w * 2) // 3,
-                                                     textvariable=self.title_font_family,
-                                                     exportselection=False)
-        self.fonttitle_family.current(self.fonts.index(self.title_font.cget('family')))
-        self.fonttitle_family.grid(row=0, column=0, padx=4, pady=4)
-        self.fonttitle_size = Combobox(fonttitle_frame, values=self.sizes, width=5,
-                                       exportselection=False,
-                                       textvariable=self.title_font_size,
-                                       validate="key",
-                                       validatecommand=(self._validate_title_size, "%d", "%P", "%V"))
-        self.fonttitle_size.current(self.sizes.index(str(self.title_font.cget('size'))))
-        self.fonttitle_size.grid(row=0, column=1, padx=4, pady=4)
-
-        frame_title_style = Frame(fonttitle_frame)
-        frame_title_style.grid(row=1, columnspan=2, padx=4, pady=6)
-
-        self.is_bold = Checkbutton(frame_title_style, text=_("Bold"),
-                                   onvalue='bold', offvalue='normal',
-                                   variable=self.title_font_bold)
-        self.is_italic = Checkbutton(frame_title_style, text=_("Italic"),
-                                     onvalue='italic', offvalue='roman',
-                                     variable=self.title_font_italic)
-        self.is_underlined = Checkbutton(frame_title_style, text=_("Underline"),
-                                         command=lambda: self.title_font.configure(underline=self.is_underlined.instate(("selected",))))
-        if self.title_font.cget('underline'):
-            self.is_underlined.state(('selected', '!alternate'))
-        else:
-            self.is_underlined.state(('!selected', '!alternate'))
-        self.is_bold.pack(side="left")
-        self.is_italic.pack(side="left")
-        self.is_underlined.pack(side="left")
-
-        # ------- text
-        fonttext_frame = Frame(frame_font)
-        self.text_font = tkfont.Font(self, font=CONFIG.get("Widget", "font"))
-        sampletitle = Label(fonttext_frame, text=_("Sample text"),
-                            anchor="center", font=self.text_font,
-                            style="prev.TLabel", relief="groove")
-
-        sampletitle.grid(row=2, columnspan=2, padx=4, pady=6,
-                         ipadx=4, ipady=4, sticky="eswn")
-        self.fonts = list(set(tkfont.families()))
-        self.fonts.append("TkDefaultFont")
-        self.fonts.sort()
-
-        self.text_font_family = StringVar(self, value=self.text_font.cget('family'))
-        add_trace(self.text_font_family, 'write',
-                  lambda *args: self.text_font.configure(family=self.text_font_family.get()))
-        self.text_font_size = StringVar(self, value=self.text_font.cget('size'))
-        add_trace(self.text_font_size, 'write',
-                  lambda *args: self._config_size(self.text_font_size, self.text_font))
-
-        w = max([len(f) for f in self.fonts])
-        self.sizes = ["%i" % i for i in (list(range(6, 17)) + list(range(18, 32, 2)))]
-
-        self.fonttext_family = AutoCompleteCombobox(fonttext_frame, values=self.fonts,
-                                                    width=(w * 2) // 3,
-                                                    textvariable=self.text_font_family,
-                                                    exportselection=False)
-        self.fonttext_family.current(self.fonts.index(self.text_font.cget('family')))
-        self.fonttext_family.grid(row=0, column=0, padx=4, pady=4)
-        self.fonttext_size = Combobox(fonttext_frame, values=self.sizes, width=5,
-                                      exportselection=False,
-                                      textvariable=self.text_font_size,
-                                      validate="key",
-                                      validatecommand=(self._validate_title_size, "%d", "%P", "%V"))
-        self.fonttext_size.current(self.sizes.index(str(self.text_font.cget('size'))))
-        self.fonttext_size.grid(row=0, column=1, padx=4, pady=4)
-        # ------- grid
+        self.title_font = FontFrame(frame_font, CONFIG.get("Widget", "font_title"), True)
+        self.text_font = FontFrame(frame_font, CONFIG.get("Widget", "font"))
         frame_font.columnconfigure(1, weight=1)
         Label(frame_font,
               text=_('Title')).grid(row=0, column=0, sticky='nw', padx=4, pady=4)
-        fonttitle_frame.grid(row=0, column=1)
+        self.title_font.grid(row=0, column=1)
         Separator(frame_font, orient='horizontal').grid(row=1, columnspan=2,
                                                         sticky='ew', padx=4,
                                                         pady=4)
         Label(frame_font,
               text=_('Text')).grid(row=2, column=0, sticky='nw', padx=4, pady=4)
-        fonttext_frame.grid(row=2, column=1)
+        self.text_font.grid(row=2, column=1)
 
         # --- opacity
-        opacity_frame = Frame(frame_widget)
-        opacity_frame.columnconfigure(1, weight=1)
-        self.opacity_scale = Scale(opacity_frame, orient="horizontal", length=300,
-                                   from_=0, to=100,
-                                   value=CONFIG.get("Widget", "alpha"),
-                                   command=self.display_label)
-        self.opacity_label = Label(opacity_frame,
-                                   text="{val}%".format(val=self.opacity_scale.get()))
-        Label(opacity_frame, font='TkDefaultFont 9 bold',
-              text=_("Opacity")).grid(row=0, column=0, sticky="w", padx=4, pady=4)
-        self.opacity_scale.grid(row=0, column=1, padx=(4, 50), pady=4)
-        self.opacity_label.place(in_=self.opacity_scale, relx=1, rely=0.5,
-                                 anchor="w", bordermode="outside")
+        self.opacity_frame = OpacityFrame(frame_widget, CONFIG.get("Widget", "alpha"))
 
         # --- colors
         frame_color = Frame(frame_widget)
         frame_color.columnconfigure(1, weight=1)
         frame_color.columnconfigure(3, weight=1)
-        self.preview_bg = tkFrame(frame_color, width=60, height=20, bg=CONFIG.get("Widget", "background"))
-        self.preview_fg = tkFrame(frame_color, width=60, height=20, bg=CONFIG.get("Widget", "foreground"))
-        self.preview_feed_bg = tkFrame(frame_color, width=60, height=20, bg=CONFIG.get("Widget", "feed_background"))
-        self.preview_feed_fg = tkFrame(frame_color, width=60, height=20, bg=CONFIG.get("Widget", "feed_foreground"))
-        self.preview_link = tkFrame(frame_color, width=60, height=20, bg=CONFIG.get("Widget", "link_color"))
+        self.color_bg = ColorFrame(frame_color,
+                                   CONFIG.get("Widget", "background"),
+                                   _('Background color'))
+        self.color_fg = ColorFrame(frame_color,
+                                   CONFIG.get("Widget", "foreground"),
+                                   _('Foreground color'))
+        self.color_feed_bg = ColorFrame(frame_color,
+                                        CONFIG.get("Widget", "feed_background"),
+                                        _('Background color'))
+        self.color_feed_fg = ColorFrame(frame_color,
+                                        CONFIG.get("Widget", "feed_foreground"),
+                                        _('Foreground color'))
+        self.color_link = ColorFrame(frame_color,
+                                     CONFIG.get("Widget", "link_color"),
+                                     _('Link color'))
         Label(frame_color,
               text=_('General')).grid(row=0, column=0, sticky='w', padx=4, pady=4)
-        Label(frame_color, text=_('Background color')).grid(row=0, column=1,
-                                                            sticky='e', padx=4,
-                                                            pady=4)
-        Label(frame_color, text=_('Foreground color')).grid(row=1, column=1,
-                                                            sticky='e', padx=4,
-                                                            pady=4)
+        self.color_bg.grid(row=0, column=1, sticky='e', padx=4, pady=4)
+        self.color_fg.grid(row=1, column=1, sticky='e', padx=4, pady=4)
+
         Separator(frame_color, orient='horizontal').grid(row=2, columnspan=4,
                                                          sticky='ew', padx=4,
                                                          pady=4)
         Label(frame_color,
               text=_('Feed entry')).grid(row=3, column=0, sticky='w', padx=4, pady=4)
-        Label(frame_color, text=_('Background color')).grid(row=3, column=1,
-                                                            sticky='e', padx=4,
-                                                            pady=4)
-        Label(frame_color, text=_('Foreground color')).grid(row=4, column=1,
-                                                            sticky='e', padx=4,
-                                                            pady=4)
-        Label(frame_color, text=_('Link color')).grid(row=5, column=1,
-                                                      sticky='e', padx=4,
-                                                      pady=4)
-        self.preview_bg.grid(row=0, column=2, sticky='w', padx=4, pady=4)
-        self.preview_fg.grid(row=1, column=2, sticky='w', padx=4, pady=4)
-        self.preview_feed_bg.grid(row=3, column=2, sticky='w', padx=4, pady=4)
-        self.preview_feed_fg.grid(row=4, column=2, sticky='w', padx=4, pady=4)
-        self.preview_link.grid(row=5, column=2, sticky='w', padx=4, pady=4)
-
-        Button(frame_color, image=self.img_color,
-               command=lambda: self.askcolor(self.preview_bg),
-               padding=0).grid(row=0, column=3, sticky='w', padx=4, pady=4)
-        Button(frame_color, image=self.img_color,
-               command=lambda: self.askcolor(self.preview_fg),
-               padding=0).grid(row=1, column=3, sticky='w', padx=4, pady=4)
-        Button(frame_color, image=self.img_color,
-               command=lambda: self.askcolor(self.preview_feed_bg),
-               padding=0).grid(row=3, column=3, sticky='w', padx=4, pady=4)
-        Button(frame_color, image=self.img_color,
-               command=lambda: self.askcolor(self.preview_feed_fg),
-               padding=0).grid(row=4, column=3, sticky='w', padx=4, pady=4)
-        Button(frame_color, image=self.img_color,
-               command=lambda: self.askcolor(self.preview_link),
-               padding=0).grid(row=5, column=3, sticky='w', padx=4, pady=4)
+        self.color_feed_bg.grid(row=3, column=1, sticky='e', padx=4, pady=4)
+        self.color_feed_fg.grid(row=4, column=1, sticky='e', padx=4, pady=4)
+        self.color_link.grid(row=5, column=1, sticky='e', padx=4, pady=4)
 
         # --- pack
         Label(frame_widget, text=_('Font'),
               font='TkDefaultFont 9 bold', anchor='w').pack(padx=4, fill='x')
         frame_font.pack(fill='x', padx=14)
         Separator(frame_widget, orient='horizontal').pack(fill='x', pady=6)
-        opacity_frame.pack(fill='x')
+        self.opacity_frame.pack(padx=(4, 10), fill='x')
         Separator(frame_widget, orient='horizontal').pack(fill='x', pady=6)
         Label(frame_widget, text=_('Colors'),
               font='TkDefaultFont 9 bold', anchor='w').pack(padx=4, fill='x')
         frame_color.pack(fill='x', padx=14)
-
-    def askcolor(self, preview):
-        try:
-            color = askcolor(preview.cget('bg'), parent=self, title=_('Color'))
-        except TclError:
-            color = askcolor(parent=self, title=_('Color'))
-        if color is not None:
-            preview.configure(bg=color)
 
     def display_label(self, value):
         self.opacity_label.configure(text=" {val} %".format(val=int(float(value))))
@@ -416,18 +275,18 @@ class Config(Toplevel):
         CONFIG.set('General', 'check_update', str(self.confirm_update.instate(('selected',))))
         CONFIG.set('General', 'splash_supported', str(not self.splash_support.instate(('selected',))))
         # --- widget
-        CONFIG.set("Widget", "alpha", "%i" % float(self.opacity_scale.get()))
+        CONFIG.set("Widget", "alpha", "%i" % self.opacity_frame.get_opacity())
 
-        font_title_dic = self.title_font.actual()
+        font_title_dic = self.title_font.get_font()
         font_title_dic['underline'] = 'underline' if font_title_dic['underline'] else ''
         font_title_dic['family'] = font_title_dic['family'].replace(' ', '\ ')
         CONFIG.set("Widget", "font_title", "{family} {size} {weight} {slant} {underline}".format(**font_title_dic))
-        font_text_dic = self.text_font.actual()
+        font_text_dic = self.text_font.get_font()
         font_text_dic['family'] = font_text_dic['family'].replace(' ', '\ ')
         CONFIG.set("Widget", "font", "{family} {size}".format(**font_text_dic))
-        CONFIG.set("Widget", "foreground", self.preview_fg.cget('bg'))
-        CONFIG.set("Widget", "background", self.preview_bg.cget('bg'))
-        CONFIG.set("Widget", "feed_foreground", self.preview_feed_fg.cget('bg'))
-        CONFIG.set("Widget", "feed_background", self.preview_feed_bg.cget('bg'))
-        CONFIG.set("Widget", "link_color", self.preview_link.cget('bg'))
+        CONFIG.set("Widget", "foreground", self.color_fg.get_color())
+        CONFIG.set("Widget", "background", self.color_bg.get_color())
+        CONFIG.set("Widget", "feed_foreground", self.color_feed_fg.get_color())
+        CONFIG.set("Widget", "feed_background", self.color_feed_bg.get_color())
+        CONFIG.set("Widget", "link_color", self.color_link.get_color())
         self.destroy()

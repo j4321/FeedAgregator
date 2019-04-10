@@ -45,7 +45,7 @@ from feedagregatorlib.messagebox import showerror
 from feedagregatorlib.trayicon import TrayIcon, SubMenu
 from feedagregatorlib.add import Add
 from feedagregatorlib.manager import Manager
-from feedagregatorlib.config import Config
+from feedagregatorlib.settings import Config
 from feedagregatorlib.widgets import CatWidget, FeedWidget
 from feedagregatorlib.version_check import UpdateChecker
 from feedagregatorlib.about import About
@@ -76,8 +76,9 @@ class App(Tk):
                        fieldbackground=[('readonly', 'white')],
                        selectbackground=[('readonly', 'white')],
                        selectforeground=[('readonly', 'black')])
-        self.style.configure("prev.TLabel", background="white")
-        self.style.map("prev.TLabel", background=[("active", "white")])
+        self.style.configure("title.TLabel", font="TkDefaultFont 9 bold")
+        self.style.configure("white.TLabel", background="white")
+        self.style.map("white.TLabel", background=[("active", "white")])
         self.style.configure('heading.TLabel', relief='ridge', borderwidth=1,
                              padding=(10, 4))
         self.style.configure('manager.TButton', padding=0)
