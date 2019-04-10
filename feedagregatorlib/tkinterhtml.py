@@ -183,7 +183,7 @@ class TkinterHtml(tk.Widget):
         else:
             try:
                 self._images.add(PhotoImage(name=name, data=data))
-            except tk.TclError as e:
+            except Exception as e:
                 logging.error('Error in tkinterhtml: %s\nurl=%s', str(e), url)
                 name = self._image_name_prefix + 'missing'
         return name
