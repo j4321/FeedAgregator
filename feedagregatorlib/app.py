@@ -178,17 +178,22 @@ class App(Tk):
         # --- tray icon menu
         self.icon = TrayIcon(cst.ICON)
         self.menu_widgets = SubMenu(parent=self.icon.menu)
+
         self.menu_categories = SubMenu(parent=self.menu_widgets)
         self.menu_categories.add_command(label=_('Hide all'), command=self.hide_all_cats)
         self.menu_categories.add_command(label=_('Show all'), command=self.hide_all_cats)
+        self.menu_categories.add_separator()
+
         self.menu_feeds = SubMenu(parent=self.menu_widgets)
         self.menu_feeds.add_command(label=_('Hide all'), command=self.hide_all_feeds)
         self.menu_feeds.add_command(label=_('Show all'), command=self.show_all_feeds)
+        self.menu_feeds.add_separator()
 
-        self.menu_widgets.add_cascade(label=_('Categories'), menu=self.menu_categories)
-        self.menu_widgets.add_cascade(label=_('Feeds'), menu=self.menu_feeds)
         self.menu_widgets.add_command(label=_('Hide all'), command=self.hide_all)
         self.menu_widgets.add_command(label=_('Show all'), command=self.show_all)
+        self.menu_widgets.add_separator()
+        self.menu_widgets.add_cascade(label=_('Categories'), menu=self.menu_categories)
+        self.menu_widgets.add_cascade(label=_('Feeds'), menu=self.menu_feeds)
 
         self.icon.menu.add_cascade(label=_('Widgets'), menu=self.menu_widgets)
         self.icon.menu.add_command(label=_('Add feed'), command=self.add)
