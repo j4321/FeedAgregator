@@ -50,8 +50,6 @@ class Config(Toplevel):
 
         self.notebook = Notebook(self)
         self._validate = self.register(self._validate_entry_nb)
-        self._validate_title_size = self.register(lambda *args: self._validate_font_size(self.fonttitle_size, *args))
-        self._validate_text_size = self.register(lambda *args: self._validate_font_size(self.font_size, *args))
 
         self.img_color = PhotoImage(master=self, file=IM_COLOR)
 
@@ -244,20 +242,6 @@ class Config(Toplevel):
         for p in parts:
             b = b and (p == "" or p.isdigit())
         return b
-
-    def _validate_font_size(self, combo, d, ch, V):
-        """Validation of the size entry content."""
-        if d == '1':
-            l = [i for i in self.sizes if i[:len(ch)] == ch]
-            if l:
-                i = self.sizes.index(l[0])
-                combo.current(i)
-                index = combo.index("insert")
-                combo.selection_range(index + 1, "end")
-                combo.icursor(index + 1)
-            return ch.isdigit()
-        else:
-            return True
 
     def change_gui(self):
         showinfo("Information",
