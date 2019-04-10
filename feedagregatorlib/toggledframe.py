@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 FeedAgregator - RSS and Atom feed agregator in desktop widgets + notifications
-Copyright 2018 Juliette Monsel <j_4321@protonmail.com>
+Copyright 2018-2019 Juliette Monsel <j_4321@protonmail.com>
 based on code by RedFantom Copyright (C) 2017
 <https://github.com/RedFantom/ttkwidgets/blob/master/ttkwidgets/frames/toggledframe.py>
 
@@ -41,16 +41,17 @@ class ToggledFrame(Frame):
         self.style.configure(self.toggle_style_name,
                              background=self.style.lookup(self.style_name, 'background'))
         self.style.map(self.toggle_style_name, background=[])
-        self.__checkbutton = Checkbutton(self,
-                                         style=self.toggle_style_name,
-                                         command=self.toggle,
-                                         cursor='arrow')
+        self._checkbutton = Checkbutton(self,
+                                        style=self.toggle_style_name,
+                                        command=self.toggle,
+                                        cursor='arrow')
         self.label = Label(self, text=text, font=font,
                            style=self.style_name.replace('TFrame', 'TLabel'))
         self.interior = Frame(self, style=self.style_name)
         self.interior.grid(row=1, column=1, sticky="nswe", padx=(4, 0))
         self.interior.grid_remove()
         self.label.bind('<Configure>', self._wrap)
+        self.label.bind('<1>', lambda e: self._checkbutton.invoke())
         self._grid_widgets()
         self.bind('<<ThemeChanged>>', self._theme_changed)
 
@@ -62,11 +63,11 @@ class ToggledFrame(Frame):
         self.label.configure(wraplength=self.label.winfo_width())
 
     def _grid_widgets(self):
-        self.__checkbutton.grid(row=0, column=0)
+        self._checkbutton.grid(row=0, column=0)
         self.label.grid(row=0, column=1, sticky="we")
 
     def toggle(self):
-        if 'selected' not in self.__checkbutton.state():
+        if 'selected' not in self._checkbutton.state():
             self.interior.grid_remove()
             self.event_generate("<<ToggledFrameClose>>")
         else:
@@ -74,11 +75,11 @@ class ToggledFrame(Frame):
             self.event_generate("<<ToggledFrameOpen>>")
 
     def open(self):
-        self.__checkbutton.state(('selected',))
+        self._checkbutton.state(('selected',))
         self.interior.grid()
         self.event_generate("<<ToggledFrameOpen>>")
 
     def close(self):
-        self.__checkbutton.state(('!selected',))
+        self._checkbutton.state(('!selected',))
         self.interior.grid_remove()
         self.event_generate("<<ToggledFrameClose>>")
