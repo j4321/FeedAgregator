@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 FeedAgregator - RSS and Atom feed agregator in desktop widgets + notifications
-Copyright 2018 Juliette Monsel <j_4321@protonmail.com>
+Copyright 2018-2019 Juliette Monsel <j_4321@protonmail.com>
 code based on the tkinterhtml module by Aivar Annamaa copyright 2015-2016
 https://pypi.python.org/pypi/tkinterhtml
 
@@ -26,12 +26,14 @@ Wrapper for the Tkhtml widget from http://tkhtml.tcl.tk/tkhtml.html
 
 import traceback
 import warnings
-from urllib.request import urlopen
-from webbrowser import open as webOpen
+import logging
 import tkinter as tk
 from tkinter import ttk
-import logging
+from urllib.request import urlopen
+from webbrowser import open as webOpen
+
 from PIL.ImageTk import PhotoImage
+
 from .constants import IM_IMG_MISSING, CONFIG
 
 

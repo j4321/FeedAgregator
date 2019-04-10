@@ -25,11 +25,13 @@ from tkinter import Toplevel, Menu, StringVar, TclError
 from tkinter import Frame as tkFrame
 from tkinter.ttk import Separator, Menubutton, Button, Label, Frame, \
     Notebook, Entry, Scale, Style, Checkbutton, Combobox
+
+from PIL.ImageTk import PhotoImage
+
 from feedagregatorlib.constants import CONFIG, TOOLKITS, IM_COLOR, APP_NAME,\
     LANGUAGES, REV_LANGUAGES, add_trace, askcolor
 from feedagregatorlib.messagebox import showinfo
 from feedagregatorlib.autocomplete import AutoCompleteCombobox
-from PIL.ImageTk import PhotoImage
 
 
 class Config(Toplevel):

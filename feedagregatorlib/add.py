@@ -2,7 +2,7 @@
 # -*- coding:Utf-8 -*-
 """
 FeedAgregator - RSS and Atom feed agregator in desktop widgets + notifications
-Copyright 2018 Juliette Monsel <j_4321@protonmail.com>
+Copyright 2018-2019 Juliette Monsel <j_4321@protonmail.com>
 
 FeedAgregator is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ Add feed dialog
 """
 from tkinter import Toplevel
 from tkinter.ttk import Label, Entry, Button, Frame
+
 from feedagregatorlib.constants import APP_NAME
 
 

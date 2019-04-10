@@ -46,18 +46,19 @@ Constants and functions
 """
 import pickle
 import os
-from configparser import ConfigParser
-from subprocess import check_output, CalledProcessError
 import warnings
-from bs4 import BeautifulSoup
-from locale import getdefaultlocale
 import gettext
-import babel
-from glob import glob
-from tkinter import colorchooser
 import logging
 from logging.handlers import TimedRotatingFileHandler
+from configparser import ConfigParser
+from subprocess import check_output, CalledProcessError
+from locale import getdefaultlocale
+from glob import glob
+from tkinter import colorchooser
+
+import babel
 from dateutil.tz import gettz
+from bs4 import BeautifulSoup
 
 
 APP_NAME = "FeedAgregator"

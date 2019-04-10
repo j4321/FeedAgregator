@@ -19,14 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Help dialog
 """
-
-
 from tkinter import Text, Toplevel
 from tkinter.ttk import Button
+from webbrowser import open as url_open
+
+from PIL.ImageTk import PhotoImage
+
 from .constants import APP_NAME, IM_ICON_24
 from .autoscrollbar import AutoScrollbar
-from webbrowser import open as url_open
-from PIL.ImageTk import PhotoImage
 
 
 class Help(Toplevel):

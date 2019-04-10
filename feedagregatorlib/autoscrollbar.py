@@ -22,8 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Scrollbar that hide automatically when not needed.
 """
-
-
 from tkinter.ttk import Scrollbar
 from tkinter import TclError
 

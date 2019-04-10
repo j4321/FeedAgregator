@@ -20,11 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Desktop category widget
 """
+import configparser
+import pickle
 from datetime import datetime
 from locale import getlocale
 from tkinter import StringVar, TclError
-import configparser
-import pickle
 
 from babel.dates import format_datetime
 

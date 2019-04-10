@@ -2,7 +2,7 @@
 # -*- coding:Utf-8 -*-
 """
 FeedAgregator - RSS and Atom feed agregator in desktop widgets + notifications
-Copyright 2018 Juliette Monsel <j_4321@protonmail.com>
+Copyright 2018-2019 Juliette Monsel <j_4321@protonmail.com>
 
 FeedAgregator is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,9 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Check for updates
 """
-
-
 import os
+import logging
 try:
     from subprocess import run
 except ImportError:
@@ -31,12 +30,13 @@ from multiprocessing import Process
 from webbrowser import open as webOpen
 from tkinter import Toplevel
 from tkinter.ttk import Label, Button, Frame, Checkbutton
+
+import feedparser
+from PIL.ImageTk import PhotoImage
+
 from feedagregatorlib.constants import CONFIG, save_config, ICONS, \
     IM_ICON_SVG, APP_NAME
 from feedagregatorlib.version import __version__
-import feedparser
-import logging
-from PIL.ImageTk import PhotoImage
 
 
 class UpdateChecker(Toplevel):

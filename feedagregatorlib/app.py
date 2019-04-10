@@ -20,29 +20,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Main class
 """
+import configparser
+import traceback
+import logging
+import os
+import pickle
 try:
     from subprocess import run
 except ImportError:
     from subprocess import call as run
-import configparser
-import traceback
 from multiprocessing import Process, Queue
-import logging
-import os
-import pickle
 from datetime import datetime
 from tkinter import Tk, TclError
 from tkinter import PhotoImage as tkPhotoImage
 from tkinter.ttk import Style
 
-from PIL.ImageTk import PhotoImage
-from PIL import Image
 import feedparser
 import dateutil.parser
+from PIL.ImageTk import PhotoImage
+from PIL import Image
 
+import feedagregatorlib.constants as cst
 from feedagregatorlib.messagebox import showerror
 from feedagregatorlib.trayicon import TrayIcon, SubMenu
-import feedagregatorlib.constants as cst
 from feedagregatorlib.add import Add
 from feedagregatorlib.manager import Manager
 from feedagregatorlib.config import Config

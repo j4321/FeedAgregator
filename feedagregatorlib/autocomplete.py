@@ -21,7 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Combobox with autocompletion
 """
-
 from tkinter import TclError
 from tkinter.ttk import Combobox
 

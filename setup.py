@@ -1,10 +1,9 @@
 #! /usr/bin/python3
 # -*- coding:Utf-8 -*-
 
+import os
 
 from setuptools import setup
-
-import os
 
 images = [os.path.join("feedagregatorlib/images/", img) for img in os.listdir("feedagregatorlib/images/")]
 data_files = [("/usr/share/applications", ["feedagregator.desktop"]),
@@ -26,28 +25,28 @@ setup(name="feedagregator",
       license="GPLv3",
       url="https://github.com/j4321/FeedAgregator/",
       packages=['feedagregatorlib', 'feedagregatorlib.trayicon'],
-      package_data={'feedagregatorlib' : ["packages.tcl"]},
+      package_data={'feedagregatorlib': ["packages.tcl"]},
       scripts=["feedagregator"],
       data_files=data_files,
       classifiers=[
-            'Development Status :: 5 - Production/Stable',
-            'Environment :: X11 Applications',
-            'Intended Audience :: End Users/Desktop',
-            'Topic :: Office/Business',
-            'Topic :: Internet',
-            'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
-            'Programming Language :: Python :: 3',
-            'Programming Language :: Python :: 3.5',
-            'Programming Language :: Python :: 3.6',
-            'Natural Language :: English',
-            'Natural Language :: French',
-            'Operating System :: POSIX :: Linux',
+          'Development Status :: 5 - Production/Stable',
+          'Environment :: X11 Applications',
+          'Intended Audience :: End Users/Desktop',
+          'Topic :: Office/Business',
+          'Topic :: Internet',
+          'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+          'Programming Language :: Python :: 3',
+          'Programming Language :: Python :: 3.5',
+          'Programming Language :: Python :: 3.6',
+          'Natural Language :: English',
+          'Natural Language :: French',
+          'Operating System :: POSIX :: Linux',
       ],
-      long_description=
-"""
+      long_description="""
 FeedAgregator periodically looks for RSS/Atom feed updates.
 If an update is found, a notification is sent. In addition, a desktop
 widget show the latest entry of all feeds and for each feed, a widget
 shows all entries.
 """,
-      install_requires=["babel", "beautifulsoup4", "feedparser", 'pillow', 'python-dateutil', 'ewmh'])
+      install_requires=["babel", "beautifulsoup4", "feedparser", 'pillow',
+                        'python-dateutil', 'ewmh'])

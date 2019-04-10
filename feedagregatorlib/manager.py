@@ -2,7 +2,7 @@
 # -*- coding:Utf-8 -*-
 """
 FeedAgregator - RSS and Atom feed agregator in desktop widgets + notifications
-Copyright 2018 Juliette Monsel <j_4321@protonmail.com>
+Copyright 2018-2019 Juliette Monsel <j_4321@protonmail.com>
 
 FeedAgregator is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,13 +22,15 @@ Feed manager dialog
 """
 from tkinter import Toplevel
 from tkinter.ttk import Entry, Button, Treeview
+
+from PIL.ImageTk import PhotoImage
+
 from feedagregatorlib.constants import FEEDS, IM_MOINS, IM_PLUS, \
     IM_MOINS_SEL, IM_MOINS_CLICKED, APP_NAME, LATESTS, CONFIG
 from feedagregatorlib.add import Add
 from feedagregatorlib.messagebox import askokcancel
 from feedagregatorlib.autoscrollbar import AutoScrollbar
 from feedagregatorlib.autocomplete import AutoCompleteCombobox
-from PIL.ImageTk import PhotoImage
 
 
 class Manager(Toplevel):

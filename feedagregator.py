@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 FeedAgregator - RSS and Atom feed agregator in desktop widgets + notifications
-Copyright 2018 Juliette Monsel <j_4321@protonmail.com>
+Copyright 2018-2019 Juliette Monsel <j_4321@protonmail.com>
 code based on http://effbot.org/zone/tkinter-autoscrollbar.htm
 
 FeedAgregator is free software: you can redistribute it and/or modify
@@ -21,17 +21,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Launch script.
 """
-
-
-from feedagregatorlib.app import App
-from feedagregatorlib.constants import PIDFILE, save_config, save_feeds, APP_NAME, save_latests
 import os
 import sys
 from tkinter import Tk
 from tkinter.ttk import Style
-from feedagregatorlib.messagebox import showerror
 import traceback
 import logging
+
+from feedagregatorlib.messagebox import showerror
+from feedagregatorlib.app import App
+from feedagregatorlib.constants import PIDFILE, save_config, save_feeds, APP_NAME, save_latests
 
 
 # check whether feedagregator is running

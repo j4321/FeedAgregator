@@ -2,7 +2,7 @@
 # -*- coding:Utf-8 -*-
 """
 FeedAgregator - RSS and Atom feed agregator in desktop widgets + notifications
-Copyright 2018 Juliette Monsel <j_4321@protonmail.com>
+Copyright 2018-2019 Juliette Monsel <j_4321@protonmail.com>
 based on code by Michael Lange <klappnase@web.de> copyright 2010
 
 FeedAgregator is free software: you can redistribute it and/or modify
@@ -24,8 +24,8 @@ Tktray is an extension that is able to create system tray icons.
 It follows http://www.freedesktop.org specifications when looking up the
 system tray manager.
 """
-
 import tkinter
+
 from PIL.ImageTk import PhotoImage
 
 

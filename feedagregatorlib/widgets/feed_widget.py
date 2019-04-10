@@ -92,7 +92,6 @@ class FeedWidget(BaseWidget):
 
     def entry_add(self, title, date, summary, url, index=0):
         """Display entry."""
-        print(title)
         tf, l = BaseWidget.entry_add(self, title, date, summary, url)
         if index == -1:
             self.entries.append((tf, l))

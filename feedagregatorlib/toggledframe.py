@@ -22,8 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ToggledFrame class.
 """
-
-
 from tkinter.ttk import Frame, Checkbutton, Style, Label
 
 
