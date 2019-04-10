@@ -10,11 +10,12 @@ Changelog
 -Version 1.3.1
     * Fix widget disappearance in Plasma desktop
     * Fix requirements in setup.py 
+    * Wrap/unwrap entries by clicking anywhere on their titles
 
 -Version 1.3.0
-	* Make image loading timeout customizable
-	* Fix error when an image cannot be loaded
-	* Add help dialog
+    * Make image loading timeout customizable
+    * Fix error when an image cannot be loaded
+    * Add help dialog
     * Improve detection of already running instances (less often ask to delete pidfile)
     
 - Version 1.2.0
