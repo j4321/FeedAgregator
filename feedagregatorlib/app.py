@@ -451,6 +451,7 @@ class App(Tk):
         value = self.cat_widgets[category].variable.get()
         self.menu_categories.set_item_value(category, value)
         LATESTS.set(category, 'visible', str(value))
+        cst.save_latests()
 
     def latests_widget_trace(self, *args):
         value = self.cat_widgets['All'].variable.get()
