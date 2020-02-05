@@ -63,7 +63,7 @@ class Manager(Toplevel):
                           command=lambda: self._sort_column('URL', False))
         self.tree.heading('Category', text=_('Category'),
                           command=lambda: self._sort_column('Category', False))
-        self.tree.column('#0', width=6)
+        self.tree.column('#0', width=14, stretch=False)
         self.tree.column('Title', width=250)
         self.tree.column('URL', width=350)
         self.tree.column('Category', width=150)
@@ -113,7 +113,7 @@ class Manager(Toplevel):
         Toplevel.destroy(self)
 
     def _edit(self, event, item):
-        """Edit feed title."""
+        """Edit feed title / category."""
         column = self.tree.identify_column(event.x)
         if column in ['#1', '#2']:
             bbox = self.tree.bbox(item, column)
