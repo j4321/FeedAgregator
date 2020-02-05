@@ -267,7 +267,10 @@ class App(Tk):
         """Log exceptions."""
         err = "".join(traceback.format_exception(*args))
         logging.error(err)
-        showerror(_("Error"), str(args[1]), err, True)
+        if args[0] is not KeyboardInterrupt:
+            showerror(_("Error"), str(args[1]), err, True)
+        else:
+            self.quit()
 
     def widget_style_init(self):
         """Init widgets style."""
