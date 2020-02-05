@@ -74,29 +74,29 @@ class FeedWidget(BaseWidget):
             self.master.feed_remove(self.name)
 
     def open_all(self):
-        for tf, l in self.entries:
+        for tf, l, b in self.entries:
             tf.open()
         self.update_idletasks()
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
 
     def close_all(self):
-        for tf, l in self.entries:
+        for tf, l, b in self.entries:
             tf.close()
         self.update_idletasks()
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
 
     def clear(self):
-        for tf, l in self.entries:
+        for tf, l, b in self.entries:
             tf.destroy()
         self.entries.clear()
 
     def entry_add(self, title, date, summary, url, index=0):
         """Display entry."""
-        tf, l = BaseWidget.entry_add(self, title, date, summary, url)
+        tf, l, b = BaseWidget.entry_add(self, title, date, summary, url)
         if index == -1:
-            self.entries.append((tf, l))
+            self.entries.append((tf, l, b))
         else:
-            self.entries.insert(index, (tf, l))
+            self.entries.insert(index, (tf, l, b))
 
     def rename(self, event):
 
@@ -122,7 +122,7 @@ class FeedWidget(BaseWidget):
 
     def update_style(self):
         BaseWidget.update_style(self)
-        for tf, l in self.entries:
+        for tf, l, b in self.entries:
             l.set_style(self._stylesheet)
             l.set_font_size(self._font_size)
 
@@ -131,7 +131,7 @@ class FeedWidget(BaseWidget):
             l = reversed(self.entries)
         else:
             l = self.entries
-        for i, (tf, l) in enumerate(l):
+        for i, (tf, l, b) in enumerate(l):
             tf.grid_configure(row=i)
 
     def _sort_trace(self, *args):

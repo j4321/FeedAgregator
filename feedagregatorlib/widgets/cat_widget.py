@@ -25,11 +25,12 @@ import pickle
 from datetime import datetime
 from locale import getlocale
 from tkinter import StringVar, TclError
+from webbrowser import open as webopen
 
 from babel.dates import format_datetime
 
 from feedagregatorlib.constants import CONFIG, FEEDS, LATESTS, add_trace, \
-    feed_get_latest, save_latests
+    feed_get_latest, save_latests, load_data
 from feedagregatorlib.messagebox import askokcancel
 from .base_widget import BaseWidget
 
@@ -65,17 +66,23 @@ class CatWidget(BaseWidget):
             self.menu.add_command(label=_('Remove category'), command=self.remove_cat)
 
     def populate_widget(self):
-        for tf, l in self.entries.values():
+        for tf, l, b in self.entries.values():
             tf.destroy()
         self.entries.clear()
         for title in sorted(FEEDS.sections(), key=lambda x: x.lower()):
             if self.name in ['All', FEEDS.get(title, 'category', fallback='')]:
                 try:
                     filename = FEEDS.get(title, 'data')
-                    latest = feed_get_latest(filename)
+                    latest_data = feed_get_latest(filename)
                 except (configparser.NoOptionError, pickle.UnpicklingError):
                     latest = ''
-                url = FEEDS.get(title, 'url')
+                    url = FEEDS.get(title, 'url')
+                else:
+                    try:
+                        latest, url = latest_data
+                    except ValueError:  # old data
+                        latest, data = load_data(filename)
+                        url = data[0][-1]
                 date = FEEDS.get(title, 'updated')
                 self.entry_add(title, date, latest, url)
         self.sort()
@@ -91,13 +98,13 @@ class CatWidget(BaseWidget):
             self.master.category_remove(self.name)
 
     def open_all(self):
-        for tf, l in self.entries.values():
+        for tf, l, b in self.entries.values():
             tf.open()
         self.update_idletasks()
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
 
     def close_all(self):
-        for tf, l in self.entries.values():
+        for tf, l, b in self.entries.values():
             tf.close()
         self.update_idletasks()
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
@@ -121,14 +128,15 @@ class CatWidget(BaseWidget):
         old_title = self.entries[new_name][0].label.cget('text')
         self.entries[new_name][0].label.configure(text=old_title.replace(old_name, new_name))
 
-    def update_display(self, title, latest, date):
+    def update_display(self, title, latest, date, link):
         formatted_date = format_datetime(datetime.strptime(date, '%Y-%m-%d %H:%M').astimezone(tz=None),
                                          'short', locale=getlocale()[0])
-        tf, l = self.entries[title]
+        tf, l, b = self.entries[title]
         tf.label.configure(text="{} - {}".format(title, formatted_date))
         l.set_content(latest)
         l.set_style(self._stylesheet)
         l.update_idletasks()
+        b.configure(command=lambda: webopen(link))
         if tf.winfo_ismapped():
             try:
                 l.configure(height=l.html.bbox()[-1])
@@ -137,7 +145,7 @@ class CatWidget(BaseWidget):
 
     def update_style(self):
         BaseWidget.update_style(self)
-        for tf, l in self.entries.values():
+        for tf, l, b in self.entries.values():
             l.set_style(self._stylesheet)
             l.set_font_size(self._font_size)
 

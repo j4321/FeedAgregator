@@ -263,6 +263,12 @@ class App(Tk):
 
         self.bind_class('TEntry', '<Control-a>', self.entry_select_all)
 
+    def report_callback_exception(self, *args):
+        """Log exceptions."""
+        err = "".join(traceback.format_exception(*args))
+        logging.error(err)
+        showerror(_("Error"), str(args[1]), err, True)
+
     def widget_style_init(self):
         """Init widgets style."""
         bg = CONFIG.get('Widget', 'background', fallback='gray10')
@@ -340,6 +346,97 @@ class App(Tk):
 
         self.update_idletasks()
 
+    @staticmethod
+    def entry_select_all(event):
+        event.widget.selection_clear()
+        event.widget.selection_range(0, 'end')
+
+    def test_connection(self):
+        """
+        Launch update check if there is an internet connection otherwise
+        check again for an internet connection after 30s.
+        """
+        if cst.internet_on():
+            logging.info('Connected to Internet')
+            self._notify_no_internet = True
+            for widget in self.feed_widgets.values():
+                widget.clear()
+            self.feed_init()
+        else:
+            self._internet_id = self.after(30000, self.test_connection)
+
+    def start_stop(self):
+        """Suspend / restart update checks."""
+        if self.icon.menu.get_item_label(4) == _("Suspend"):
+            after_ids = [self._update_id, self._check_add_id, self._internet_id,
+                         self._check_end_update_id, self._update_id]
+            after_ids.extend(self._check_result_update_id.values())
+            after_ids.extend(self._check_result_init_id.values())
+            for after_id in after_ids:
+                try:
+                    self.after_cancel(after_id)
+                except ValueError:
+                    pass
+            self.icon.menu.set_item_label(4, _("Restart"))
+            self.icon.menu.disable_item(1)
+            self.icon.menu.disable_item(2)
+            self.icon.change_icon(cst.ICON_DISABLED, 'feedagregator suspended')
+        else:
+            self.icon.menu.set_item_label(4, _("Suspend"))
+            self.icon.menu.enable_item(1)
+            self.icon.menu.enable_item(2)
+            self.icon.change_icon(cst.ICON, 'feedagregator')
+            for widget in self.feed_widgets.values():
+                widget.clear()
+            self.feed_init()
+
+    def settings(self):
+        update_delay = CONFIG.get('General', 'update_delay')
+        splash_supp = CONFIG.get('General', 'splash_supported', fallback=True)
+        dialog = Config(self)
+        self.wait_window(dialog)
+        cst.save_config()
+        self.widget_style_init()
+        splash_change = splash_supp != CONFIG.get('General', 'splash_supported')
+        for widget in self.cat_widgets.values():
+            widget.update_style()
+            if splash_change:
+                widget.update_position()
+        for widget in self.feed_widgets.values():
+            widget.update_style()
+            if splash_change:
+                widget.update_position()
+        if update_delay != CONFIG.get('General', 'update_delay'):
+            self.feed_update()
+
+    def add(self):
+        dialog = Add(self)
+        self.wait_window(dialog)
+        url = dialog.url
+        self.feed_add(url)
+
+    def quit(self):
+        for after_id in self.tk.call('after', 'info'):
+            try:
+                self.after_cancel(after_id)
+            except ValueError:
+                pass
+        for thread in self.threads.values():
+            try:
+                thread.terminate()
+            except AttributeError:
+                pass
+        for title, widget in self.feed_widgets.items():
+            FEEDS.set(title, 'visible', str(widget.variable.get()))
+        for cat, widget in self.cat_widgets.items():
+            LATESTS.set(cat, 'visible', str(widget.variable.get()))
+        try:
+            self.destroy()
+        except TclError:
+            logging.error("Error on quit")
+            self.after(500, self.quit)
+
+    # --- hide / show
     def hide_all(self):
         """Withdraw all widgets."""
         for widget in self.cat_widgets.values():
@@ -376,71 +473,7 @@ class App(Tk):
             if cat != 'All':
                 widget.deiconify()
 
-    def start_stop(self):
-        """Suspend / restart update checks."""
-        if self.icon.menu.get_item_label(4) == _("Suspend"):
-            after_ids = [self._update_id, self._check_add_id, self._internet_id,
-                         self._check_end_update_id, self._update_id]
-            after_ids.extend(self._check_result_update_id.values())
-            after_ids.extend(self._check_result_init_id.values())
-            for after_id in after_ids:
-                try:
-                    self.after_cancel(after_id)
-                except ValueError:
-                    pass
-            self.icon.menu.set_item_label(4, _("Restart"))
-            self.icon.menu.disable_item(1)
-            self.icon.menu.disable_item(2)
-            self.icon.change_icon(cst.ICON_DISABLED, 'feedagregator suspended')
-        else:
-            self.icon.menu.set_item_label(4, _("Suspend"))
-            self.icon.menu.enable_item(1)
-            self.icon.menu.enable_item(2)
-            self.icon.change_icon(cst.ICON, 'feedagregator')
-            for widget in self.feed_widgets.values():
-                widget.clear()
-            self.feed_init()
-
-    @staticmethod
-    def entry_select_all(event):
-        event.widget.selection_clear()
-        event.widget.selection_range(0, 'end')
-
-    def test_connection(self):
-        """
-        Launch update check if there is an internet connection otherwise
-        check again for an internet connection after 30s.
-        """
-        if cst.internet_on():
-            logging.info('Connected to Internet')
-            self._notify_no_internet = True
-            for widget in self.feed_widgets.values():
-                widget.clear()
-            self.feed_init()
-        else:
-            self._internet_id = self.after(30000, self.test_connection)
-
-    def quit(self):
-        for after_id in self.tk.call('after', 'info'):
-            try:
-                self.after_cancel(after_id)
-            except ValueError:
-                pass
-        for thread in self.threads.values():
-            try:
-                thread.terminate()
-            except AttributeError:
-                pass
-        for title, widget in self.feed_widgets.items():
-            FEEDS.set(title, 'visible', str(widget.variable.get()))
-        for cat, widget in self.cat_widgets.items():
-            LATESTS.set(cat, 'visible', str(widget.variable.get()))
-        try:
-            self.destroy()
-        except TclError:
-            logging.error("Error on quit")
-            self.after(500, self.quit)
-
+    # --- visibility trace
     def feed_widget_trace(self, title):
         value = self.feed_widgets[title].variable.get()
         self.menu_feeds.set_item_value(title, value)
@@ -459,6 +492,7 @@ class App(Tk):
         LATESTS.set('All', 'visible', str(value))
         cst.save_latests()
 
+    # --- toggle visibility
     def toggle_category_widget(self, category):
         value = self.menu_categories.get_item_value(category)
         if value:
@@ -483,37 +517,7 @@ class App(Tk):
             self.feed_widgets[title].withdraw()
         self.update_idletasks()
 
-    def report_callback_exception(self, *args):
-        """Log exceptions."""
-        err = "".join(traceback.format_exception(*args))
-        logging.error(err)
-        showerror(_("Error"), str(args[1]), err, True)
-
-    def settings(self):
-        update_delay = CONFIG.get('General', 'update_delay')
-        splash_supp = CONFIG.get('General', 'splash_supported', fallback=True)
-        dialog = Config(self)
-        self.wait_window(dialog)
-        cst.save_config()
-        self.widget_style_init()
-        splash_change = splash_supp != CONFIG.get('General', 'splash_supported')
-        for widget in self.cat_widgets.values():
-            widget.update_style()
-            if splash_change:
-                widget.update_position()
-        for widget in self.feed_widgets.values():
-            widget.update_style()
-            if splash_change:
-                widget.update_position()
-        if update_delay != CONFIG.get('General', 'update_delay'):
-            self.feed_update()
-
-    def add(self):
-        dialog = Add(self)
-        self.wait_window(dialog)
-        url = dialog.url
-        self.feed_add(url)
-
+    # --- categories
     def category_remove(self, category):
         self.cat_widgets[category].destroy()
         del self.cat_widgets[category]
@@ -522,6 +526,7 @@ class App(Tk):
         cst.save_feeds()
         cst.save_latests()
 
+    # --- feeds
     @staticmethod
     def feed_get_info(url, queue, mode='latest'):
         feed = feedparser.parse(url)
@@ -555,73 +560,10 @@ class App(Tk):
                 else:
                     date = entry.get('published', today)
                 date = dateutil.parser.parse(date, tzinfos=cst.TZINFOS).strftime('%Y-%m-%d %H:%M')
-                link = entry.get('link', '')
-                data.append((title, date, summary, link))
-            queue.put((feed_title, latest, updated, data))
+                data.append((title, date, summary, entry.get('link', '')))
+            queue.put((feed_title, latest, updated, data, link))
         else:
             queue.put((feed_title, latest, updated, entry_title, summary, link))
-
-    def _check_result_add(self, thread, queue, url, manager_queue=None):
-        if thread.is_alive():
-            self._check_add_id = self.after(1000, self._check_result_add,
-                                            thread, queue, url, manager_queue)
-        else:
-            title, latest, date, data = queue.get(False)
-            if title:
-                try:
-                    # check if feed's title already exists
-                    FEEDS.add_section(title)
-                except configparser.DuplicateSectionError:
-                    i = 2
-                    duplicate = True
-                    while duplicate:
-                        # increment i until title~#i does not already exist
-                        try:
-                            FEEDS.add_section("{}~#{}".format(title, i))
-                        except configparser.DuplicateSectionError:
-                            i += 1
-                        else:
-                            duplicate = False
-                            name = "{}~#{}".format(title, i)
-                else:
-                    name = title
-                if manager_queue is not None:
-                    manager_queue.put(name)
-                logging.info("Added feed '%s' %s", name, url)
-                if CONFIG.getboolean("General", "notifications", fallback=True):
-                    run(["notify-send", "-i", cst.IM_ICON_SVG, name,
-                         cst.html2text(latest)])
-                self.cat_widgets['All'].entry_add(name, date, latest, url)
-                filename = cst.new_data_file()
-                cst.save_data(filename, latest, data)
-                FEEDS.set(name, 'url', url)
-                FEEDS.set(name, 'updated', date)
-                FEEDS.set(name, 'data', filename)
-                FEEDS.set(name, 'visible', 'True')
-                FEEDS.set(name, 'geometry', '')
-                FEEDS.set(name, 'position', 'normal')
-                FEEDS.set(name, 'category', '')
-                FEEDS.set(name, 'sort_is_reversed', 'False')
-                FEEDS.set(name, 'active', 'True')
-                cst.save_feeds()
-                self.queues[name] = queue
-                self.feed_widgets[name] = FeedWidget(self, name)
-                self.menu_feeds.add_checkbutton(label=name,
-                                                command=lambda: self.toggle_feed_widget(name))
-                cst.add_trace(self.feed_widgets[name].variable, 'write',
-                              lambda *args: self.feed_widget_trace(name))
-                self.feed_widgets[name].variable.set(True)
-                for entry_title, date, summary, link in data:
-                    self.feed_widgets[name].entry_add(entry_title, date, summary, link, -1)
-            else:
-                if manager_queue is not None:
-                    manager_queue.put('')
-                if cst.internet_on():
-                    logging.error('%s is not a valid feed.', url)
-                    showerror(_('Error'), _('{url} is not a valid feed.').format(url=url))
-                else:
-                    logging.warning('No Internet connection.')
-                    showerror(_('Error'), _('No Internet connection.'))
 
     def feed_add(self, url, manager=False):
         """
@@ -680,13 +622,19 @@ class App(Tk):
                 else:
                     try:
                         filename = FEEDS.get(title, 'data')
-                        latest = cst.feed_get_latest(filename)
+                        latest_data = cst.feed_get_latest(filename)
                     except (configparser.NoOptionError, pickle.UnpicklingError):
                         latest = ''
+                        link = FEEDS.get(title, 'url')
+                    else:
+                        try:
+                            latest, link = latest_data
+                        except ValueError:  # old data
+                            latest, data = cst.load_data(filename)
+                            link = data[0][-1]
                     self.cat_widgets[new_cat].entry_add(title,
                                                         FEEDS.get(title, 'updated'),
-                                                        latest,
-                                                        FEEDS.get(title, 'url'))
+                                                        latest, link)
 
     def feed_rename(self, old_name, new_name):
         options = {opt: FEEDS.get(old_name, opt) for opt in FEEDS.options(old_name)}
@@ -785,13 +733,40 @@ class App(Tk):
                 self._check_result_init(title)
         self._check_end_update_id = self.after(2000, self._check_end_update)
 
+    def _feed_update(self, title):
+        """Update feed with given title."""
+        logging.info("Updating feed '%s'", title)
+        self.threads[title] = Process(target=self.feed_get_info,
+                                      args=(FEEDS.get(title, 'url'),
+                                            self.queues[title]),
+                                      daemon=True)
+        self.threads[title].start()
+        self._check_result_update(title)
+
+    def feed_update(self):
+        """Update all feeds."""
+        try:
+            self.after_cancel(self._update_id)
+        except ValueError:
+            pass
+        for thread in self.threads.values():
+            try:
+                thread.terminate()
+            except AttributeError:
+                pass
+        self.threads.clear()
+        for title in FEEDS.sections():
+            if FEEDS.getboolean(title, 'active', fallback=True):
+                self._feed_update(title)
+        self._check_end_update_id = self.after(2000, self._check_end_update)
+
     def _check_result_init(self, title):
         if self.threads[title].is_alive():
             self._check_result_init_id[title] = self.after(1000,
                                                            self._check_result_init,
                                                            title)
         else:
-            t, latest, updated, data = self.queues[title].get()
+            t, latest, updated, data, link = self.queues[title].get()
             if not t:
                 if cst.internet_on():
                     run(["notify-send", "-i", "dialog-error", _("Error"),
@@ -822,13 +797,13 @@ class App(Tk):
                              cst.html2text(latest)])
                     FEEDS.set(title, 'updated', updated)
                     category = FEEDS.get(title, 'category', fallback='')
-                    self.cat_widgets['All'].update_display(title, latest, updated)
+                    self.cat_widgets['All'].update_display(title, latest, updated, link)
                     if category != '':
-                        self.cat_widgets[category].update_display(title, latest, updated)
+                        self.cat_widgets[category].update_display(title, latest, updated, link)
                     logging.info("Updated feed '%s'", title)
                     self.feed_widgets[title].clear()
-                    for entry_title, date, summary, link in data:
-                        self.feed_widgets[title].entry_add(entry_title, date, summary, link, -1)
+                    for entry_title, date, summary, entry_link in data:
+                        self.feed_widgets[title].entry_add(entry_title, date, summary, entry_link, -1)
                     logging.info("Populated widget for feed '%s'", title)
                     self.feed_widgets[title].event_generate('<Configure>')
                     self.feed_widgets[title].sort_by_date()
@@ -838,36 +813,9 @@ class App(Tk):
                         filename = cst.new_data_file()
                         FEEDS.set(title, 'data', filename)
                         cst.save_feeds()
-                    cst.save_data(filename, latest, data)
+                    cst.save_data(filename, (latest, link), data)
                 else:
                     logging.info("Feed '%s' is up-to-date", title)
-
-    def _feed_update(self, title):
-        """Update feed with given title."""
-        logging.info("Updating feed '%s'", title)
-        self.threads[title] = Process(target=self.feed_get_info,
-                                      args=(FEEDS.get(title, 'url'),
-                                            self.queues[title]),
-                                      daemon=True)
-        self.threads[title].start()
-        self._check_result_update(title)
-
-    def feed_update(self):
-        """Update all feeds."""
-        try:
-            self.after_cancel(self._update_id)
-        except ValueError:
-            pass
-        for thread in self.threads.values():
-            try:
-                thread.terminate()
-            except AttributeError:
-                pass
-        self.threads.clear()
-        for title in FEEDS.sections():
-            if FEEDS.getboolean(title, 'active', fallback=True):
-                self._feed_update(title)
-        self._check_end_update_id = self.after(2000, self._check_end_update)
 
     def _check_result_update(self, title):
         if self.threads[title].is_alive():
@@ -906,9 +854,9 @@ class App(Tk):
                              cst.html2text(latest)])
                     FEEDS.set(title, 'updated', updated)
                     category = FEEDS.get(title, 'category', fallback='')
-                    self.cat_widgets['All'].update_display(title, latest, updated)
+                    self.cat_widgets['All'].update_display(title, latest, updated, link)
                     if category != '':
-                        self.cat_widgets[category].update_display(title, latest, updated)
+                        self.cat_widgets[category].update_display(title, latest, updated, link)
                     self.feed_widgets[title].entry_add(entry_title, updated,
                                                        summary, link, 0)
                     self.feed_widgets[title].sort_by_date()
@@ -916,16 +864,78 @@ class App(Tk):
                         filename = FEEDS.get(title, 'data')
                         old, data = cst.load_data(filename)
                     except pickle.UnpicklingError:
-                        cst.save_data(filename, latest, [(entry_title, updated, summary, link)])
+                        cst.save_data(filename, (latest, link), [(entry_title, updated, summary, link)])
                     except configparser.NoOptionError:
                         filename = cst.new_data_file()
                         FEEDS.set(title, 'data', filename)
-                        cst.save_data(filename, latest, [(entry_title, updated, summary, link)])
+                        cst.save_data(filename, (latest, link), [(entry_title, updated, summary, link)])
                     else:
                         data.insert(0, (entry_title, updated, summary, link))
-                        cst.save_data(filename, latest, data)
+                        cst.save_data(filename, (latest, link), data)
                 else:
                     logging.info("Feed '%s' is up-to-date", title)
+
+    def _check_result_add(self, thread, queue, url, manager_queue=None):
+        if thread.is_alive():
+            self._check_add_id = self.after(1000, self._check_result_add,
+                                            thread, queue, url, manager_queue)
+        else:
+            title, latest, date, data, link = queue.get(False)
+            if title:
+                try:
+                    # check if feed's title already exists
+                    FEEDS.add_section(title)
+                except configparser.DuplicateSectionError:
+                    i = 2
+                    duplicate = True
+                    while duplicate:
+                        # increment i until title~#i does not already exist
+                        try:
+                            FEEDS.add_section("{}~#{}".format(title, i))
+                        except configparser.DuplicateSectionError:
+                            i += 1
+                        else:
+                            duplicate = False
+                            name = "{}~#{}".format(title, i)
+                else:
+                    name = title
+                if manager_queue is not None:
+                    manager_queue.put(name)
+                logging.info("Added feed '%s' %s", name, url)
+                if CONFIG.getboolean("General", "notifications", fallback=True):
+                    run(["notify-send", "-i", cst.IM_ICON_SVG, name,
+                         cst.html2text(latest)])
+                self.cat_widgets['All'].entry_add(name, date, latest, link)
+                filename = cst.new_data_file()
+                cst.save_data(filename, (latest, link), data)
+                FEEDS.set(name, 'url', url)
+                FEEDS.set(name, 'updated', date)
+                FEEDS.set(name, 'data', filename)
+                FEEDS.set(name, 'visible', 'True')
+                FEEDS.set(name, 'geometry', '')
+                FEEDS.set(name, 'position', 'normal')
+                FEEDS.set(name, 'category', '')
+                FEEDS.set(name, 'sort_is_reversed', 'False')
+                FEEDS.set(name, 'active', 'True')
+                cst.save_feeds()
+                self.queues[name] = queue
+                self.feed_widgets[name] = FeedWidget(self, name)
+                self.menu_feeds.add_checkbutton(label=name,
+                                                command=lambda: self.toggle_feed_widget(name))
+                cst.add_trace(self.feed_widgets[name].variable, 'write',
+                              lambda *args: self.feed_widget_trace(name))
+                self.feed_widgets[name].variable.set(True)
+                for entry_title, date, summary, entry_link in data:
+                    self.feed_widgets[name].entry_add(entry_title, date, summary, entry_link, -1)
+            else:
+                if manager_queue is not None:
+                    manager_queue.put('')
+                if cst.internet_on():
+                    logging.error('%s is not a valid feed.', url)
+                    showerror(_('Error'), _('{url} is not a valid feed.').format(url=url))
+                else:
+                    logging.warning('No Internet connection.')
+                    showerror(_('Error'), _('No Internet connection.'))
 
     def _check_end_update(self):
         b = [t.is_alive() for t in self.threads.values() if t is not None]

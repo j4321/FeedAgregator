@@ -195,12 +195,13 @@ class BaseWidget(Toplevel):
         tf.interior.rowconfigure(0, weight=1)
         tf.interior.columnconfigure(0, weight=1)
         l.grid(padx=4, sticky='eswn')
-        Button(tf.interior, text='Open', style='widget.TButton',
-               command=lambda: webopen(url)).grid(pady=4, padx=6, sticky='e')
+        b = Button(tf.interior, text='Open', style='widget.TButton',
+                   command=lambda: webopen(url))
+        b.grid(pady=4, padx=6, sticky='e')
         tf.grid(sticky='we', row=len(self.entries), pady=2, padx=(8, 4))
         tf.bind("<<ToggledFrameOpen>>", unwrap)
         l.bind("<Configure>", resize)
-        return tf, l
+        return tf, l, b
 
     def update_position(self):
         if self._position.get() == 'normal':
