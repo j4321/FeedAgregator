@@ -258,3 +258,5 @@ class Manager(Toplevel):
 
                 self.change_made = True
             self.configure(cursor='arrow')
+            self.focus_set()
+            self.grab_set()

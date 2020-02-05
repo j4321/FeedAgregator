@@ -117,6 +117,7 @@ else:
     CONFIG.set("General", "confirm_feed_remove", "True")
     CONFIG.set("General", "categories", "")
     CONFIG.set("General", "splash_supported", str(os.environ.get('DESKTOP_SESSION') != 'plasma'))
+    CONFIG.set("General", "notifications", "True")
     CONFIG.add_section("Widget")
     CONFIG.set("Widget", "alpha", "80")
     CONFIG.set("Widget", 'font', 'Liberation\ Sans 10')

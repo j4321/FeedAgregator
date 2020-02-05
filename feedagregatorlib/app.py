@@ -451,6 +451,7 @@ class App(Tk):
         value = self.cat_widgets[category].variable.get()
         self.menu_categories.set_item_value(category, value)
         LATESTS.set(category, 'visible', str(value))
+        cst.save_latests()
 
     def latests_widget_trace(self, *args):
         value = self.cat_widgets['All'].variable.get()
@@ -587,8 +588,9 @@ class App(Tk):
                 if manager_queue is not None:
                     manager_queue.put(name)
                 logging.info("Added feed '%s' %s", name, url)
-                run(["notify-send", "-i", cst.IM_ICON_SVG, name,
-                     cst.html2text(latest)])
+                if CONFIG.getboolean("General", "notifications", fallback=True):
+                    run(["notify-send", "-i", cst.IM_ICON_SVG, name,
+                         cst.html2text(latest)])
                 self.cat_widgets['All'].entry_add(name, date, latest, url)
                 filename = cst.new_data_file()
                 cst.save_data(filename, latest, data)
@@ -813,10 +815,11 @@ class App(Tk):
                             pass
             else:
                 date = datetime.strptime(updated, '%Y-%m-%d %H:%M')
-                if (date > datetime.strptime(FEEDS.get(title, 'updated'), '%Y-%m-%d %H:%M') or
-                   not FEEDS.has_option(title, 'data')):
-                    run(["notify-send", "-i", cst.IM_ICON_SVG, title,
-                         cst.html2text(latest)])
+                if (date > datetime.strptime(FEEDS.get(title, 'updated'), '%Y-%m-%d %H:%M')
+                   or not FEEDS.has_option(title, 'data')):
+                    if CONFIG.getboolean("General", "notifications", fallback=True):
+                        run(["notify-send", "-i", cst.IM_ICON_SVG, title,
+                             cst.html2text(latest)])
                     FEEDS.set(title, 'updated', updated)
                     category = FEEDS.get(title, 'category', fallback='')
                     self.cat_widgets['All'].update_display(title, latest, updated)
@@ -898,8 +901,9 @@ class App(Tk):
                 date = datetime.strptime(updated, '%Y-%m-%d %H:%M')
                 if date > datetime.strptime(FEEDS.get(title, 'updated'), '%Y-%m-%d %H:%M'):
                     logging.info("Updated feed '%s'", title)
-                    run(["notify-send", "-i", cst.IM_ICON_SVG, title,
-                         cst.html2text(latest)])
+                    if CONFIG.getboolean("General", "notifications", fallback=True):
+                        run(["notify-send", "-i", cst.IM_ICON_SVG, title,
+                             cst.html2text(latest)])
                     FEEDS.set(title, 'updated', updated)
                     category = FEEDS.get(title, 'category', fallback='')
                     self.cat_widgets['All'].update_display(title, latest, updated)

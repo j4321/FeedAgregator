@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-24 23:35+0100\n"
+"POT-Creation-Date: 2019-05-03 14:47+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,270 +16,6 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: feedagregator.py:53 feedagregator.py:69 feedagregatorlib/app.py:482
-#: feedagregatorlib/app.py:606 feedagregatorlib/app.py:609
-#: feedagregatorlib/app.py:782 feedagregatorlib/app.py:787
-#: feedagregatorlib/app.py:865 feedagregatorlib/app.py:870
-msgid "Error"
-msgstr ""
-
-#: feedagregator.py:53
-#, python-brace-format
-msgid ""
-"{app_name} is already running, if not delete ~/.feedagregator/feedagregator."
-"pid."
-msgstr ""
-
-#: feedagregatorlib/config.py:38 feedagregatorlib/app.py:197
-msgid "Settings"
-msgstr ""
-
-#: feedagregatorlib/config.py:63 feedagregatorlib/add.py:43
-msgid "Ok"
-msgstr ""
-
-#: feedagregatorlib/config.py:66 feedagregatorlib/add.py:47
-#: feedagregatorlib/messagebox.py:257 feedagregatorlib/messagebox.py:378
-msgid "Cancel"
-msgstr ""
-
-#: feedagregatorlib/config.py:73 feedagregatorlib/config.py:303
-msgid "General"
-msgstr ""
-
-#: feedagregatorlib/config.py:75
-msgid "Language"
-msgstr ""
-
-#: feedagregatorlib/config.py:93
-msgid "GUI Toolkit for the system tray icon"
-msgstr ""
-
-#: feedagregatorlib/config.py:110
-msgid "Feed update delay (min)"
-msgstr ""
-
-#: feedagregatorlib/config.py:120
-msgid "Image loading timeout (s)"
-msgstr ""
-
-#: feedagregatorlib/config.py:130
-msgid "Show confirmation dialog before removing feed"
-msgstr ""
-
-#: feedagregatorlib/config.py:138
-msgid "Show confirmation dialog before removing category"
-msgstr ""
-
-#: feedagregatorlib/config.py:146
-msgid "Check for updates on start-up"
-msgstr ""
-
-#: feedagregatorlib/config.py:155
-msgid "Check this box if the widgets disappear when you click"
-msgstr ""
-
-#: feedagregatorlib/config.py:164
-msgid "Widget"
-msgstr ""
-
-#: feedagregatorlib/config.py:171 feedagregatorlib/config.py:233
-msgid "Sample text"
-msgstr ""
-
-#: feedagregatorlib/config.py:214
-msgid "Bold"
-msgstr ""
-
-#: feedagregatorlib/config.py:217
-msgid "Italic"
-msgstr ""
-
-#: feedagregatorlib/config.py:220
-msgid "Underline"
-msgstr ""
-
-#: feedagregatorlib/config.py:269 feedagregatorlib/manager.py:58
-msgid "Title"
-msgstr ""
-
-#: feedagregatorlib/config.py:275
-msgid "Text"
-msgstr ""
-
-#: feedagregatorlib/config.py:288
-msgid "Opacity"
-msgstr ""
-
-#: feedagregatorlib/config.py:304 feedagregatorlib/config.py:315
-msgid "Background color"
-msgstr ""
-
-#: feedagregatorlib/config.py:307 feedagregatorlib/config.py:318
-msgid "Foreground color"
-msgstr ""
-
-#: feedagregatorlib/config.py:314
-msgid "Feed entry"
-msgstr ""
-
-#: feedagregatorlib/config.py:321
-msgid "Link color"
-msgstr ""
-
-#: feedagregatorlib/config.py:347
-msgid "Font"
-msgstr ""
-
-#: feedagregatorlib/config.py:353
-msgid "Colors"
-msgstr ""
-
-#: feedagregatorlib/config.py:359 feedagregatorlib/config.py:361
-msgid "Color"
-msgstr ""
-
-#: feedagregatorlib/config.py:370
-msgid "The language setting will take effect after restarting the application"
-msgstr ""
-
-#: feedagregatorlib/config.py:404
-msgid ""
-"The GUI Toolkit setting will take effect after restarting the application"
-msgstr ""
-
-#: feedagregatorlib/about.py:37
-#, python-brace-format
-msgid "About {app_name}"
-msgstr ""
-
-#: feedagregatorlib/about.py:43 feedagregatorlib/help.py:56
-msgid "RSS and Atom feed agregator in desktop widgets + notifications"
-msgstr ""
-
-#: feedagregatorlib/about.py:46 feedagregatorlib/about.py:71
-msgid "License"
-msgstr ""
-
-#: feedagregatorlib/about.py:47 feedagregatorlib/about.py:97
-#: feedagregatorlib/help.py:103
-msgid "Close"
-msgstr ""
-
-#: feedagregatorlib/about.py:80
-#, python-brace-format
-msgid ""
-"{app_name} is free software: you can redistribute it and/or modify it under "
-"the terms of the GNU General Public License as published by the Free "
-"Software Foundation, either version 3 of the License, or (at your option) "
-"any later version.\n"
-"\n"
-msgstr ""
-
-#: feedagregatorlib/about.py:82
-#, python-brace-format
-msgid ""
-"{app_name} is distributed in the hope that it will be useful, but WITHOUT "
-"ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or "
-"FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for "
-"more details.\n"
-"\n"
-msgstr ""
-
-#: feedagregatorlib/about.py:84
-msgid ""
-"You should have received a copy of the GNU General Public License along with "
-"this program. If not, see http://www.gnu.org/licenses/."
-msgstr ""
-
-#: feedagregatorlib/cat_widget.py:81 feedagregatorlib/feed_widget.py:77
-msgid "Oldest first"
-msgstr ""
-
-#: feedagregatorlib/cat_widget.py:84 feedagregatorlib/feed_widget.py:81
-msgid "Most recent first"
-msgstr ""
-
-#: feedagregatorlib/cat_widget.py:88 feedagregatorlib/feed_widget.py:86
-msgid "Normal"
-msgstr ""
-
-#: feedagregatorlib/cat_widget.py:90 feedagregatorlib/feed_widget.py:88
-msgid "Above"
-msgstr ""
-
-#: feedagregatorlib/cat_widget.py:92 feedagregatorlib/feed_widget.py:90
-msgid "Below"
-msgstr ""
-
-#: feedagregatorlib/cat_widget.py:94 feedagregatorlib/feed_widget.py:92
-msgid "Sort"
-msgstr ""
-
-#: feedagregatorlib/cat_widget.py:95 feedagregatorlib/feed_widget.py:93
-msgid "Position"
-msgstr ""
-
-#: feedagregatorlib/cat_widget.py:96 feedagregatorlib/feed_widget.py:94
-msgid "Hide"
-msgstr ""
-
-#: feedagregatorlib/cat_widget.py:97 feedagregatorlib/feed_widget.py:95
-msgid "Open all"
-msgstr ""
-
-#: feedagregatorlib/cat_widget.py:98 feedagregatorlib/feed_widget.py:96
-msgid "Close all"
-msgstr ""
-
-#: feedagregatorlib/cat_widget.py:100
-msgid "Remove category"
-msgstr ""
-
-#: feedagregatorlib/cat_widget.py:103
-msgid "Feeds: Latests"
-msgstr ""
-
-#: feedagregatorlib/cat_widget.py:103
-#, python-brace-format
-msgid "Feeds: {category}"
-msgstr ""
-
-#: feedagregatorlib/cat_widget.py:164 feedagregatorlib/manager.py:184
-#: feedagregatorlib/feed_widget.py:168
-msgid "Confirmation"
-msgstr ""
-
-#: feedagregatorlib/cat_widget.py:165
-#, python-brace-format
-msgid "Do you want to remove the category {category}?"
-msgstr ""
-
-#: feedagregatorlib/manager.py:37
-msgid "Manage Feeds"
-msgstr ""
-
-#: feedagregatorlib/manager.py:60 feedagregatorlib/add.py:36
-msgid "URL"
-msgstr ""
-
-#: feedagregatorlib/manager.py:62
-msgid "Category"
-msgstr ""
-
-#: feedagregatorlib/manager.py:185 feedagregatorlib/feed_widget.py:169
-#, python-brace-format
-msgid "Do you want to remove the feed {feed}?"
-msgstr ""
-
-#: feedagregatorlib/feed_widget.py:97
-msgid "Remove feed"
-msgstr ""
-
-#: feedagregatorlib/add.py:31
-msgid "Add Feed"
-msgstr ""
 
 #: feedagregatorlib/version_check.py:47 feedagregatorlib/version_check.py:96
 msgid "Update"
@@ -311,12 +47,86 @@ msgstr ""
 msgid "{app_name} is up-to-date."
 msgstr ""
 
-#: feedagregatorlib/messagebox.py:172
-msgid "Please report this bug on "
+#: feedagregatorlib/widgets/cat_widget.py:44
+msgid "Feeds: Latests"
 msgstr ""
 
-#: feedagregatorlib/help.py:39 feedagregatorlib/app.py:200
+#: feedagregatorlib/widgets/cat_widget.py:44
+#, python-brace-format
+msgid "Feeds: {category}"
+msgstr ""
+
+#: feedagregatorlib/widgets/cat_widget.py:58
+#: feedagregatorlib/widgets/feed_widget.py:48
+msgid "Oldest first"
+msgstr ""
+
+#: feedagregatorlib/widgets/cat_widget.py:61
+#: feedagregatorlib/widgets/feed_widget.py:52
+msgid "Most recent first"
+msgstr ""
+
+#: feedagregatorlib/widgets/cat_widget.py:65
+msgid "Remove category"
+msgstr ""
+
+#: feedagregatorlib/widgets/cat_widget.py:86
+#: feedagregatorlib/widgets/feed_widget.py:71 feedagregatorlib/manager.py:186
+msgid "Confirmation"
+msgstr ""
+
+#: feedagregatorlib/widgets/cat_widget.py:87
+#, python-brace-format
+msgid "Do you want to remove the category {category}?"
+msgstr ""
+
+#: feedagregatorlib/widgets/base_widget.py:143
+msgid "Normal"
+msgstr ""
+
+#: feedagregatorlib/widgets/base_widget.py:145
+msgid "Above"
+msgstr ""
+
+#: feedagregatorlib/widgets/base_widget.py:147
+msgid "Below"
+msgstr ""
+
+#: feedagregatorlib/widgets/base_widget.py:149
+msgid "Sort"
+msgstr ""
+
+#: feedagregatorlib/widgets/base_widget.py:150
+msgid "Position"
+msgstr ""
+
+#: feedagregatorlib/widgets/base_widget.py:151
+msgid "Hide"
+msgstr ""
+
+#: feedagregatorlib/widgets/base_widget.py:152
+msgid "Open all"
+msgstr ""
+
+#: feedagregatorlib/widgets/base_widget.py:153
+msgid "Close all"
+msgstr ""
+
+#: feedagregatorlib/widgets/feed_widget.py:56
+msgid "Remove feed"
+msgstr ""
+
+#: feedagregatorlib/widgets/feed_widget.py:72 feedagregatorlib/manager.py:187
+#, python-brace-format
+msgid "Do you want to remove the feed {feed}?"
+msgstr ""
+
+#: feedagregatorlib/help.py:39 feedagregatorlib/app.py:208
 msgid "Help"
+msgstr ""
+
+#: feedagregatorlib/help.py:56 feedagregatorlib/about.py:43
+msgid "RSS and Atom feed agregator in desktop widgets + notifications"
 msgstr ""
 
 #: feedagregatorlib/help.py:59
@@ -342,7 +152,7 @@ msgstr ""
 msgid "Feeds can be managed by clicking on "
 msgstr ""
 
-#: feedagregatorlib/help.py:69 feedagregatorlib/app.py:193
+#: feedagregatorlib/help.py:69 feedagregatorlib/app.py:201
 msgid "Manage feeds"
 msgstr ""
 
@@ -402,69 +212,268 @@ msgstr ""
 msgid " or write me an email at "
 msgstr ""
 
-#: feedagregatorlib/app.py:179 feedagregatorlib/app.py:182
-#: feedagregatorlib/app.py:187
+#: feedagregatorlib/help.py:103 feedagregatorlib/about.py:47
+#: feedagregatorlib/about.py:97
+msgid "Close"
+msgstr ""
+
+#: feedagregatorlib/settings/opacity.py:37
+msgid "Opacity"
+msgstr ""
+
+#: feedagregatorlib/settings/config.py:40 feedagregatorlib/app.py:205
+msgid "Settings"
+msgstr ""
+
+#: feedagregatorlib/settings/config.py:63 feedagregatorlib/add.py:44
+msgid "Ok"
+msgstr ""
+
+#: feedagregatorlib/settings/config.py:66 feedagregatorlib/add.py:48
+#: feedagregatorlib/messagebox.py:257 feedagregatorlib/messagebox.py:378
+msgid "Cancel"
+msgstr ""
+
+#: feedagregatorlib/settings/config.py:74
+#: feedagregatorlib/settings/config.py:208
+msgid "General"
+msgstr ""
+
+#: feedagregatorlib/settings/config.py:76
+msgid "Language"
+msgstr ""
+
+#: feedagregatorlib/settings/config.py:89
+msgid "GUI Toolkit for the system tray icon"
+msgstr ""
+
+#: feedagregatorlib/settings/config.py:105
+msgid "Feed update delay (min)"
+msgstr ""
+
+#: feedagregatorlib/settings/config.py:115
+msgid "Image loading timeout (s)"
+msgstr ""
+
+#: feedagregatorlib/settings/config.py:125
+msgid "Activate notifications"
+msgstr ""
+
+#: feedagregatorlib/settings/config.py:134
+msgid "Show confirmation dialog before removing feed"
+msgstr ""
+
+#: feedagregatorlib/settings/config.py:142
+msgid "Show confirmation dialog before removing category"
+msgstr ""
+
+#: feedagregatorlib/settings/config.py:150
+msgid "Check for updates on start-up"
+msgstr ""
+
+#: feedagregatorlib/settings/config.py:159
+msgid "Check this box if the widgets disappear when you click"
+msgstr ""
+
+#: feedagregatorlib/settings/config.py:168
+msgid "Widget"
+msgstr ""
+
+#: feedagregatorlib/settings/config.py:176 feedagregatorlib/manager.py:60
+msgid "Title"
+msgstr ""
+
+#: feedagregatorlib/settings/config.py:182
+msgid "Text"
+msgstr ""
+
+#: feedagregatorlib/settings/config.py:194
+#: feedagregatorlib/settings/config.py:200
+msgid "Background color"
+msgstr ""
+
+#: feedagregatorlib/settings/config.py:197
+#: feedagregatorlib/settings/config.py:203
+msgid "Foreground color"
+msgstr ""
+
+#: feedagregatorlib/settings/config.py:206
+msgid "Link color"
+msgstr ""
+
+#: feedagregatorlib/settings/config.py:216
+msgid "Feed entry"
+msgstr ""
+
+#: feedagregatorlib/settings/config.py:223
+msgid "Font"
+msgstr ""
+
+#: feedagregatorlib/settings/config.py:229
+msgid "Colors"
+msgstr ""
+
+#: feedagregatorlib/settings/config.py:238
+msgid "The language setting will take effect after restarting the application"
+msgstr ""
+
+#: feedagregatorlib/settings/config.py:258
+msgid ""
+"The GUI Toolkit setting will take effect after restarting the application"
+msgstr ""
+
+#: feedagregatorlib/settings/font.py:32
+msgid "Sample text"
+msgstr ""
+
+#: feedagregatorlib/settings/font.py:92
+msgid "Bold"
+msgstr ""
+
+#: feedagregatorlib/settings/font.py:95
+msgid "Italic"
+msgstr ""
+
+#: feedagregatorlib/settings/font.py:98
+msgid "Underline"
+msgstr ""
+
+#: feedagregatorlib/settings/color.py:53 feedagregatorlib/settings/color.py:55
+msgid "Color"
+msgstr ""
+
+#: feedagregatorlib/add.py:32
+msgid "Add Feed"
+msgstr ""
+
+#: feedagregatorlib/add.py:37 feedagregatorlib/manager.py:62
+msgid "URL"
+msgstr ""
+
+#: feedagregatorlib/about.py:37
+#, python-brace-format
+msgid "About {app_name}"
+msgstr ""
+
+#: feedagregatorlib/about.py:46 feedagregatorlib/about.py:71
+msgid "License"
+msgstr ""
+
+#: feedagregatorlib/about.py:80
+#, python-brace-format
+msgid ""
+"{app_name} is free software: you can redistribute it and/or modify it under "
+"the terms of the GNU General Public License as published by the Free "
+"Software Foundation, either version 3 of the License, or (at your option) "
+"any later version.\n"
+"\n"
+msgstr ""
+
+#: feedagregatorlib/about.py:82
+#, python-brace-format
+msgid ""
+"{app_name} is distributed in the hope that it will be useful, but WITHOUT "
+"ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or "
+"FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for "
+"more details.\n"
+"\n"
+msgstr ""
+
+#: feedagregatorlib/about.py:84
+msgid ""
+"You should have received a copy of the GNU General Public License along with "
+"this program. If not, see http://www.gnu.org/licenses/."
+msgstr ""
+
+#: feedagregatorlib/messagebox.py:172
+msgid "Please report this bug on "
+msgstr ""
+
+#: feedagregatorlib/app.py:183 feedagregatorlib/app.py:188
+#: feedagregatorlib/app.py:192
 msgid "Hide all"
 msgstr ""
 
-#: feedagregatorlib/app.py:180 feedagregatorlib/app.py:183
-#: feedagregatorlib/app.py:188
+#: feedagregatorlib/app.py:184 feedagregatorlib/app.py:189
+#: feedagregatorlib/app.py:193
 msgid "Show all"
 msgstr ""
 
-#: feedagregatorlib/app.py:185
+#: feedagregatorlib/app.py:195
 msgid "Categories"
 msgstr ""
 
-#: feedagregatorlib/app.py:186
+#: feedagregatorlib/app.py:196
 msgid "Feeds"
 msgstr ""
 
-#: feedagregatorlib/app.py:190
+#: feedagregatorlib/app.py:198
 msgid "Widgets"
 msgstr ""
 
-#: feedagregatorlib/app.py:191
+#: feedagregatorlib/app.py:199
 msgid "Add feed"
 msgstr ""
 
-#: feedagregatorlib/app.py:192
+#: feedagregatorlib/app.py:200
 msgid "Update feeds"
 msgstr ""
 
-#: feedagregatorlib/app.py:195 feedagregatorlib/app.py:374
-#: feedagregatorlib/app.py:389
+#: feedagregatorlib/app.py:203 feedagregatorlib/app.py:381
+#: feedagregatorlib/app.py:396
 msgid "Suspend"
 msgstr ""
 
-#: feedagregatorlib/app.py:198
+#: feedagregatorlib/app.py:206
 msgid "Check for updates"
 msgstr ""
 
-#: feedagregatorlib/app.py:201
+#: feedagregatorlib/app.py:209
 msgid "About"
 msgstr ""
 
-#: feedagregatorlib/app.py:202
+#: feedagregatorlib/app.py:210
 msgid "Quit"
 msgstr ""
 
-#: feedagregatorlib/app.py:220 feedagregatorlib/app.py:450
-#: feedagregatorlib/app.py:463
+#: feedagregatorlib/app.py:228 feedagregatorlib/app.py:457
+#: feedagregatorlib/app.py:470
 msgid "Latests"
 msgstr ""
 
-#: feedagregatorlib/app.py:384
+#: feedagregatorlib/app.py:391
 msgid "Restart"
 msgstr ""
 
-#: feedagregatorlib/app.py:606 feedagregatorlib/app.py:783
-#: feedagregatorlib/app.py:866
+#: feedagregatorlib/app.py:489 feedagregatorlib/app.py:620
+#: feedagregatorlib/app.py:623 feedagregatorlib/app.py:796
+#: feedagregatorlib/app.py:801 feedagregatorlib/app.py:880
+#: feedagregatorlib/app.py:885 feedagregator.py:52 feedagregator.py:68
+msgid "Error"
+msgstr ""
+
+#: feedagregatorlib/app.py:620 feedagregatorlib/app.py:797
+#: feedagregatorlib/app.py:881
 #, python-brace-format
 msgid "{url} is not a valid feed."
 msgstr ""
 
-#: feedagregatorlib/app.py:609 feedagregatorlib/app.py:788
-#: feedagregatorlib/app.py:871
+#: feedagregatorlib/app.py:623 feedagregatorlib/app.py:802
+#: feedagregatorlib/app.py:886
 msgid "No Internet connection."
+msgstr ""
+
+#: feedagregatorlib/manager.py:39
+msgid "Manage Feeds"
+msgstr ""
+
+#: feedagregatorlib/manager.py:64
+msgid "Category"
+msgstr ""
+
+#: feedagregator.py:52
+#, python-brace-format
+msgid ""
+"{app_name} is already running, if not delete ~/.feedagregator/feedagregator."
+"pid."
 msgstr ""
