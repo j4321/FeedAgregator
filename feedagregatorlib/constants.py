@@ -150,7 +150,7 @@ REV_LANGUAGES = {full_name: lang for lang, full_name in LANGUAGES.items()}
 if not CONFIG.get("General", "language") in LANGUAGES:
     CONFIG.set("General", "language", "en_US")
 
-gettext.bind_textdomain_codeset(APP_NAME, "UTF-8")
+
 gettext.bindtextdomain(APP_NAME, PATH_LOCALE)
 gettext.textdomain(APP_NAME)
 
